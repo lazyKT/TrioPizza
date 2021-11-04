@@ -12,3 +12,10 @@
 * 1 - cd frontend
 * 2 - npm install
 * 3 - npm start
+
+Useful Commands
+
+git remote -v           (List remote git)
+git branch -a           (List all branches)
+git pull                (Pull from current branch to sync) 
+git push origin master  (Push to master branch)
