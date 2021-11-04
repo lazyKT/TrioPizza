@@ -6,6 +6,7 @@ import Loader from './Loader'
 import Message from './Message'
 import { listTopProducts } from '../actions/productActions'
 
+
 function ProductCarousel() {
     const dispatch = useDispatch()
 
