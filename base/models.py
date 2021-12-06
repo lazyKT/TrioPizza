@@ -1,7 +1,38 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
-# Create your models here.
+class Profile (models.Model):
+    """
+    # This profile model will be extended from the django default user model
+    """
+    user = models.OneToOneField (User, primary_key=True, on_delete=models.CASCADE)
+    type = models.CharField (max_length=30, blank=True)
+    mobile = models.CharField (max_length=8, blank=True)
+
+
+"""
+# Whenever the new user is created, the user profile will also be created via signals
+"""
+@receiver (post_save, sender=User)
+def create_user_profile (sender, instance, created, **kwargs):
+    if created:
+        Profile.objects.create (user=instance)
+
+
+"""
+# Whenever the new user is created, the user profile will also be created via signals
+"""
+@receiver (post_save, sender=User)
+def save_user_profile (sender, instance, **kwargs):
+    print ('Inside save_user_profile method')
+    print ('**kwargs :')
+    for (k, v) in kwargs.items():
+        print(k, v)
+    print ('instance = ', instance )
+    instance.profile.save()
+
 
 
 class Product(models.Model):

@@ -3,6 +3,7 @@ from base.views import user_views as views
 
 
 urlpatterns = [
+    path('', views.UserList.as_view()),
     path('login/', views.MyTokenObtainPairView.as_view(),
          name='token_obtain_pair'),
 
