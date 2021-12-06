@@ -60,7 +60,7 @@ function switchContents (page) {
 }
 
 
-export default function Admin () {
+export default function Admin ({hideHeader}) {
 
   const theme = useTheme();
   const [ open, setOpen ] = useState(false);
@@ -82,7 +82,8 @@ export default function Admin () {
 
 	useEffect(() => {
 		setPageTitle(page);
-	}, [open, page]);
+    hideHeader();
+	}, [open, page, hideHeader]);
 
   return (
     <Box sx={{ display: 'flex' }}>

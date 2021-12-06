@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import Box from '@mui/material/Box';
 import TableCell from '@mui/material/TableCell';
 import TableBody from '@mui/material/TableBody';
 import TableRow from '@mui/material/TableRow';
@@ -77,8 +76,7 @@ export default function CustomTableBody (props) {
           const labelId = `enhanced-table-checkbox-${index}`;
 
           const cells = getCellData('test');
-          console.log(cells);
-          console.log(row[cells[0]]);
+
           return (
             <TableRow
               hover
@@ -98,8 +96,8 @@ export default function CustomTableBody (props) {
                   }}
                 />
               </TableCell>
-              { cells.map( cell =>
-                  <TableCell>{row[cell]}</TableCell>
+              { cells.map( (cell, idx) =>
+                  <TableCell key={idx}>{row[cell]}</TableCell>
               )}
             </TableRow>
           );
