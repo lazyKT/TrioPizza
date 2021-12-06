@@ -104,7 +104,7 @@ export default function Admin () {
 				page={page}
 			/>
 
-      <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
+      <Box component="main" sx={{ flexGrow: 1, p: 3, background: '#f9f9f9' }}>
         <DrawerHeader />
         { switchContents(page) }
       </Box>
