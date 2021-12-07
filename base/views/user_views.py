@@ -1,16 +1,16 @@
 from django.shortcuts import render
+from rest_framework.views import APIView
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
-
-from django.contrib.auth.models import User
-from base.serializers import ProductSerializer, UserSerializer, UserSerializerWithToken
-# Create your views here.
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
-
+from django.contrib.auth.models import User
 from django.contrib.auth.hashers import make_password
 from rest_framework import status
+
+from base.models import Profile
+from base.serializers import ProductSerializer, UserSerializer, UserSerializerWithToken
 
 
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
@@ -28,21 +28,56 @@ class MyTokenObtainPairView(TokenObtainPairView):
     serializer_class = MyTokenObtainPairSerializer
 
 
+class UserList (APIView):
+    """
+    # Get All Users, Create New Users
+    """
+    def get (self, request, format=None):
+        users = User.objects.all()
+        serializer = UserSerializer(users, many=True)
+        return Response(serializer.data)
+
+
 @api_view(['POST'])
 def registerUser(request):
     data = request.data
     try:
+
+        user = User.objects.filter(username=data['username'])
+        if user:
+            error = 'User already exists with username, %s' % data['username']
+            return Response ({'details' : error}, status=status.HTTP_400_BAD_REQUEST)
+
+        user = User.objects.filter(email=data['email'])
+        if user:
+            error = 'User already exists with email, %s' % data['email']
+            return Response ({'details' : error}, status=status.HTTP_400_BAD_REQUEST)
+
+        if 'type' not in data:
+            error = 'Type is required*'
+            return Response ({'details' : error}, status=status.HTTP_400_BAD_REQUEST)
+
+        if data['type'] != 'customer' and data['type'] != 'driver':
+            error = 'Invalid User Type, %s' % data['type']
+            return Response ({'details' : error}, status=status.HTTP_400_BAD_REQUEST)
+
         user = User.objects.create(
-            first_name=data['name'],
-            username=data['email'],
+            first_name=data['first_name'],
+            last_name=data['last_name'],
+            username=data['username'],
             email=data['email'],
             password=make_password(data['password'])
         )
+        profile = user.profile
+        profile.type = data['type']
+        profile.save()
 
         serializer = UserSerializerWithToken(user, many=False)
         return Response(serializer.data)
-    except:
-        message = {'detail': 'User with this email already exists'}
+
+    except Exception as e:
+        print (e)
+        message = {'detail': repr(e)}
         return Response(message, status=status.HTTP_400_BAD_REQUEST)
 
 

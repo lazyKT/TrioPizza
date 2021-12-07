@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react'
+import React, { useEffect } from 'react';
+import { useHistory } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux'
 import { Row, Col } from 'react-bootstrap'
 import Product from '../components/Product'
@@ -10,16 +11,17 @@ import { listProducts } from '../actions/productActions'
 
 
 
-function HomeScreen({ history }) {
+function HomeScreen ({displayHeader}) {
     const dispatch = useDispatch()
     const productList = useSelector(state => state.productList)
     const { error, loading, products, page, pages } = productList
 
+    const history = useHistory();
     let keyword = history.location.search
 
     useEffect(() => {
         dispatch(listProducts(keyword))
-
+        displayHeader();
     }, [dispatch, keyword])
 
     return (

@@ -3,9 +3,9 @@ from django.contrib.auth.models import User
 
 
 def updateUser(sender, instance, **kwargs):
-    user = instance
-    if user.email != '':
-        user.username = user.email
+    """
+    # Nth here
+    """
 
 
 pre_save.connect(updateUser, sender=User)
