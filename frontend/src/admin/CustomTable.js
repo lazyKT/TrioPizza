@@ -13,6 +13,7 @@ import Tooltip from '@mui/material/Tooltip';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Switch from '@mui/material/Switch';
 import DeleteIcon from '@mui/icons-material/Delete';
+import EditIcon from '@mui/icons-material/Edit';
 import FilterListIcon from '@mui/icons-material/FilterList';
 
 import CustomTableHead from './CustomTableHead';
@@ -20,7 +21,7 @@ import CustomTableBody from './CustomTableBody';
 
 
 const EnhancedTableToolbar = (props) => {
-  const { numSelected } = props;
+  const { numSelected, openEditUser } = props;
 
   return (
     <Toolbar
@@ -54,11 +55,21 @@ const EnhancedTableToolbar = (props) => {
       )}
 
       {numSelected > 0 ? (
-        <Tooltip title="Delete">
-          <IconButton>
-            <DeleteIcon />
-          </IconButton>
-        </Tooltip>
+        <>
+          <Tooltip title="Edit">
+            <IconButton
+              color="primary"
+              onClick={() => openEditUser()}
+            >
+              <EditIcon />
+            </IconButton>
+          </Tooltip>
+          <Tooltip title="Delete">
+            <IconButton>
+              <DeleteIcon />
+            </IconButton>
+          </Tooltip>
+        </>
       ) : (
         <Tooltip title="Filter list">
           <IconButton>
@@ -76,7 +87,7 @@ EnhancedTableToolbar.propTypes = {
 
 export default function CustomTable (props) {
 
-  const { columns, rows, type } = props;
+  const { columns, rows, type, editUser } = props;
 
   const [ order, setOrder ] = React.useState('asc');
   const [ orderBy, setOrderBy ] = React.useState('calories');
@@ -142,7 +153,12 @@ export default function CustomTable (props) {
   return (
     <Box sx={{ width: '100%' }}>
       <Paper sx={{ width: '100%', mb: 2 }}>
-        <EnhancedTableToolbar numSelected={selected.length} />
+
+        <EnhancedTableToolbar
+          numSelected={selected.length}
+          openEditUser={() => editUser()}
+        />
+
         <TableContainer>
           <Table
             sx={{ minWidth: 750 }}

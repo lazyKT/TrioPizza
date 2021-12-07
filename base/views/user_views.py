@@ -17,6 +17,7 @@ from base.serializers import ProductSerializer, UserSerializer, UserSerializerWi
 
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
     def validate(self, attrs):
+        print ('attrs', attrs)
         data = super().validate(attrs)
 
         serializer = UserSerializerWithToken(self.user).data
@@ -35,22 +36,15 @@ class UserList (APIView):
     # Get All Users, Create New Users
     """
 
-    def get_user_by_email (self, email):
-        user = User.objects.filter(email=email)
-        return user
-
     def get_user_by_username (self, username):
         user = User.objects.filter(username=username)
         return user
+
 
     def validate_request_body (self, body):
         if 'username' not in body:
             error = True
             message = 'Username is required!'
-            return error, message
-        if 'email' not in body:
-            error = True
-            message = 'Email Address is required!'
             return error, message
         if 'first_name' not in body:
             error = True
@@ -70,6 +64,7 @@ class UserList (APIView):
             return error, message
         return False, ''
 
+
     def get (self, request, format=None):
         """
         # Get All Users
@@ -77,6 +72,7 @@ class UserList (APIView):
         users = User.objects.all()
         serializer = UserSerializer(users, many=True)
         return Response(serializer.data)
+
 
     def post (self, request, *args, **kwargs):
         """
@@ -92,16 +88,11 @@ class UserList (APIView):
             if len(user) > 0:
                 error = 'User already exists with username, %s' % data['username']
                 return Response ({'details' : error}, status=status.HTTP_400_BAD_REQUEST)
-            # Check user by email
-            user = self.get_user_by_email (data['email'])
-            if len(user) > 0:
-                error = 'User already exists with email, %s' % data['email']
-                return Response ({'details' : error}, status=status.HTTP_400_BAD_REQUEST)
+
             user = User.objects.create(
                 first_name=data['first_name'],
                 last_name=data['last_name'],
                 username=data['username'],
-                email=data['email'],
                 password=make_password(data['password'])
             )
 
@@ -132,11 +123,6 @@ class UserDetails (APIView):
         except User.DoesNotExist:
             raise Http404
 
-
-    def get_user_by_email (self, email):
-        return User.objects.filter(email=email)
-
-
     def get_user_by_username (self, username):
         return User.objects.filter(username=username)
 
@@ -147,16 +133,6 @@ class UserDetails (APIView):
         user = self.get_user_by_username (new_username)
         if len(user) > 0:
             message = 'Username, %s, is already taken by other user' % new_username
-            return False, message
-        return True, ''
-
-
-    def validate_email (self, email, new_email):
-        if email == new_email:
-            return True, ''
-        user = self.get_user_by_email (new_email)
-        if len(user) > 0:
-            message = 'Email Address, %s, is already taken by other user' % new_email
             return False, message
         return True, ''
 
@@ -172,10 +148,6 @@ class UserDetails (APIView):
         data = request.data
 
         is_valid, message = self.validate_username(user.username, data['username'])
-        if is_valid is not True:
-            return Response ({'details' : message}, status=status.HTTP_400_BAD_REQUEST)
-
-        is_valid, message = self.validate_email (user.email, data['email'])
         if is_valid is not True:
             return Response ({'details' : message}, status=status.HTTP_400_BAD_REQUEST)
 

@@ -6,7 +6,7 @@ import CssBaseline from '@mui/material/CssBaseline';
 import AdminAppbar from './AdminAppbar';
 import AdminDrawerMenu from './AdminDrawerMenu';
 import Dashboard from './Dashboard';
-import UserList from './users/UserList';
+import UserAdminDashboard from './users/UserAdminDashboard';
 import OrderList from './orders/OrderList';
 
 const drawerWidth = 240;
@@ -47,7 +47,7 @@ function switchContents (page) {
 			case 'Dashboard':
 				return <Dashboard />;
 			case 'Users':
-				return <UserList />;
+				return <UserAdminDashboard />;
 			case 'Food':
 				return (
 					<div>Food</div>
