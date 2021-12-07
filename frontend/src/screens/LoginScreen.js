@@ -7,6 +7,25 @@ import Message from '../components/Message'
 import FormContainer from '../components/FormContainer'
 import { login } from '../actions/userActions'
 
+
+// redirect to protected contents based on the user type
+function redirectToProtectedPage (userType, cb) {
+  switch (userType) {
+    case 'customer':
+      cb('');
+      break;
+    case 'dirver':
+      cb('')
+      break;
+    case 'admin':
+      cb('')
+      break;
+    default:
+      throw new Error ('Unknown User Type');
+  }
+}
+
+
 function LoginScreen({ location, history }) {
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
@@ -20,7 +39,7 @@ function LoginScreen({ location, history }) {
 
     useEffect(() => {
         if (userInfo) {
-            history.push(redirect)
+            // history.push(redirect)
         }
     }, [history, userInfo, redirect])
 
@@ -28,6 +47,8 @@ function LoginScreen({ location, history }) {
         e.preventDefault()
         dispatch(login(email, password))
     }
+
+    console.log('userInfo', userInfo);
 
     return (
         <FormContainer>

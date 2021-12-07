@@ -24,7 +24,6 @@ class UserSerializer(serializers.ModelSerializer):
         return obj.get_full_name()
 
     def get_type (self, obj):
-        print(obj.profile)
         return obj.profile.type
 
 

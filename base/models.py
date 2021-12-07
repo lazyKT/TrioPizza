@@ -21,17 +21,20 @@ def create_user_profile (sender, instance, created, **kwargs):
         Profile.objects.create (user=instance)
 
 
-"""
-# Whenever the new user is created, the user profile will also be created via signals
-"""
-@receiver (post_save, sender=User)
-def save_user_profile (sender, instance, **kwargs):
-    print ('Inside save_user_profile method')
-    print ('**kwargs :')
-    for (k, v) in kwargs.items():
-        print(k, v)
-    print ('instance = ', instance )
-    instance.profile.save()
+# """
+# # Whenever the new user is created, the user profile will also be created via signals
+# """
+# @receiver (post_save, sender=User)
+# def save_user_profile (sender, instance, **kwargs):
+#     print ('sender')
+#     print ('Inside save_user_profile method')
+#     print ('**kwargs :')
+#     for (k, v) in kwargs.items():
+#         print(k, v)
+#     print ('instance = ', instance.username, instance.profile )
+#     print (type(instance.profile))
+#     (instance.profile).save()
+#     print('instance.profile saved')
 
 
 
