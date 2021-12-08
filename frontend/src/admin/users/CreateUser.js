@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Form } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
 import Paper from '@mui/material/Paper';
@@ -8,22 +8,30 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import FormContainer from '../../components/FormContainer';
 import Loader from '../../components/Loader';
 import Message from '../../components/Message';
+import { register } from '../../actions/userActions';
 
 
 export default function CreateUser ({backToUserList}) {
 
-  const [ message, setMessage ] = useState('');
   const [ user, setUser ] = useState({
-    firstName: '',
-    lastName: '',
+    name: '',
     username: '',
     password: '',
+    mobile: '',
     type: ''
   });
 
   const dispatch = useDispatch();
   const userRegister = useSelector(state => state.userRegister);
   const { error, loading, userInfo } = userRegister;
+
+
+  const handleBackButtonClick = (event) => {
+    event.preventDefault();
+    console.log(handleBackButtonClick);
+    backToUserList();
+  }
+
 
   const handleOnChange = (event) => {
     const { name, value } = event.target;
@@ -35,15 +43,22 @@ export default function CreateUser ({backToUserList}) {
 
   const createNewUser = (event) => {
     event.preventDefault();
-
-    console.log(user);
+    dispatch(register(user));
   }
 
+
+  useEffect(() => {
+    console.log(userInfo);
+    if (userInfo) {
+      // after successful user creation, redirect back to user list page
+      backToUserList();
+    }
+  }, [userInfo]);
 
   return (
     <>
       <Button
-        onClick={() => backToUserList()}
+        onClick={handleBackButtonClick}
         startIcon={<ArrowBackIcon />}
       >
         Back
@@ -53,31 +68,18 @@ export default function CreateUser ({backToUserList}) {
       >
         <FormContainer>
           <h4>Create New User</h4>
-          {message && <Message variant='danger'>{message}</Message>}
           {error && <Message variant='danger'>{error}</Message>}
           {loading && <Loader />}
           <Form onSubmit={createNewUser}>
 
-            <Form.Group controlId='firstName'>
-              <Form.Label>First Name</Form.Label>
+            <Form.Group controlId='name'>
+              <Form.Label>Full Name</Form.Label>
               <Form.Control
                 required
                 type="text"
-                placeholder="Enter First Name"
-                name='firstName'
-                value={user.firstName}
-                onChange={handleOnChange}
-              />
-            </Form.Group>
-
-            <Form.Group controlId='lastName'>
-              <Form.Label>Last Name</Form.Label>
-              <Form.Control
-                required
-                type="text"
-                placeholder="Enter Last Name"
-                name='lastName'
-                value={user.lastName}
+                placeholder="Enter Full Name"
+                name='name'
+                value={user.name}
                 onChange={handleOnChange}
               />
             </Form.Group>
@@ -90,6 +92,18 @@ export default function CreateUser ({backToUserList}) {
                 placeholder="Enter Email Address"
                 name='username'
                 value={user.username}
+                onChange={handleOnChange}
+              />
+            </Form.Group>
+
+            <Form.Group controlId='mobile'>
+              <Form.Label>Mobile Number</Form.Label>
+              <Form.Control
+                required
+                type="text"
+                placeholder="Enter Mobile Number"
+                name='mobile'
+                value={user.mobile}
                 onChange={handleOnChange}
               />
             </Form.Group>
@@ -113,10 +127,12 @@ export default function CreateUser ({backToUserList}) {
                 onChange={handleOnChange}
                 name="type"
                 value={user.type}
+                required
               >
                 <option>Select User Type</option>
                 <option value="customer">Customer</option>
                 <option value="driver">Driver</option>
+                <option value="admin">Admin</option>
               </Form.Control>
             </Form.Group>
 

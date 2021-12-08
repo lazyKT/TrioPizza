@@ -46,21 +46,21 @@ class UserList (APIView):
             error = True
             message = 'Username is required!'
             return error, message
-        if 'first_name' not in body:
+        if 'name' not in body:
             error = True
-            message = 'Firstname is required!'
-            return error, message
-        if 'last_name' not in body:
-            error = True
-            message = 'Lastname is required!'
+            message = 'Full Name is required!'
             return error, message
         if 'type' not in body:
             error = True
             message = 'User Type is required!'
             return error, message
-        if body['type'] != 'customer' and body['type'] != 'driver':
+        if body['type'] != 'customer' and body['type'] != 'driver' and body['type'] != 'admin':
             error = True
             message = 'Invalid User Type!'
+            return error, message
+        if 'mobile' not in body:
+            error = True
+            message = 'Mobile is required!'
             return error, message
         return False, ''
 
@@ -90,14 +90,14 @@ class UserList (APIView):
                 return Response ({'details' : error}, status=status.HTTP_400_BAD_REQUEST)
 
             user = User.objects.create(
-                first_name=data['first_name'],
-                last_name=data['last_name'],
                 username=data['username'],
                 password=make_password(data['password'])
             )
 
             profile = user.profile
             profile.type = data['type']
+            profile.name = data['name']
+            profile.mobile = data['mobile']
             profile.save()
             print('user profile saved!')
             serializer = UserSerializer (user)
@@ -123,6 +123,31 @@ class UserDetails (APIView):
         except User.DoesNotExist:
             raise Http404
 
+
+    def validate_request_body (self, body):
+        if 'username' not in body:
+            error = True
+            message = 'Username is required!'
+            return error, message
+        if 'name' not in body:
+            error = True
+            message = 'Full Name is required!'
+            return error, message
+        if 'type' not in body:
+            error = True
+            message = 'User Type is required!'
+            return error, message
+        if body['type'] != 'customer' and body['type'] != 'driver' and body['type'] != 'admin':
+            error = True
+            message = 'Invalid User Type!'
+            return error, message
+        if 'mobile' not in body:
+            error = True
+            message = 'Mobile is required!'
+            return error, message
+        return False, ''
+
+
     def get_user_by_username (self, username):
         return User.objects.filter(username=username)
 
@@ -144,21 +169,34 @@ class UserDetails (APIView):
 
 
     def put (self, request, pk, format=None):
-        user = self.get_object (pk)
-        data = request.data
+        try:
+            user = self.get_object (pk)
+            data = request.data
 
-        is_valid, message = self.validate_username(user.username, data['username'])
-        if is_valid is not True:
-            return Response ({'details' : message}, status=status.HTTP_400_BAD_REQUEST)
+            error, message = self.validate_request_body (data)
+            print('1st Check', message)
+            if error:
+                return Response ({'details': message}, status=status.HTTP_400_BAD_REQUEST)
 
-        serializer = UserSerializer(user, data=data)
-        if serializer.is_valid():
-            serializer.save()
-            profile = user.profile
-            profile.type = data['type']
-            profile.save()
-            return Response (serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            is_valid, message = self.validate_username(user.username, data['username'])
+            print('2nd Check', message)
+            if is_valid is not True:
+                return Response ({'details' : message}, status=status.HTTP_400_BAD_REQUEST)
+
+            serializer = UserSerializer(user, data=data)
+            if serializer.is_valid():
+                serializer.save()
+                profile = user.profile
+                profile.name = data['name']
+                profile.type = data['type']
+                profile.mobile = data['mobile']
+                profile.save()
+                return Response (serializer.data)
+            print('3rd Check', 'Failed')
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            error = repr(e)
+            return Response ({'details' : error}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
     def delete (self, request, pk, format=None):

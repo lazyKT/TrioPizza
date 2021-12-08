@@ -41,26 +41,26 @@ export const login = (email, password) => async (dispatch) => {
     try {
         dispatch({
             type: USER_LOGIN_REQUEST
-        })
+        });
 
         const config = {
             headers: {
                 'Content-type': 'application/json'
             }
-        }
+        };
 
         const { data } = await axios.post(
             '/api/users/login/',
             { 'username': email, 'password': password },
             config
-        )
+        );
 
         dispatch({
             type: USER_LOGIN_SUCCESS,
             payload: data
         })
 
-        localStorage.setItem('userInfo', JSON.stringify(data))
+        // localStorage.setItem('userInfo', JSON.stringify(data))
 
     } catch (error) {
         dispatch({
@@ -82,7 +82,7 @@ export const logout = () => (dispatch) => {
 }
 
 
-export const register = (name, email, password) => async (dispatch) => {
+export const register = (user) => async (dispatch) => {
     try {
         dispatch({
             type: USER_REGISTER_REQUEST
@@ -94,23 +94,15 @@ export const register = (name, email, password) => async (dispatch) => {
             }
         }
 
-        const { data } = await axios.post(
-            '/api/users/register/',
-            { 'name': name, 'email': email, 'password': password },
+        const { data } = await axios.post ( '/api/users/',
+            user,
             config
         )
 
         dispatch({
             type: USER_REGISTER_SUCCESS,
             payload: data
-        })
-
-        dispatch({
-            type: USER_LOGIN_SUCCESS,
-            payload: data
-        })
-
-        localStorage.setItem('userInfo', JSON.stringify(data))
+        });
 
     } catch (error) {
         dispatch({
@@ -127,28 +119,28 @@ export const getUserDetails = (id) => async (dispatch, getState) => {
     try {
         dispatch({
             type: USER_DETAILS_REQUEST
-        })
+        });
 
         const {
             userLogin: { userInfo },
-        } = getState()
+        } = getState();
 
         const config = {
             headers: {
                 'Content-type': 'application/json',
-                Authorization: `Bearer ${userInfo.token}`
+                // Authorization: `Bearer ${userInfo.token}`
             }
         }
 
         const { data } = await axios.get(
             `/api/users/${id}/`,
             config
-        )
+        );
 
         dispatch({
             type: USER_DETAILS_SUCCESS,
             payload: data
-        })
+        });
 
 
     } catch (error) {
@@ -212,7 +204,7 @@ export const listUsers = () => async (dispatch, getState) => {
     try {
         dispatch({
             type: USER_LIST_REQUEST
-        })
+        });
 
         const {
             userLogin: { userInfo },
@@ -221,7 +213,7 @@ export const listUsers = () => async (dispatch, getState) => {
         const config = {
             headers: {
                 'Content-type': 'application/json',
-                Authorization: `Bearer ${userInfo.token}`
+                // Authorization: `Bearer ${userInfo.token}`
             }
         }
 
@@ -286,11 +278,11 @@ export const deleteUser = (id) => async (dispatch, getState) => {
 }
 
 
-export const updateUser = (user) => async (dispatch, getState) => {
+export const updateUser = (id, user) => async (dispatch, getState) => {
     try {
         dispatch({
             type: USER_UPDATE_REQUEST
-        })
+        });
 
         const {
             userLogin: { userInfo },
@@ -299,24 +291,20 @@ export const updateUser = (user) => async (dispatch, getState) => {
         const config = {
             headers: {
                 'Content-type': 'application/json',
-                Authorization: `Bearer ${userInfo.token}`
+                // Authorization: `Bearer ${userInfo.token}`
             }
         }
 
         const { data } = await axios.put(
-            `/api/users/update/${user._id}/`,
+            `/api/users/${id}/`,
             user,
             config
         )
 
         dispatch({
             type: USER_UPDATE_SUCCESS,
-        })
-
-        dispatch({
-            type: USER_DETAILS_SUCCESS,
             payload: data
-        })
+        });
 
 
     } catch (error) {

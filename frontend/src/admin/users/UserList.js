@@ -40,6 +40,13 @@ const columns = [
     format: (value) => value.toLocaleString('en-US'),
   },
   {
+    id: 'mobile',
+    label: 'Mobile',
+    maxWidth: 150,
+    align: 'right',
+    format: (value) => value.toLocaleString('en-US'),
+  },
+  {
     id: 'type',
     label: 'User Type',
     minWidth: 100,
@@ -59,16 +66,30 @@ const columns = [
 export default function UserList({addNewUser}) {
 
   const [ openEditUser, setOpenEditUser ] = useState(false);
+  const [ editingID, setEditingID ] = useState(null);
 
   const dispatch = useDispatch();
 
   const userList = useSelector(state => state.userList);
   const { loading, error, users } = userList;
 
+
+  const editUser = (id) => {
+    setEditingID(id);
+    setOpenEditUser(true);
+  }
+
+
+  const handleAddButtonOnClick = (event) => {
+    event.preventDefault();
+    console.log('handleAddButtonOnClick!')
+    addNewUser();
+  }
+
+
   useEffect(() => {
     if (!openEditUser) {
-      dispatch(listUsers);
-      console.log(error, users);
+      dispatch(listUsers());
     }
   }, [openEditUser]);
 
@@ -78,41 +99,57 @@ export default function UserList({addNewUser}) {
       ? (
         <EditUser
           closeEditUser={() => setOpenEditUser(false)}
+          editingID={editingID}
         />
       )
       : (
         <>
-          <Paper
-            sx={styles.topContainer}
-          >
-            <Box sx={{width: '40%', maxWidth: '400px'}}>
-              <TextField fullWidth label="Search" variant="outlined" size="small"/>
-            </Box>
+        {loading
+          ? "Loading ..."
+          : (
+            <>
+            { error
+              ? "Error Loading Users"
+              : (
+                <>
+                  <Paper
+                    sx={styles.topContainer}
+                  >
+                    <Box sx={{width: '40%', maxWidth: '400px'}}>
+                      <TextField fullWidth label="Search" variant="outlined" size="small"/>
+                    </Box>
 
-            <Box>
-              <Button
-                sx={{margin: '10px'}}
-                variant="contained"
-                color="success"
-                onClick={() => addNewUser()}
-                endIcon={<AddIcon />}
-              >
-                Add
-              </Button>
-              <Button sx={{margin: '10px'}} variant="contained" endIcon={<FileDownloadIcon />}>
-                Export
-              </Button>
-              <IconButton>
-                <RefreshIcon color="primary" />
-              </IconButton>
-            </Box>
-          </Paper>
+                    <Box>
+                      <Button
+                        sx={{margin: '10px'}}
+                        variant="contained"
+                        color="success"
+                        onClick={handleAddButtonOnClick}
+                        endIcon={<AddIcon />}
+                      >
+                        Add
+                      </Button>
+                      <Button sx={{margin: '10px'}} variant="contained" endIcon={<FileDownloadIcon />}>
+                        Export
+                      </Button>
+                      <IconButton>
+                        <RefreshIcon color="primary" />
+                      </IconButton>
+                    </Box>
+                  </Paper>
 
-          <CustomTable
-            columns={columns}
-            rows={users}
-            editUser={() => setOpenEditUser(true)}
-          />
+                  <CustomTable
+                    columns={columns}
+                    rows={users}
+                    type="user"
+                    editUser={editUser}
+                  />
+                </>
+              )
+            }
+            </>
+          )
+        }
         </>
       )
     }

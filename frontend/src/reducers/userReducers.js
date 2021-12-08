@@ -83,14 +83,13 @@ export const userDetailsReducer = (state = { user: {} }, action) => {
             return { ...state, loading: true }
 
         case USER_DETAILS_SUCCESS:
-            return { loading: false, user: action.payload }
+            return { loading: false, userInfo: action.payload }
 
         case USER_DETAILS_FAIL:
             return { loading: false, error: action.payload }
 
         case USER_DETAILS_RESET:
             return { user: {} }
-
 
         default:
             return state
@@ -141,13 +140,13 @@ export const userListReducer = (state = { users: [] }, action) => {
 export const userDeleteReducer = (state = {}, action) => {
     switch (action.type) {
         case USER_DELETE_REQUEST:
-            return { loading: true }
+            return { loadingUpdate: true }
 
         case USER_DELETE_SUCCESS:
-            return { loading: false, success: true }
+            return { loadingUpdate: false, successUpdate: true }
 
         case USER_DELETE_FAIL:
-            return { loading: false, error: action.payload }
+            return { loadingUpdate: false, errorUpdate: action.payload }
 
         default:
             return state

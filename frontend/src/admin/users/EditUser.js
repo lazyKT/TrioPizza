@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Paper from '@mui/material/Paper';
 import Button from '@mui/material/Button';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
@@ -8,20 +8,24 @@ import { useDispatch, useSelector } from 'react-redux';
 import FormContainer from '../../components/FormContainer';
 import Loader from '../../components/Loader';
 import Message from '../../components/Message';
+import { getUserDetails, updateUser } from '../../actions/userActions';
 
-export default function EditUser ({closeEditUser}) {
 
-  const [ message, setMessage ] = useState('');
+export default function EditUser ({closeEditUser, editingID}) {
+
   const [ user, setUser ] = useState({
-    firstName: '',
-    lastName: '',
+    name: '',
     username: '',
+    mobile: '',
     type: ''
   });
 
   const dispatch = useDispatch();
-  const userRegister = useSelector(state => state.userRegister);
-  const { error, loading, userInfo } = userRegister;
+  const userDetails = useSelector(state => state.userDetails);
+  const { error, loading, userInfo } = userDetails;
+
+  const userUpdate = useSelector(state => state.userUpdate);
+  const { success } = userUpdate;
 
   const handleOnChange = (event) => {
     setUser({
@@ -30,10 +34,28 @@ export default function EditUser ({closeEditUser}) {
     });
   }
 
-
-  const updateUser = (event) => {
+  function handleOnSubmit (event) {
     event.preventDefault();
+    dispatch(updateUser(editingID, user));
   }
+
+
+  useEffect(() => {
+    if (editingID && editingID > 0) {
+      dispatch(getUserDetails(editingID));
+    }
+  }, [editingID, success]);
+
+  useEffect(() => {
+    if (userInfo) {
+      setUser({
+        name: userInfo.name,
+        username: userInfo.username,
+        mobile: userInfo.mobile,
+        type: userInfo.type
+      });
+    }
+  }, [userInfo])
 
 
   return (
@@ -47,31 +69,18 @@ export default function EditUser ({closeEditUser}) {
       <h4>Edit User</h4>
       <Paper sx={{ margin: '10px', paddingTop: '20px', paddingBottom: '20px'}}>
         <FormContainer>
-          {message && <Message variant='danger'>{message}</Message>}
           {error && <Message variant='danger'>{error}</Message>}
           {loading && <Loader />}
-          <Form onSubmit={updateUser}>
+          <Form onSubmit={handleOnSubmit}>
 
-            <Form.Group controlId='firstName'>
-              <Form.Label>First Name</Form.Label>
-              <Form.Control
-                required
-                type="text"
-                placeholder="Enter First Name"
-                name='firstName'
-                value={user.firstName}
-                onChange={handleOnChange}
-              />
-            </Form.Group>
-
-            <Form.Group controlId='lastName'>
-              <Form.Label>Last Name</Form.Label>
+            <Form.Group controlId='name'>
+              <Form.Label>Full Name</Form.Label>
               <Form.Control
                 required
                 type="text"
                 placeholder="Enter Last Name"
-                name='lastName'
-                value={user.lastName}
+                name='name'
+                value={user.name}
                 onChange={handleOnChange}
               />
             </Form.Group>
@@ -88,14 +97,14 @@ export default function EditUser ({closeEditUser}) {
               />
             </Form.Group>
 
-            <Form.Group controlId='password'>
-              <Form.Label>Password</Form.Label>
+            <Form.Group controlId='mobile'>
+              <Form.Label>Mobile Number</Form.Label>
               <Form.Control
                 required
-                type="password"
-                placeholder="Enter Password"
-                name='password'
-                value={user.password}
+                type="text"
+                placeholder="Enter Mobile Number"
+                name='mobile'
+                value={user.mobile}
                 onChange={handleOnChange}
               />
             </Form.Group>
@@ -111,6 +120,7 @@ export default function EditUser ({closeEditUser}) {
                 <option>Select User Type</option>
                 <option value="customer">Customer</option>
                 <option value="driver">Driver</option>
+                <option value="admin">Admin</option>
               </Form.Control>
             </Form.Group>
 
