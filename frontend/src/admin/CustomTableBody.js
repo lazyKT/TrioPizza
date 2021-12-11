@@ -45,6 +45,8 @@ function getCellData (type) {
         return ['name', 'code', 'population', 'size', 'density'];
       case 'user':
         return ['id', 'name', 'username', 'mobile', 'type', 'isAdmin'];
+      case 'products':
+        return ['_id', 'name', 'description', 'price', 'numReviews', 'rating'];
       default:
         throw new Error ("Invalid Data Type")
     }
@@ -74,19 +76,19 @@ export default function CustomTableBody (props) {
       {stableSort(rows, getComparator(order, orderBy))
         .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
         .map((row, index) => {
-          const isItemSelected = isSelected(row.id);
-          const labelId = `enhanced-table-checkbox-${index}`;
-
           const cells = getCellData(dataType);
+
+          const isItemSelected = isSelected(row[cells[0]]);
+          const labelId = `enhanced-table-checkbox-${index}`;
 
           return (
             <TableRow
               hover
-              onClick={(event) => handleClick(event, row.id)}
+              onClick={(event) => handleClick(event, row[cells[0]])}
               role="checkbox"
               aria-checked={isItemSelected}
               tabIndex={-1}
-              key={row.id}
+              key={row[cells[0]]}
               selected={isItemSelected}
             >
               <TableCell padding="checkbox">

@@ -116,10 +116,10 @@ export const productUpdateReducer = (state = { product: {} }, action) => {
             return { loading: true }
 
         case PRODUCT_UPDATE_SUCCESS:
-            return { loading: false, success: true, product: action.payload }
+            return { loading: false, success: true, updatedProduct: action.payload }
 
         case PRODUCT_UPDATE_FAIL:
-            return { loading: false, error: action.payload }
+            return { loading: false, updateError: action.payload }
 
         case PRODUCT_UPDATE_RESET:
             return { product: {} }
@@ -167,4 +167,3 @@ export const productTopRatedReducer = (state = { products: [] }, action) => {
             return state
     }
 }
-

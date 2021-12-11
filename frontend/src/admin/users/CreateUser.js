@@ -78,7 +78,7 @@ export default function CreateUser ({backToUserList}) {
         Back
       </Button>
       <Paper
-        sx={{ padding: '20px', paddingBottom: '50px'}}
+        sx={{ paddingTop: '20px', paddingBottom: '50px'}}
       >
         <FormContainer>
           <h4>Create New User</h4>

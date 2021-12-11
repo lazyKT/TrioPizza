@@ -22,7 +22,7 @@ import CustomTableBody from './CustomTableBody';
 
 const EnhancedTableToolbar = (props) => {
 
-  const { selected, openEditUser, deleteUser, numSelected } = props;
+  const { selected, openEditPannel, deleteUser, numSelected } = props;
 
   const handleDeleteClick = (e) => {
     e.preventDefault();
@@ -66,7 +66,7 @@ const EnhancedTableToolbar = (props) => {
             <Tooltip title="Edit">
               <IconButton
                 color="primary"
-                onClick={() => openEditUser(selected[0])}
+                onClick={() => openEditPannel(selected[0])}
               >
                 <EditIcon />
               </IconButton>
@@ -97,7 +97,7 @@ EnhancedTableToolbar.propTypes = {
 
 export default function CustomTable (props) {
 
-  const { columns, rows, type, editUser } = props;
+  const { columns, rows, type, edit } = props;
 
   const [ order, setOrder ] = useState('asc');
   const [ orderBy, setOrderBy ] = useState('calories');
@@ -166,11 +166,11 @@ export default function CustomTable (props) {
         (
           <>
             <Paper sx={{ width: '100%', mb: 2 }}>
-              
+
               <EnhancedTableToolbar
                 numSelected={selected.length}
                 selected={selected}
-                openEditUser={(id) => editUser(id)}
+                openEditPannel={(id) => edit(id)}
               />
 
               <TableContainer>

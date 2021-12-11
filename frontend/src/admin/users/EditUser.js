@@ -63,12 +63,14 @@ export default function EditUser ({closeEditUser, editingID}) {
     if (userInfo) {
       if (success)
         setMessage('User Updated Successfully!');
-      setUser({
-        name: userInfo.name,
-        username: userInfo.username,
-        mobile: userInfo.mobile,
-        type: userInfo.type
-      });
+      else {
+        setUser({
+          name: userInfo.name,
+          username: userInfo.username,
+          mobile: userInfo.mobile,
+          type: userInfo.type
+        });
+      }
     }
 
     return (() => {

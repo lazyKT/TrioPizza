@@ -7,9 +7,7 @@ export default function UserAdminDashboard () {
 
   const [ openCreateUser, setOpenCreateUser ] = useState(false);
 
-  const addNewUser = () => {
-    setOpenCreateUser(true);
-  }
+  const addNewUser = () => setOpenCreateUser(true);
 
   const backToUserList = () => setOpenCreateUser(false);
 
