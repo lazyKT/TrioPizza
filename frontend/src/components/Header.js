@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import Cookies from 'js-cookie';
 import { useDispatch, useSelector } from 'react-redux'
 import { Navbar, Nav, Container, NavDropdown } from 'react-bootstrap'
 import { LinkContainer } from 'react-router-bootstrap'
@@ -8,6 +9,7 @@ import { logout } from '../actions/userActions'
 function Header(props) {
 
   const [ showHeader, setShowHeader ] = useState(false);
+  const [ user, setUser ] = useState(false);
 
   const userLogin = useSelector(state => state.userLogin)
   const { userInfo } = userLogin
@@ -15,13 +17,33 @@ function Header(props) {
   const dispatch = useDispatch()
 
 
+  const logoutHandler = () => {
+    dispatch(logout());
+    Cookies.remove('user');
+  }
+
+  const readCookie = () => {
+    try {
+      const cookie = JSON.parse(Cookies.get('user'));
+      return cookie;
+    }
+    catch (error) {
+      return undefined;
+    }
+  }
+
   useEffect(() => {
     setShowHeader(props.show);
-  }, [showHeader, props.show]);
 
-  const logoutHandler = () => {
-    dispatch(logout())
-  }
+    if (props.show) {
+      const cookie = readCookie();
+      if (cookie)
+        setUser(cookie);
+      else
+        setUser(null);
+    }
+
+  }, [showHeader, props.show, userInfo]);
 
   return (
     <>
@@ -42,8 +64,8 @@ function Header(props) {
                     <Nav.Link ><i className="fas fa-shopping-cart"></i>Cart</Nav.Link>
                   </LinkContainer>
 
-                  {userInfo ? (
-                    <NavDropdown title={userInfo.name} id='username'>
+                  {user ? (
+                    <NavDropdown title={user.name} id='username'>
                       <LinkContainer to='/profile'>
                         <NavDropdown.Item>Profile</NavDropdown.Item>
                       </LinkContainer>

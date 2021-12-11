@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import Cookies from 'js-cookie';
 import { useHistory } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux'
 import { Row, Col } from 'react-bootstrap'
@@ -19,10 +20,33 @@ function HomeScreen ({displayHeader}) {
     const history = useHistory();
     let keyword = history.location.search
 
+
+    const readCookies = () => {
+      try {
+        const cookies = JSON.parse(Cookies.get('user'));
+
+        return cookies;
+      }
+      catch (error) {
+        return undefined;
+      }
+    }
+
     useEffect(() => {
-        dispatch(listProducts(keyword))
-        displayHeader();
-    }, [dispatch, keyword, displayHeader])
+
+        const cookies = readCookies();
+
+        if (cookies) {
+            if (cookies.isAdmin === 'Yes')
+              history.push('/admin');
+            else if (cookies.isAdmin === 'No')
+              history.push('/');
+        }
+        else {
+          dispatch(listProducts(keyword))
+          displayHeader();
+        }
+    }, [dispatch, keyword, displayHeader]);
 
     return (
         <div>

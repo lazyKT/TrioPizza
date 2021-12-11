@@ -9,10 +9,12 @@ import FormContainer from '../../components/FormContainer';
 import Loader from '../../components/Loader';
 import Message from '../../components/Message';
 import { register } from '../../actions/userActions';
+import { USER_CREATE_RESET } from '../../constants/userConstants';
 
 
 export default function CreateUser ({backToUserList}) {
 
+  const [ message, setMessage ] = useState('');
   const [ user, setUser ] = useState({
     name: '',
     username: '',
@@ -28,7 +30,6 @@ export default function CreateUser ({backToUserList}) {
 
   const handleBackButtonClick = (event) => {
     event.preventDefault();
-    console.log(handleBackButtonClick);
     backToUserList();
   }
 
@@ -48,11 +49,24 @@ export default function CreateUser ({backToUserList}) {
 
 
   useEffect(() => {
-    console.log(userInfo);
     if (userInfo) {
       // after successful user creation, redirect back to user list page
-      backToUserList();
+      setMessage("User Created Successfully!");
+      setUser({
+        name: '',
+        username: '',
+        password: '',
+        mobile: '',
+        type: ''
+      })
     }
+
+    return (() => {
+      if (userInfo)
+        dispatch({
+          type: USER_CREATE_RESET
+        });
+    });
   }, [userInfo]);
 
   return (
@@ -68,6 +82,7 @@ export default function CreateUser ({backToUserList}) {
       >
         <FormContainer>
           <h4>Create New User</h4>
+          {message !== '' && <Message variant='success'>{message}</Message>}
           {error && <Message variant='danger'>{error}</Message>}
           {loading && <Loader />}
           <Form onSubmit={createNewUser}>

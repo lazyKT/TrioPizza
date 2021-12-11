@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { alpha } from '@mui/material/styles';
 import Box from '@mui/material/Box';
@@ -21,7 +21,13 @@ import CustomTableBody from './CustomTableBody';
 
 
 const EnhancedTableToolbar = (props) => {
-  const { selected, openEditUser, numSelected } = props;
+
+  const { selected, openEditUser, deleteUser, numSelected } = props;
+
+  const handleDeleteClick = (e) => {
+    e.preventDefault();
+    deleteUser(selected[0]);
+  }
 
   return (
     <Toolbar
@@ -67,7 +73,9 @@ const EnhancedTableToolbar = (props) => {
             </Tooltip>
           }
           <Tooltip title="Delete">
-            <IconButton>
+            <IconButton
+              onClick={handleDeleteClick}
+            >
               <DeleteIcon />
             </IconButton>
           </Tooltip>
@@ -91,12 +99,12 @@ export default function CustomTable (props) {
 
   const { columns, rows, type, editUser } = props;
 
-  const [ order, setOrder ] = React.useState('asc');
-  const [ orderBy, setOrderBy ] = React.useState('calories');
-  const [ selected, setSelected ] = React.useState([]);
-  const [ page, setPage ] = React.useState(0);
-  const [ dense, setDense ] = React.useState(false);
-  const [ rowsPerPage, setRowsPerPage ] = React.useState(5);
+  const [ order, setOrder ] = useState('asc');
+  const [ orderBy, setOrderBy ] = useState('calories');
+  const [ selected, setSelected ] = useState([]);
+  const [ page, setPage ] = useState(0);
+  const [ dense, setDense ] = useState(false);
+  const [ rowsPerPage, setRowsPerPage ] = useState(5);
 
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === 'asc';
@@ -129,7 +137,7 @@ export default function CustomTable (props) {
         selected.slice(selectedIndex + 1),
       );
     }
-    
+
     setSelected(newSelected);
   };
 
@@ -158,7 +166,7 @@ export default function CustomTable (props) {
         (
           <>
             <Paper sx={{ width: '100%', mb: 2 }}>
-
+              
               <EnhancedTableToolbar
                 numSelected={selected.length}
                 selected={selected}

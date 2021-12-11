@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Paper from '@mui/material/Paper';
+import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { Form } from 'react-bootstrap';
@@ -8,11 +9,14 @@ import { useDispatch, useSelector } from 'react-redux';
 import FormContainer from '../../components/FormContainer';
 import Loader from '../../components/Loader';
 import Message from '../../components/Message';
-import { getUserDetails, updateUser } from '../../actions/userActions';
+import { getUserDetails, updateUser, deleteUser } from '../../actions/userActions';
+import { USER_UPDATE_RESET, USER_DELETE_RESET } from '../../constants/userConstants';
+
 
 
 export default function EditUser ({closeEditUser, editingID}) {
 
+  const [ message, setMessage ] = useState('');
   const [ user, setUser ] = useState({
     name: '',
     username: '',
@@ -27,6 +31,9 @@ export default function EditUser ({closeEditUser, editingID}) {
   const userUpdate = useSelector(state => state.userUpdate);
   const { success } = userUpdate;
 
+  const userDelete = useSelector(state => state.userDelete);
+  const { loadingDelete, successDelete, errorDelete } = userDelete;
+
   const handleOnChange = (event) => {
     setUser({
       ...user,
@@ -40,14 +47,22 @@ export default function EditUser ({closeEditUser, editingID}) {
   }
 
 
+  function handleDelete (event) {
+    event.preventDefault();
+    dispatch(deleteUser(editingID));
+  }
+
+
   useEffect(() => {
     if (editingID && editingID > 0) {
       dispatch(getUserDetails(editingID));
     }
-  }, [editingID, success]);
+  }, [editingID]);
 
   useEffect(() => {
     if (userInfo) {
+      if (success)
+        setMessage('User Updated Successfully!');
       setUser({
         name: userInfo.name,
         username: userInfo.username,
@@ -55,7 +70,31 @@ export default function EditUser ({closeEditUser, editingID}) {
         type: userInfo.type
       });
     }
-  }, [userInfo])
+
+    return (() => {
+      if (success)
+        dispatch({
+          type: USER_UPDATE_RESET,
+        });
+    });
+  }, [userInfo, success]);
+
+
+  useEffect(() => {
+    if (successDelete) {
+      closeEditUser();
+    }
+    else if (errorDelete) {
+      setMessage(errorDelete);
+    }
+
+    return(() => {
+      if (successDelete)
+        dispatch({
+          type: USER_DELETE_RESET
+        });
+    });
+  }, [errorDelete, successDelete]);
 
 
   return (
@@ -69,8 +108,10 @@ export default function EditUser ({closeEditUser, editingID}) {
       <h4>Edit User</h4>
       <Paper sx={{ margin: '10px', paddingTop: '20px', paddingBottom: '20px'}}>
         <FormContainer>
+          {message !== '' && <Message variant='success'>{message}</Message>}
           {error && <Message variant='danger'>{error}</Message>}
-          {loading && <Loader />}
+          {errorDelete && <Message variant='danger'>{errorDelete}</Message>}
+          {(loading || loadingDelete) && <Loader />}
           <Form onSubmit={handleOnSubmit}>
 
             <Form.Group controlId='name'>
@@ -124,13 +165,21 @@ export default function EditUser ({closeEditUser, editingID}) {
               </Form.Control>
             </Form.Group>
 
-            <Button
-              type="submit"
-              color="success"
-              variant="contained"
-            >
-              Save Changes
-            </Button>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between'}}>
+              <Button
+                variant="contained"
+                type="submit"
+              >
+                Save Changes
+              </Button>
+              <Button
+                variant="contained"
+                color="error"
+                onClick={handleDelete}
+              >
+                Delete User
+              </Button>
+            </Box>
 
           </Form>
         </FormContainer>

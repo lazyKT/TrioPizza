@@ -2,12 +2,14 @@ import {
     USER_LOGIN_REQUEST,
     USER_LOGIN_SUCCESS,
     USER_LOGIN_FAIL,
+    USER_LOGIN_CLEAR,
 
     USER_LOGOUT,
 
     USER_REGISTER_REQUEST,
     USER_REGISTER_SUCCESS,
     USER_REGISTER_FAIL,
+    USER_CREATE_RESET,
 
     USER_DETAILS_REQUEST,
     USER_DETAILS_SUCCESS,
@@ -27,13 +29,14 @@ import {
     USER_DELETE_REQUEST,
     USER_DELETE_SUCCESS,
     USER_DELETE_FAIL,
+    USER_DELETE_RESET,
 
     USER_UPDATE_REQUEST,
     USER_UPDATE_SUCCESS,
     USER_UPDATE_FAIL,
     USER_UPDATE_RESET,
 
-} from '../constants/userConstants'
+} from '../constants/userConstants';
 
 
 export const userLoginReducer = (state = {}, action) => {
@@ -46,6 +49,9 @@ export const userLoginReducer = (state = {}, action) => {
 
         case USER_LOGIN_FAIL:
             return { loading: false, error: action.payload }
+
+        case USER_LOGIN_CLEAR:
+            return {}
 
         case USER_LOGOUT:
             return {}
@@ -68,6 +74,9 @@ export const userRegisterReducer = (state = {}, action) => {
             return { loading: false, error: action.payload }
 
         case USER_LOGOUT:
+            return {}
+
+        case USER_CREATE_RESET:
             return {}
 
         default:
@@ -140,13 +149,16 @@ export const userListReducer = (state = { users: [] }, action) => {
 export const userDeleteReducer = (state = {}, action) => {
     switch (action.type) {
         case USER_DELETE_REQUEST:
-            return { loadingUpdate: true }
+            return { loadingDelete: true }
 
         case USER_DELETE_SUCCESS:
-            return { loadingUpdate: false, successUpdate: true }
+            return { loadingDelete: false, successDelete: true }
 
         case USER_DELETE_FAIL:
-            return { loadingUpdate: false, errorUpdate: action.payload }
+            return { loadingDelete: false, errorDelete: action.payload }
+
+        case USER_DELETE_RESET:
+            return {}
 
         default:
             return state
