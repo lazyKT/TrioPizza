@@ -141,7 +141,7 @@ export default function AdminDrawerMenu (props) {
       <Divider />
       <List>
         {['Profile', 'Setting', 'Sign Out'].map((text, index) => (
-          <ListItem button key={text}>
+          <ListItem button key={text} onClick={() => onChangePage(text)}>
             <ListItemIcon>
               { renderDrawerMenu(text) }
             </ListItemIcon>

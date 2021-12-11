@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import TableCell from '@mui/material/TableCell';
 import TableBody from '@mui/material/TableBody';
 import TableRow from '@mui/material/TableRow';
@@ -44,7 +44,9 @@ function getCellData (type) {
       case 'test':
         return ['name', 'code', 'population', 'size', 'density'];
       case 'user':
-        return ['username', 'email', 'type', 'status'];
+        return ['id', 'name', 'username', 'mobile', 'type', 'isAdmin'];
+      default:
+        throw new Error ("Invalid Data Type")
     }
 }
 
@@ -72,19 +74,19 @@ export default function CustomTableBody (props) {
       {stableSort(rows, getComparator(order, orderBy))
         .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
         .map((row, index) => {
-          const isItemSelected = isSelected(row.name);
+          const isItemSelected = isSelected(row.id);
           const labelId = `enhanced-table-checkbox-${index}`;
 
-          const cells = getCellData('test');
+          const cells = getCellData(dataType);
 
           return (
             <TableRow
               hover
-              onClick={(event) => handleClick(event, row.name)}
+              onClick={(event) => handleClick(event, row.id)}
               role="checkbox"
               aria-checked={isItemSelected}
               tabIndex={-1}
-              key={row.name}
+              key={row.id}
               selected={isItemSelected}
             >
               <TableCell padding="checkbox">

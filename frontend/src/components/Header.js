@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from 'react'
+import Cookies from 'js-cookie';
+import { useHistory } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux'
 import { Navbar, Nav, Container, NavDropdown } from 'react-bootstrap'
 import { LinkContainer } from 'react-router-bootstrap'
@@ -9,19 +11,20 @@ function Header(props) {
 
   const [ showHeader, setShowHeader ] = useState(false);
 
-  const userLogin = useSelector(state => state.userLogin)
-  const { userInfo } = userLogin
+  const userCookies = useSelector(state => state.userCookie);
+  const { userInfo } = userCookies;
 
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
+  const history = useHistory();
 
+
+  const logoutHandler = () => {
+    dispatch(logout());
+  }
 
   useEffect(() => {
     setShowHeader(props.show);
-  }, [showHeader, props.show]);
-
-  const logoutHandler = () => {
-    dispatch(logout())
-  }
+  }, [showHeader, props.show, userInfo]);
 
   return (
     <>
@@ -56,24 +59,6 @@ function Header(props) {
                       <Nav.Link><i className="fas fa-user"></i>Login</Nav.Link>
                     </LinkContainer>
                     )}
-
-
-                  {userInfo && userInfo.isAdmin && (
-                    <NavDropdown title='Admin' id='adminmenue'>
-                      <LinkContainer to='/admin/userlist'>
-                        <NavDropdown.Item>Users</NavDropdown.Item>
-                      </LinkContainer>
-
-                      <LinkContainer to='/admin/productlist'>
-                        <NavDropdown.Item>Products</NavDropdown.Item>
-                      </LinkContainer>
-
-                      <LinkContainer to='/admin/orderlist'>
-                        <NavDropdown.Item>Orders</NavDropdown.Item>
-                      </LinkContainer>
-
-                    </NavDropdown>
-                  )}
 
                 </Nav>
               </Navbar.Collapse>

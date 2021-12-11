@@ -1,13 +1,18 @@
 import React, { useState, useEffect } from 'react';
+import { useDispatch } from 'react-redux';
+import { useHistory } from 'react-router-dom';
 import { styled, useTheme } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import CssBaseline from '@mui/material/CssBaseline';
+import Cookies from 'js-cookie';
 
 import AdminAppbar from './AdminAppbar';
 import AdminDrawerMenu from './AdminDrawerMenu';
 import Dashboard from './Dashboard';
-import UserList from './users/UserList';
+import UserAdminDashboard from './users/UserAdminDashboard';
 import OrderList from './orders/OrderList';
+import { logout } from '../actions/userActions';
+
 
 const drawerWidth = 240;
 
@@ -47,7 +52,7 @@ function switchContents (page) {
 			case 'Dashboard':
 				return <Dashboard />;
 			case 'Users':
-				return <UserList />;
+				return <UserAdminDashboard />;
 			case 'Food':
 				return (
 					<div>Food</div>
@@ -67,6 +72,9 @@ export default function Admin ({hideHeader}) {
 	const [ page, setPage ] = useState('Dashboard');
 	const [ pageTitle, setPageTitle ] = useState('Dashboard');
 
+  const dispatch = useDispatch();
+  const history = useHistory();
+
   const handleDrawerOpen = () => {
     setOpen(true);
   };
@@ -76,8 +84,16 @@ export default function Admin ({hideHeader}) {
   };
 
 	const onChangePage = (page) => {
-		console.log('onChangePage', page);
-		setPage(page);
+    console.log(page);
+		if (page === 'Sign Out') {
+      // sign out user
+      dispatch(logout());
+      Cookies.remove('user');
+      history.push('/');
+    }
+    else {
+      setPage(page);
+    }
 	}
 
 	useEffect(() => {

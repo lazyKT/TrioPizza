@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { alpha } from '@mui/material/styles';
 import Box from '@mui/material/Box';
@@ -13,6 +13,7 @@ import Tooltip from '@mui/material/Tooltip';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Switch from '@mui/material/Switch';
 import DeleteIcon from '@mui/icons-material/Delete';
+import EditIcon from '@mui/icons-material/Edit';
 import FilterListIcon from '@mui/icons-material/FilterList';
 
 import CustomTableHead from './CustomTableHead';
@@ -20,7 +21,13 @@ import CustomTableBody from './CustomTableBody';
 
 
 const EnhancedTableToolbar = (props) => {
-  const { numSelected } = props;
+
+  const { selected, openEditUser, deleteUser, numSelected } = props;
+
+  const handleDeleteClick = (e) => {
+    e.preventDefault();
+    deleteUser(selected[0]);
+  }
 
   return (
     <Toolbar
@@ -54,11 +61,25 @@ const EnhancedTableToolbar = (props) => {
       )}
 
       {numSelected > 0 ? (
-        <Tooltip title="Delete">
-          <IconButton>
-            <DeleteIcon />
-          </IconButton>
-        </Tooltip>
+        <>
+          { numSelected === 1 &&
+            <Tooltip title="Edit">
+              <IconButton
+                color="primary"
+                onClick={() => openEditUser(selected[0])}
+              >
+                <EditIcon />
+              </IconButton>
+            </Tooltip>
+          }
+          <Tooltip title="Delete">
+            <IconButton
+              onClick={handleDeleteClick}
+            >
+              <DeleteIcon />
+            </IconButton>
+          </Tooltip>
+        </>
       ) : (
         <Tooltip title="Filter list">
           <IconButton>
@@ -76,14 +97,14 @@ EnhancedTableToolbar.propTypes = {
 
 export default function CustomTable (props) {
 
-  const { columns, rows, type } = props;
+  const { columns, rows, type, editUser } = props;
 
-  const [ order, setOrder ] = React.useState('asc');
-  const [ orderBy, setOrderBy ] = React.useState('calories');
-  const [ selected, setSelected ] = React.useState([]);
-  const [ page, setPage ] = React.useState(0);
-  const [ dense, setDense ] = React.useState(false);
-  const [ rowsPerPage, setRowsPerPage ] = React.useState(5);
+  const [ order, setOrder ] = useState('asc');
+  const [ orderBy, setOrderBy ] = useState('calories');
+  const [ selected, setSelected ] = useState([]);
+  const [ page, setPage ] = useState(0);
+  const [ dense, setDense ] = useState(false);
+  const [ rowsPerPage, setRowsPerPage ] = useState(5);
 
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === 'asc';
@@ -141,53 +162,62 @@ export default function CustomTable (props) {
 
   return (
     <Box sx={{ width: '100%' }}>
-      <Paper sx={{ width: '100%', mb: 2 }}>
-        <EnhancedTableToolbar numSelected={selected.length} />
-        <TableContainer>
-          <Table
-            sx={{ minWidth: 750 }}
-            aria-labelledby="tableTitle"
-            size={dense ? 'small' : 'medium'}
-          >
-            <CustomTableHead
-              headCells={columns}
-              numSelected={selected.length}
-              order={order}
-              orderBy={orderBy}
-              onSelectAllClick={handleSelectAllClick}
-              onRequestSort={handleRequestSort}
-              rowCount={rows.length}
+      { rows &&
+        (
+          <>
+            <Paper sx={{ width: '100%', mb: 2 }}>
+              
+              <EnhancedTableToolbar
+                numSelected={selected.length}
+                selected={selected}
+                openEditUser={(id) => editUser(id)}
+              />
+
+              <TableContainer>
+                <Table
+                  sx={{ minWidth: 750 }}
+                  aria-labelledby="tableTitle"
+                  size={dense ? 'small' : 'medium'}
+                >
+                  <CustomTableHead
+                    headCells={columns}
+                    numSelected={selected.length}
+                    order={order}
+                    orderBy={orderBy}
+                    onSelectAllClick={handleSelectAllClick}
+                    onRequestSort={handleRequestSort}
+                    rowCount={rows.length}
+                  />
+                  <CustomTableBody
+                    rows={rows}
+                    page={page}
+                    rowsPerPage={rowsPerPage}
+                    handleClick={handleClick}
+                    orderBy={orderBy}
+                    emptyRows={emptyRows}
+                    isSelected={isSelected}
+                    order={order}
+                    dataType={type}
+                  />
+                </Table>
+              </TableContainer>
+              <TablePagination
+                rowsPerPageOptions={[5, 10, 25]}
+                component="div"
+                count={rows.length}
+                rowsPerPage={rowsPerPage}
+                page={page}
+                onPageChange={handleChangePage}
+                onRowsPerPageChange={handleChangeRowsPerPage}
+              />
+            </Paper>
+            <FormControlLabel
+              control={<Switch checked={dense} onChange={handleChangeDense} />}
+              label="Dense padding"
             />
-
-            <CustomTableBody
-              rows={rows}
-              page={page}
-              rowsPerPage={rowsPerPage}
-              handleClick={handleClick}
-              orderBy={orderBy}
-              emptyRows={emptyRows}
-              isSelected={isSelected}
-              order={order}
-              dataType={type}
-            />
-
-
-          </Table>
-        </TableContainer>
-        <TablePagination
-          rowsPerPageOptions={[5, 10, 25]}
-          component="div"
-          count={rows.length}
-          rowsPerPage={rowsPerPage}
-          page={page}
-          onPageChange={handleChangePage}
-          onRowsPerPageChange={handleChangeRowsPerPage}
-        />
-      </Paper>
-      <FormControlLabel
-        control={<Switch checked={dense} onChange={handleChangeDense} />}
-        label="Dense padding"
-      />
+          </>
+        )
+      }
     </Box>
   );
 }

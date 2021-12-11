@@ -2,12 +2,14 @@ import {
     USER_LOGIN_REQUEST,
     USER_LOGIN_SUCCESS,
     USER_LOGIN_FAIL,
+    USER_LOGIN_CLEAR,
 
     USER_LOGOUT,
 
     USER_REGISTER_REQUEST,
     USER_REGISTER_SUCCESS,
     USER_REGISTER_FAIL,
+    USER_CREATE_RESET,
 
     USER_DETAILS_REQUEST,
     USER_DETAILS_SUCCESS,
@@ -27,13 +29,30 @@ import {
     USER_DELETE_REQUEST,
     USER_DELETE_SUCCESS,
     USER_DELETE_FAIL,
+    USER_DELETE_RESET,
 
     USER_UPDATE_REQUEST,
     USER_UPDATE_SUCCESS,
     USER_UPDATE_FAIL,
     USER_UPDATE_RESET,
 
-} from '../constants/userConstants'
+} from '../constants/userConstants';
+
+
+export function userCookieReducer (state = {}, action) {
+  switch (action.type) {
+    case 'read_cookie':
+      return { loading: true }
+    case 'read_cookie_success':
+      return { loading: false, userInfo: action.payload }
+    case 'read_cookie_failed':
+      return { loading: false }
+    case 'remove_user_cookie':
+      return {}
+    default:
+      return state
+  }
+}
 
 
 export const userLoginReducer = (state = {}, action) => {
@@ -46,6 +65,9 @@ export const userLoginReducer = (state = {}, action) => {
 
         case USER_LOGIN_FAIL:
             return { loading: false, error: action.payload }
+
+        case USER_LOGIN_CLEAR:
+            return {}
 
         case USER_LOGOUT:
             return {}
@@ -70,6 +92,9 @@ export const userRegisterReducer = (state = {}, action) => {
         case USER_LOGOUT:
             return {}
 
+        case USER_CREATE_RESET:
+            return {}
+
         default:
             return state
     }
@@ -83,14 +108,13 @@ export const userDetailsReducer = (state = { user: {} }, action) => {
             return { ...state, loading: true }
 
         case USER_DETAILS_SUCCESS:
-            return { loading: false, user: action.payload }
+            return { loading: false, userInfo: action.payload }
 
         case USER_DETAILS_FAIL:
             return { loading: false, error: action.payload }
 
         case USER_DETAILS_RESET:
             return { user: {} }
-
 
         default:
             return state
@@ -141,13 +165,16 @@ export const userListReducer = (state = { users: [] }, action) => {
 export const userDeleteReducer = (state = {}, action) => {
     switch (action.type) {
         case USER_DELETE_REQUEST:
-            return { loading: true }
+            return { loadingDelete: true }
 
         case USER_DELETE_SUCCESS:
-            return { loading: false, success: true }
+            return { loadingDelete: false, successDelete: true }
 
         case USER_DELETE_FAIL:
-            return { loading: false, error: action.payload }
+            return { loadingDelete: false, errorDelete: action.payload }
+
+        case USER_DELETE_RESET:
+            return {}
 
         default:
             return state
