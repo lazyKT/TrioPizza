@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import Cookies from 'js-cookie';
 import { Link } from 'react-router-dom'
 import { Form, Button, Row, Col } from 'react-bootstrap'
 import { useDispatch, useSelector } from 'react-redux'
@@ -6,12 +7,15 @@ import Loader from '../components/Loader'
 import Message from '../components/Message'
 import FormContainer from '../components/FormContainer'
 import { register } from '../actions/userActions'
+import { USER_CREATE_RESET } from '../constants/userConstants';
+
 
 function RegisterScreen({ location, history }) {
 
     const [name, setName] = useState('')
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
+    const [mobile, setMobile] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('')
     const [message, setMessage] = useState('')
 
@@ -22,22 +26,56 @@ function RegisterScreen({ location, history }) {
     const userRegister = useSelector(state => state.userRegister)
     const { error, loading, userInfo } = userRegister
 
-    useEffect(() => {
-        if (userInfo) {
-            history.push(redirect)
-        }
-    }, [history, userInfo, redirect])
-
     const submitHandler = (e) => {
         e.preventDefault()
 
         if (password != confirmPassword) {
             setMessage('Passwords do not match')
         } else {
-            dispatch(register(name, email, password))
+            dispatch(
+              register({
+                name,
+                username: email,
+                type: 'customer',
+                mobile,
+                password
+              })
+            );
         }
-
     }
+
+    const readCookies = () => {
+      try {
+        const cookies = JSON.parse(Cookies.get('user'));
+
+        return cookies;
+      }
+      catch (error) {
+        return undefined;
+      }
+    }
+
+    useEffect(() => {
+      const cookie = readCookies();
+
+      if (cookie) {
+        if (cookie.isAdmin === 'Yes')
+          history.push('/admin');
+        else if (cookie.isAdmin === 'No')
+          history.push('/');
+      }
+      if (userInfo) {
+          history.push('/login')
+      }
+
+      return(() => {
+        if (userInfo) {
+          dispatch({
+            type: USER_CREATE_RESET
+          });
+        }
+      });
+    }, [history, userInfo, redirect])
 
     return (
         <FormContainer>
@@ -67,6 +105,18 @@ function RegisterScreen({ location, history }) {
                         placeholder='Enter Email'
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
+                    >
+                    </Form.Control>
+                </Form.Group>
+
+                <Form.Group controlId='mobile'>
+                    <Form.Label>Mobile Number</Form.Label>
+                    <Form.Control
+                        required
+                        type='text'
+                        placeholder='83210054'
+                        value={mobile}
+                        onChange={(e) => setMobile(e.target.value)}
                     >
                     </Form.Control>
                 </Form.Group>

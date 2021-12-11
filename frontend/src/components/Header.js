@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import Cookies from 'js-cookie';
+import { useHistory } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux'
 import { Navbar, Nav, Container, NavDropdown } from 'react-bootstrap'
 import { LinkContainer } from 'react-router-bootstrap'
@@ -14,12 +15,15 @@ function Header(props) {
   const userLogin = useSelector(state => state.userLogin)
   const { userInfo } = userLogin
 
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
+  const history = useHistory();
 
 
   const logoutHandler = () => {
     dispatch(logout());
+    history.push('/home');
     Cookies.remove('user');
+    setUser(null);
   }
 
   const readCookie = () => {

@@ -78,8 +78,8 @@ export const login = (email, password) => async (dispatch) => {
     } catch (error) {
         dispatch({
             type: USER_LOGIN_FAIL,
-            payload: error.response && error.response.data.details
-                ? error.response.data.details
+            payload: error.response && error.response.data.detail
+                ? error.response.data.detail
                 : error.message,
         })
     }
@@ -106,7 +106,7 @@ export const register = (user) => async (dispatch) => {
                 'Content-type': 'application/json'
             }
         }
-
+        console.log(user);
         const { data } = await axios.post ( '/api/users/',
             user,
             config
@@ -118,6 +118,7 @@ export const register = (user) => async (dispatch) => {
         });
 
     } catch (error) {
+        console.log(error.response);
         dispatch({
             type: USER_REGISTER_FAIL,
             payload: (error?.response?.data?.details)

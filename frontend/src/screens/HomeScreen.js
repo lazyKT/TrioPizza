@@ -39,8 +39,14 @@ function HomeScreen ({displayHeader}) {
         if (cookies) {
             if (cookies.isAdmin === 'Yes')
               history.push('/admin');
-            else if (cookies.isAdmin === 'No')
-              history.push('/');
+            else if (cookies.isAdmin === 'No') {
+              if (cookies.type === 'customer') {
+                history.push('/');
+              }
+              else if (cookies.type === 'driver') {
+                history.push('/driver');
+              }
+            }
         }
         else {
           dispatch(listProducts(keyword))

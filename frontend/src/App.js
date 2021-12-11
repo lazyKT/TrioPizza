@@ -20,6 +20,7 @@ import ProductEditScreen from './screens/ProductEditScreen'
 import OrderListScreen from './screens/OrderListScreen'
 
 import Admin from './admin/Admin';
+import DriverDashboard from './driver/Dashboard';
 
 
 function App() {
@@ -57,6 +58,8 @@ function App() {
           <Route path='/admin/product/:id/edit' component={ProductEditScreen} />
 
           <Route path='/admin/orderlist' component={OrderListScreen} />
+
+          <Route path='/driver' component={DriverDashboard} />
         </Container>
         <Route path='/admin'
           render={ props =>
