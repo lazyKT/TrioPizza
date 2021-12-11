@@ -1,3 +1,4 @@
+import Cookies from 'js-cookie';
 import { createStore, combineReducers, applyMiddleware } from 'redux'
 import thunk from 'redux-thunk'
 import { composeWithDevTools } from 'redux-devtools-extension'
@@ -14,6 +15,7 @@ import {
 import { cartReducer } from './reducers/cartReducers'
 
 import {
+    userCookieReducer,
     userLoginReducer,
     userRegisterReducer,
     userDetailsReducer,
@@ -42,6 +44,8 @@ const reducer = combineReducers({
     productTopRated: productTopRatedReducer,
 
     cart: cartReducer,
+
+    userCookie: userCookieReducer,
     userLogin: userLoginReducer,
     userRegister: userRegisterReducer,
     userDetails: userDetailsReducer,
@@ -62,9 +66,8 @@ const reducer = combineReducers({
 const cartItemsFromStorage = localStorage.getItem('cartItems') ?
     JSON.parse(localStorage.getItem('cartItems')) : []
 
-const userInfoFromStorage = localStorage.getItem('userInfo') ?
-    JSON.parse(localStorage.getItem('userInfo')) : null
-
+const userInfoFromStorage = Cookies.get('user') ?
+    JSON.parse(Cookies.get('user')) : null
 
 const shippingAddressFromStorage = localStorage.getItem('shippingAddress') ?
     JSON.parse(localStorage.getItem('shippingAddress')) : {}
@@ -75,7 +78,7 @@ const initialState = {
         cartItems: cartItemsFromStorage,
         shippingAddress: shippingAddressFromStorage,
     },
-    userLogin: { userInfo: userInfoFromStorage },
+    userCookie: { userInfo: userInfoFromStorage },
 }
 
 const middleware = [thunk]

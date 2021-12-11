@@ -39,6 +39,22 @@ import {
 } from '../constants/userConstants';
 
 
+export function userCookieReducer (state = {}, action) {
+  switch (action.type) {
+    case 'read_cookie':
+      return { loading: true }
+    case 'read_cookie_success':
+      return { loading: false, userInfo: action.payload }
+    case 'read_cookie_failed':
+      return { loading: false }
+    case 'remove_user_cookie':
+      return {}
+    default:
+      return state
+  }
+}
+
+
 export const userLoginReducer = (state = {}, action) => {
     switch (action.type) {
         case USER_LOGIN_REQUEST:

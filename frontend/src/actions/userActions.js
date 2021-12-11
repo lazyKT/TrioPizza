@@ -40,6 +40,15 @@ import { ORDER_LIST_MY_RESET } from '../constants/orderConstants';
 import Cookie from 'js-cookie';
 
 
+function setUserCookie (userInfo) {
+  Cookie.set('user', JSON.stringify(userInfo));
+}
+
+
+function removeUserCookie () {
+  Cookie.remove('user');
+}
+
 function getTokenFromCookie () {
   try {
     const user = JSON.parse(Cookie.get('user'));
@@ -49,6 +58,7 @@ function getTokenFromCookie () {
     console.error(error);
   }
 }
+
 
 export const login = (email, password) => async (dispatch) => {
     try {
@@ -71,9 +81,14 @@ export const login = (email, password) => async (dispatch) => {
         dispatch({
             type: USER_LOGIN_SUCCESS,
             payload: data
-        })
+        });
 
-        // localStorage.setItem('userInfo', JSON.stringify(data))
+        dispatch({
+          type: 'read_cookie_success',
+          payload: data
+        });
+
+        setUserCookie(data);
 
     } catch (error) {
         dispatch({
@@ -88,10 +103,12 @@ export const login = (email, password) => async (dispatch) => {
 
 export const logout = () => (dispatch) => {
     localStorage.removeItem('userInfo')
-    dispatch({ type: USER_LOGOUT })
-    dispatch({ type: USER_DETAILS_RESET })
-    dispatch({ type: ORDER_LIST_MY_RESET })
-    dispatch({ type: USER_LIST_RESET })
+    dispatch({ type: USER_LOGOUT });
+    dispatch({ type: USER_DETAILS_RESET });
+    dispatch({ type: ORDER_LIST_MY_RESET });
+    dispatch({ type: USER_LIST_RESET });
+    dispatch({ type: 'remove_user_cookie' });
+    removeUserCookie();
 }
 
 
@@ -174,7 +191,7 @@ export const updateUserProfile = (user) => async (dispatch, getState) => {
         })
 
         const {
-            userLogin: { userInfo },
+            userCookie: { userInfo },
         } = getState()
 
         const config = {

@@ -23,15 +23,7 @@ function LoginScreen({ location, history }) {
     const { error, loading, userInfo } = userLogin;
 
 
-    const readCookies = () => {
-      try {
-        const user = JSON.parse(Cookies.get('user'));
-        return user;
-      }
-      catch (error) {
-        return undefined;
-      }
-    }
+
 
     const submitHandler = (e) => {
         e.preventDefault()
@@ -41,13 +33,7 @@ function LoginScreen({ location, history }) {
 
     useEffect(() => {
 
-        const cookies = readCookies();
-        if (cookies) {
-          if (cookies.isAdmin === 'Yes')
-            history.push('/admin');
-          else if (cookies.isAdmin === 'No')
-            history.push('/');
-        }
+        console.log('userInfo', userInfo);
 
         if (userInfo) {
             // set cookies

@@ -10,10 +10,9 @@ import { logout } from '../actions/userActions'
 function Header(props) {
 
   const [ showHeader, setShowHeader ] = useState(false);
-  const [ user, setUser ] = useState(false);
 
-  const userLogin = useSelector(state => state.userLogin)
-  const { userInfo } = userLogin
+  const userCookies = useSelector(state => state.userCookie);
+  const { userInfo } = userCookies;
 
   const dispatch = useDispatch();
   const history = useHistory();
@@ -21,32 +20,10 @@ function Header(props) {
 
   const logoutHandler = () => {
     dispatch(logout());
-    history.push('/home');
-    Cookies.remove('user');
-    setUser(null);
-  }
-
-  const readCookie = () => {
-    try {
-      const cookie = JSON.parse(Cookies.get('user'));
-      return cookie;
-    }
-    catch (error) {
-      return undefined;
-    }
   }
 
   useEffect(() => {
     setShowHeader(props.show);
-
-    if (props.show) {
-      const cookie = readCookie();
-      if (cookie)
-        setUser(cookie);
-      else
-        setUser(null);
-    }
-
   }, [showHeader, props.show, userInfo]);
 
   return (
@@ -68,8 +45,8 @@ function Header(props) {
                     <Nav.Link ><i className="fas fa-shopping-cart"></i>Cart</Nav.Link>
                   </LinkContainer>
 
-                  {user ? (
-                    <NavDropdown title={user.name} id='username'>
+                  {userInfo ? (
+                    <NavDropdown title={userInfo.name} id='username'>
                       <LinkContainer to='/profile'>
                         <NavDropdown.Item>Profile</NavDropdown.Item>
                       </LinkContainer>

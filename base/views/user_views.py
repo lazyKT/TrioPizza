@@ -64,7 +64,7 @@ class UserList (APIView):
             return error, message
         return False, ''
 
-    @permission_classes([IsAdminUser, IsAuthenticated])
+
     def get (self, request, format=None):
         """
         # Get All Users
