@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Container } from 'react-bootstrap'
 import { HashRouter as Router, Route } from 'react-router-dom'
 import Header from './components/Header'
@@ -18,14 +19,28 @@ import ProductListScreen from './screens/ProductListScreen'
 import ProductEditScreen from './screens/ProductEditScreen'
 import OrderListScreen from './screens/OrderListScreen'
 
+import Admin from './admin/Admin';
+import DriverDashboard from './driver/Dashboard';
+
 
 function App() {
+
+  const [ showHeader, setShowHeader ] = useState(true);
+
+  const hideHeader = () => setShowHeader(false);
+
+  const displayHeader = () => setShowHeader(true);
+
   return (
     <Router>
-      <Header />
+      <Header show={showHeader}/>
       <main className="py-3">
         <Container>
-          <Route path='/' component={HomeScreen} exact />
+          <Route path='/' exact
+            render={props =>
+              <HomeScreen displayHeader={displayHeader} />
+            }
+          />
           <Route path='/login' component={LoginScreen} />
           <Route path='/register' component={RegisterScreen} />
           <Route path='/profile' component={ProfileScreen} />
@@ -43,7 +58,14 @@ function App() {
           <Route path='/admin/product/:id/edit' component={ProductEditScreen} />
 
           <Route path='/admin/orderlist' component={OrderListScreen} />
+
+          <Route path='/driver' component={DriverDashboard} />
         </Container>
+        <Route path='/admin'
+          render={ props =>
+            <Admin hideHeader={hideHeader} />
+          }
+        />
       </main>
       <Footer />
     </Router>

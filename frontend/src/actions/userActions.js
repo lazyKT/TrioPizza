@@ -35,32 +35,60 @@ import {
 
 } from '../constants/userConstants'
 
-import { ORDER_LIST_MY_RESET } from '../constants/orderConstants'
+import { ORDER_LIST_MY_RESET } from '../constants/orderConstants';
+
+import Cookie from 'js-cookie';
+
+
+function setUserCookie (userInfo) {
+  Cookie.set('user', JSON.stringify(userInfo));
+}
+
+
+function removeUserCookie () {
+  Cookie.remove('user');
+}
+
+function getTokenFromCookie () {
+  try {
+    const user = JSON.parse(Cookie.get('user'));
+    return user;
+  }
+  catch (error) {
+    console.error(error);
+  }
+}
+
 
 export const login = (email, password) => async (dispatch) => {
     try {
         dispatch({
             type: USER_LOGIN_REQUEST
-        })
+        });
 
         const config = {
             headers: {
                 'Content-type': 'application/json'
             }
-        }
+        };
 
         const { data } = await axios.post(
             '/api/users/login/',
             { 'username': email, 'password': password },
             config
-        )
+        );
 
         dispatch({
             type: USER_LOGIN_SUCCESS,
             payload: data
-        })
+        });
 
-        localStorage.setItem('userInfo', JSON.stringify(data))
+        dispatch({
+          type: 'read_cookie_success',
+          payload: data
+        });
+
+        setUserCookie(data);
 
     } catch (error) {
         dispatch({
@@ -75,14 +103,16 @@ export const login = (email, password) => async (dispatch) => {
 
 export const logout = () => (dispatch) => {
     localStorage.removeItem('userInfo')
-    dispatch({ type: USER_LOGOUT })
-    dispatch({ type: USER_DETAILS_RESET })
-    dispatch({ type: ORDER_LIST_MY_RESET })
-    dispatch({ type: USER_LIST_RESET })
+    dispatch({ type: USER_LOGOUT });
+    dispatch({ type: USER_DETAILS_RESET });
+    dispatch({ type: ORDER_LIST_MY_RESET });
+    dispatch({ type: USER_LIST_RESET });
+    dispatch({ type: 'remove_user_cookie' });
+    removeUserCookie();
 }
 
 
-export const register = (name, email, password) => async (dispatch) => {
+export const register = (user) => async (dispatch) => {
     try {
         dispatch({
             type: USER_REGISTER_REQUEST
@@ -93,30 +123,23 @@ export const register = (name, email, password) => async (dispatch) => {
                 'Content-type': 'application/json'
             }
         }
-
-        const { data } = await axios.post(
-            '/api/users/register/',
-            { 'name': name, 'email': email, 'password': password },
+        console.log(user);
+        const { data } = await axios.post ( '/api/users/',
+            user,
             config
         )
 
         dispatch({
             type: USER_REGISTER_SUCCESS,
             payload: data
-        })
-
-        dispatch({
-            type: USER_LOGIN_SUCCESS,
-            payload: data
-        })
-
-        localStorage.setItem('userInfo', JSON.stringify(data))
+        });
 
     } catch (error) {
+        console.log(error.response);
         dispatch({
             type: USER_REGISTER_FAIL,
-            payload: error.response && error.response.data.detail
-                ? error.response.data.detail
+            payload: (error?.response?.data?.details)
+                ? error.response.data.details
                 : error.message,
         })
     }
@@ -127,35 +150,34 @@ export const getUserDetails = (id) => async (dispatch, getState) => {
     try {
         dispatch({
             type: USER_DETAILS_REQUEST
-        })
+        });
 
-        const {
-            userLogin: { userInfo },
-        } = getState()
+        const { token } = getTokenFromCookie();
 
         const config = {
             headers: {
                 'Content-type': 'application/json',
-                Authorization: `Bearer ${userInfo.token}`
+                Authorization: `Bearer ${token}`
             }
         }
 
         const { data } = await axios.get(
             `/api/users/${id}/`,
             config
-        )
+        );
 
         dispatch({
             type: USER_DETAILS_SUCCESS,
             payload: data
-        })
+        });
 
 
     } catch (error) {
+        console.log('error', error.response);
         dispatch({
             type: USER_DETAILS_FAIL,
-            payload: error.response && error.response.data.detail
-                ? error.response.data.detail
+            payload: error.response?.data?.details
+                ? error.response.data.details
                 : error.message,
         })
     }
@@ -169,8 +191,8 @@ export const updateUserProfile = (user) => async (dispatch, getState) => {
         })
 
         const {
-            userLogin: { userInfo },
-        } = getState()
+            userCookie: { userInfo },
+        } = getState();
 
         const config = {
             headers: {
@@ -200,8 +222,8 @@ export const updateUserProfile = (user) => async (dispatch, getState) => {
     } catch (error) {
         dispatch({
             type: USER_UPDATE_PROFILE_FAIL,
-            payload: error.response && error.response.data.detail
-                ? error.response.data.detail
+            payload: error.response && error.response.data.details
+                ? error.response.data.details
                 : error.message,
         })
     }
@@ -212,7 +234,7 @@ export const listUsers = () => async (dispatch, getState) => {
     try {
         dispatch({
             type: USER_LIST_REQUEST
-        })
+        });
 
         const {
             userLogin: { userInfo },
@@ -221,7 +243,7 @@ export const listUsers = () => async (dispatch, getState) => {
         const config = {
             headers: {
                 'Content-type': 'application/json',
-                Authorization: `Bearer ${userInfo.token}`
+                // Authorization: `Bearer ${userInfo.token}`
             }
         }
 
@@ -239,8 +261,8 @@ export const listUsers = () => async (dispatch, getState) => {
     } catch (error) {
         dispatch({
             type: USER_LIST_FAIL,
-            payload: error.response && error.response.data.detail
-                ? error.response.data.detail
+            payload: error.response && error.response.data.details
+                ? error.response.data.details
                 : error.message,
         })
     }
@@ -254,8 +276,8 @@ export const deleteUser = (id) => async (dispatch, getState) => {
         })
 
         const {
-            userLogin: { userInfo },
-        } = getState()
+            userCookie: { userInfo },
+        } = getState();
 
         const config = {
             headers: {
@@ -265,9 +287,11 @@ export const deleteUser = (id) => async (dispatch, getState) => {
         }
 
         const { data } = await axios.delete(
-            `/api/users/delete/${id}/`,
+            `/api/users/${id}/`,
             config
-        )
+        );
+
+        console.log(data);
 
         dispatch({
             type: USER_DELETE_SUCCESS,
@@ -278,22 +302,22 @@ export const deleteUser = (id) => async (dispatch, getState) => {
     } catch (error) {
         dispatch({
             type: USER_DELETE_FAIL,
-            payload: error.response && error.response.data.detail
-                ? error.response.data.detail
+            payload: error.response && error.response.data.details
+                ? error.response.data.details
                 : error.message,
         })
     }
 }
 
 
-export const updateUser = (user) => async (dispatch, getState) => {
+export const updateUser = (id, user) => async (dispatch, getState) => {
     try {
         dispatch({
             type: USER_UPDATE_REQUEST
-        })
+        });
 
         const {
-            userLogin: { userInfo },
+            userCookie: { userInfo },
         } = getState()
 
         const config = {
@@ -304,26 +328,22 @@ export const updateUser = (user) => async (dispatch, getState) => {
         }
 
         const { data } = await axios.put(
-            `/api/users/update/${user._id}/`,
+            `/api/users/${id}/`,
             user,
             config
         )
 
         dispatch({
             type: USER_UPDATE_SUCCESS,
-        })
-
-        dispatch({
-            type: USER_DETAILS_SUCCESS,
             payload: data
-        })
+        });
 
 
     } catch (error) {
         dispatch({
             type: USER_UPDATE_FAIL,
-            payload: error.response && error.response.data.detail
-                ? error.response.data.detail
+            payload: error.response && error.response.data.details
+                ? error.response.data.details
                 : error.message,
         })
     }

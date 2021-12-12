@@ -6,25 +6,25 @@ from .models import Product, Order, OrderItem, ShippingAddress, Review
 
 class UserSerializer(serializers.ModelSerializer):
     name = serializers.SerializerMethodField(read_only=True)
-    _id = serializers.SerializerMethodField(read_only=True)
     isAdmin = serializers.SerializerMethodField(read_only=True)
+    mobile = serializers.SerializerMethodField(read_only=True)
+    type = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = User
-        fields = ['id', '_id', 'username', 'email', 'name', 'isAdmin']
-
-    def get__id(self, obj):
-        return obj.id
+        fields = ['id', 'username', 'mobile', 'name', 'isAdmin', 'type']
 
     def get_isAdmin(self, obj):
-        return obj.is_staff
+        return 'Yes' if obj.is_staff else 'No'
 
-    def get_name(self, obj):
-        name = obj.first_name
-        if name == '':
-            name = obj.email
+    def get_name (self, obj):
+        return obj.profile.name
 
-        return name
+    def get_mobile (self, obj):
+        return obj.profile.mobile
+
+    def get_type (self, obj):
+        return obj.profile.type
 
 
 class UserSerializerWithToken(UserSerializer):
@@ -32,7 +32,7 @@ class UserSerializerWithToken(UserSerializer):
 
     class Meta:
         model = User
-        fields = ['id', '_id', 'username', 'email', 'name', 'isAdmin', 'token']
+        fields = ['id', 'username', 'name', 'isAdmin', 'type', 'token']
 
     def get_token(self, obj):
         token = RefreshToken.for_user(obj)

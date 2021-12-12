@@ -1,5 +1,4 @@
 from django.shortcuts import render
-
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
@@ -41,75 +40,98 @@ def getProducts(request):
 
 @api_view(['GET'])
 def getTopProducts(request):
-    products = Product.objects.filter(rating__gte=4).order_by('-rating')[0:5]
-    serializer = ProductSerializer(products, many=True)
-    return Response(serializer.data)
-
+    try:
+        products = Product.objects.filter(rating__gte=4).order_by('-rating')[0:5]
+        if len(products) == 0:
+            products = Product.objects.all()[:5]
+        serializer = ProductSerializer(products, many=True)
+        return Response(serializer.data)
+    except Exception as e:
+        return Response({'details' : repr(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 @api_view(['GET'])
 def getProduct(request, pk):
-    product = Product.objects.get(_id=pk)
-    serializer = ProductSerializer(product, many=False)
-    return Response(serializer.data)
+    try:
+        product = Product.objects.get(_id=pk)
+        serializer = ProductSerializer(product, many=False)
+        return Response(serializer.data)
+    except Product.DoesNotExist:
+        return Response({'details' : 'Product Not Found'}, status=status.HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        return Response({'details' : repr(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 @api_view(['POST'])
-@permission_classes([IsAdminUser])
+# @permission_classes([IsAdminUser])
 def createProduct(request):
-    user = request.user
+    try:
+        data = request.data
+        print(data);
 
-    product = Product.objects.create(
-        user=user,
-        name='Sample Name',
-        price=0,
-        brand='Sample Brand',
-        countInStock=0,
-        category='Sample Category',
-        description=''
-    )
+        product = Product.objects.create(
+            name=data['name'],
+            price=data['price'],
+            description=data['description']
+        )
 
-    serializer = ProductSerializer(product, many=False)
-    return Response(serializer.data)
+        serializer = ProductSerializer(product, many=False)
+        return Response(serializer.data)
+    except Exception as e:
+        print(repr(e))
+        return Response({'details' : repr(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['PUT'])
-@permission_classes([IsAdminUser])
+# @permission_classes([IsAdminUser])
 def updateProduct(request, pk):
-    data = request.data
-    product = Product.objects.get(_id=pk)
+    try:
+        data = request.data
+        product = Product.objects.get(_id=pk)
 
-    product.name = data['name']
-    product.price = data['price']
-    product.brand = data['brand']
-    product.countInStock = data['countInStock']
-    product.category = data['category']
-    product.description = data['description']
+        product.name = data['name']
+        product.price = data['price']
+        product.description = data['description']
 
-    product.save()
+        product.save()
 
-    serializer = ProductSerializer(product, many=False)
-    return Response(serializer.data)
+        serializer = ProductSerializer(product, many=False)
+        return Response(serializer.data)
+    except Product.DoesNotExist:
+        return Response({'details' : 'Product Not Found!'}, status.HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        return Response({'details' : repr(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 @api_view(['DELETE'])
-@permission_classes([IsAdminUser])
+# @permission_classes([IsAdminUser])
 def deleteProduct(request, pk):
-    product = Product.objects.get(_id=pk)
-    product.delete()
-    return Response('Producted Deleted')
+    try:
+        product = Product.objects.get(_id=pk)
+        product.delete()
+        return Response('Producted Deleted')
+    except Product.DoesNotExist:
+        return Response({'details' : 'Product Not Found!'}, status.HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        return Response({'details' : repr(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 
 
 @api_view(['POST'])
 def uploadImage(request):
-    data = request.data
+    try:
+        data = request.data
+        id = data['product_id']
+        product = Product.objects.get(_id=id)
 
-    product_id = data['product_id']
-    product = Product.objects.get(_id=product_id)
+        product.image = request.FILES.get('image')
+        product.save()
 
-    product.image = request.FILES.get('image')
-    product.save()
+        return Response({'details' : 'Image Uploaded Successfully!'}, status=status.HTTP_200_OK)
+    except Product.DoesNotExist:
+        return Response({'details' : 'Product Not Found!'}, status=status.HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        return Response({'details' : repr(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-    return Response('Image was uploaded')
 
 
 @api_view(['POST'])

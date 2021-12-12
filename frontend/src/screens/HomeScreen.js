@@ -1,4 +1,6 @@
-import React, { useState, useEffect } from 'react'
+import React, { useEffect } from 'react';
+import Cookies from 'js-cookie';
+import { useHistory } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux'
 import { Row, Col } from 'react-bootstrap'
 import Product from '../components/Product'
@@ -10,17 +12,47 @@ import { listProducts } from '../actions/productActions'
 
 
 
-function HomeScreen({ history }) {
+function HomeScreen ({displayHeader}) {
     const dispatch = useDispatch()
-    const productList = useSelector(state => state.productList)
-    const { error, loading, products, page, pages } = productList
+    const productList = useSelector(state => state.productList);
+    const { error, loading, products, page, pages } = productList;
 
+    const history = useHistory();
     let keyword = history.location.search
 
-    useEffect(() => {
-        dispatch(listProducts(keyword))
 
-    }, [dispatch, keyword])
+    const readCookies = () => {
+      try {
+        const cookies = JSON.parse(Cookies.get('user'));
+
+        return cookies;
+      }
+      catch (error) {
+        return undefined;
+      }
+    }
+
+    useEffect(() => {
+
+        const cookies = readCookies();
+
+        if (cookies) {
+            if (cookies.isAdmin === 'Yes')
+              history.push('/admin');
+            else if (cookies.isAdmin === 'No') {
+              if (cookies.type === 'customer') {
+                history.push('/');
+              }
+              else if (cookies.type === 'driver') {
+                history.push('/driver');
+              }
+            }
+        }
+        else {
+          dispatch(listProducts(keyword))
+          displayHeader();
+        }
+    }, [dispatch, keyword, displayHeader]);
 
     return (
         <div>
