@@ -1,16 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import { styled, useTheme } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import CssBaseline from '@mui/material/CssBaseline';
-import Cookies from 'js-cookie';
 
 import AdminAppbar from './AdminAppbar';
 import AdminDrawerMenu from './AdminDrawerMenu';
 import Dashboard from './Dashboard';
 import UserAdminDashboard from './users/UserAdminDashboard';
+import ProductDashboard from './products/ProductDashboard';
 import OrderList from './orders/OrderList';
+import Profile from './Profile';
+import Setting from './Setting';
 import { logout } from '../actions/userActions';
 
 
@@ -53,12 +55,14 @@ function switchContents (page) {
 				return <Dashboard />;
 			case 'Users':
 				return <UserAdminDashboard />;
-			case 'Food':
-				return (
-					<div>Food</div>
-				);
+			case 'Products':
+				return <ProductDashboard />;
 			case 'Orders':
 				return <OrderList />;
+      case 'Profile':
+        return <Profile />
+      case 'Setting':
+        return <Setting />;
 			default:
 				throw new Error ('Invalid Admin Page Content');
 		}
@@ -75,6 +79,9 @@ export default function Admin ({hideHeader}) {
   const dispatch = useDispatch();
   const history = useHistory();
 
+  const userCookie = useSelector(state => state.userCookie);
+  const { userInfo } = userCookie;
+
   const handleDrawerOpen = () => {
     setOpen(true);
   };
@@ -88,8 +95,6 @@ export default function Admin ({hideHeader}) {
 		if (page === 'Sign Out') {
       // sign out user
       dispatch(logout());
-      Cookies.remove('user');
-      history.push('/');
     }
     else {
       setPage(page);
@@ -99,7 +104,11 @@ export default function Admin ({hideHeader}) {
 	useEffect(() => {
 		setPageTitle(page);
     hideHeader();
-	}, [open, page, hideHeader]);
+
+    if (!userInfo)
+      history.push('/');
+
+	}, [open, page, hideHeader, dispatch, userInfo]);
 
   return (
     <Box sx={{ display: 'flex' }}>

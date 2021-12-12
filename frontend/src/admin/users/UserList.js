@@ -142,7 +142,7 @@ export default function UserList({addNewUser}) {
                     columns={columns}
                     rows={users}
                     type="user"
-                    editUser={editUser}
+                    edit={editUser}
                   />
                 </>
               )
