@@ -11,6 +11,8 @@ import Dashboard from './Dashboard';
 import UserAdminDashboard from './users/UserAdminDashboard';
 import ProductDashboard from './products/ProductDashboard';
 import OrderList from './orders/OrderList';
+import Profile from './Profile';
+import Setting from './Setting';
 import { logout } from '../actions/userActions';
 
 
@@ -57,6 +59,10 @@ function switchContents (page) {
 				return <ProductDashboard />;
 			case 'Orders':
 				return <OrderList />;
+      case 'Profile':
+        return <Profile />
+      case 'Setting':
+        return <Setting />;
 			default:
 				throw new Error ('Invalid Admin Page Content');
 		}

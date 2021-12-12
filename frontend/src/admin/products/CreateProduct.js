@@ -116,6 +116,7 @@ export default function CreateProduct ({backToProductList}) {
             <Form.Group controlId='description'>
               <Form.Label>Product Description</Form.Label>
               <Form.Control
+                as="textarea"
                 required
                 type="text"
                 placeholder="Tasty Pizza with Pineapple"

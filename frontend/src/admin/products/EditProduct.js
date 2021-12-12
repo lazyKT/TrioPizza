@@ -9,8 +9,8 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import FormContainer from '../../components/FormContainer';
 import Loader from '../../components/Loader';
 import Message from '../../components/Message';
-import { listProductDetails, updateProduct } from '../../actions/productActions';
-import { PRODUCT_UPDATE_RESET } from '../../constants/productConstants';
+import { listProductDetails, updateProduct, deleteProduct } from '../../actions/productActions';
+import { PRODUCT_UPDATE_RESET, PRODUCT_DELETE_RESET } from '../../constants/productConstants';
 
 
 export default function EditProduct ({editingID, backToProductList}) {
@@ -26,6 +26,8 @@ export default function EditProduct ({editingID, backToProductList}) {
   const { loading, product, error } = useSelector(state => state.productDetails );
 
   const { updateError, updatedProduct } = useSelector(state => state.productUpdate);
+
+  const { errorDelete, successDelete } = useSelector(state => state.productDelete);
 
 
   const handleOnChange = (e) => {
@@ -47,7 +49,6 @@ export default function EditProduct ({editingID, backToProductList}) {
     }
   }
 
-
   const validateEditingProduct = (editingProduct) => {
     if (editingProduct.description && editingProduct.description === '')
       return { error : true, errorMessage: 'Error: Empty Description*' };
@@ -59,6 +60,13 @@ export default function EditProduct ({editingID, backToProductList}) {
       return { error : true, errorMessage: 'Error: Invalid Price*'};
 
     return { error: false };
+  }
+
+  const onDeleteProduct = (e) => {
+    e.preventDefault();
+    if (editingID && parseInt(editingID) > 0) {
+      dispatch(deleteProduct(editingID));
+    }
   }
 
 
@@ -100,6 +108,22 @@ export default function EditProduct ({editingID, backToProductList}) {
       }
     });
   }, [updatedProduct]);
+
+  useEffect(() => {
+    if (successDelete) {
+      backToProductList();
+    }
+    else if (errorDelete) {
+      setMessage(errorDelete);
+    }
+
+    return(() => {
+      if (successDelete)
+        dispatch({
+          type: PRODUCT_DELETE_RESET
+        });
+    });
+  }, [errorDelete, successDelete]);
 
 
   return (
@@ -161,9 +185,11 @@ export default function EditProduct ({editingID, backToProductList}) {
               >
                 Save Changes
               </Button>
+
               <Button
                 variant="contained"
                 color="error"
+                onClick={onDeleteProduct}
               >
                 Delete Product
               </Button>

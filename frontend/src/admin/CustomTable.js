@@ -22,7 +22,7 @@ import CustomTableBody from './CustomTableBody';
 
 const EnhancedTableToolbar = (props) => {
 
-  const { selected, openEditPannel, deleteUser, numSelected } = props;
+  const { selected, openEditPannel, deleteUser, numSelected, type } = props;
 
   const handleDeleteClick = (e) => {
     e.preventDefault();
@@ -50,40 +50,16 @@ const EnhancedTableToolbar = (props) => {
           {numSelected} selected
         </Typography>
       ) : (
-        <Typography
-          sx={{ flex: '1 1 100%' }}
-          variant="h6"
-          id="tableTitle"
-          component="div"
-        >
-          Users
-        </Typography>
+        <h6>{type}</h6>
       )}
 
-      {numSelected > 0 ? (
-        <>
-          { numSelected === 1 &&
-            <Tooltip title="Edit">
-              <IconButton
-                color="primary"
-                onClick={() => openEditPannel(selected[0])}
-              >
-                <EditIcon />
-              </IconButton>
-            </Tooltip>
-          }
-          <Tooltip title="Delete">
-            <IconButton
-              onClick={handleDeleteClick}
-            >
-              <DeleteIcon />
-            </IconButton>
-          </Tooltip>
-        </>
-      ) : (
-        <Tooltip title="Filter list">
-          <IconButton>
-            <FilterListIcon />
+      {numSelected > 0 && (
+        <Tooltip title="Edit">
+          <IconButton
+            color="primary"
+            onClick={() => openEditPannel(selected[0])}
+          >
+            <EditIcon />
           </IconButton>
         </Tooltip>
       )}
@@ -114,7 +90,12 @@ export default function CustomTable (props) {
 
   const handleSelectAllClick = (event) => {
     if (event.target.checked) {
-      const newSelecteds = rows.map((n) => n.name);
+      const newSelecteds = rows.map((n) => {
+        if (n.id)
+          return n.id;
+        else
+          return n._id;
+      });
       setSelected(newSelecteds);
       return;
     }
@@ -171,6 +152,7 @@ export default function CustomTable (props) {
                 numSelected={selected.length}
                 selected={selected}
                 openEditPannel={(id) => edit(id)}
+                type={type.toUpperCase()}
               />
 
               <TableContainer>

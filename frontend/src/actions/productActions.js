@@ -104,7 +104,7 @@ export const deleteProduct = (id) => async (dispatch, getState) => {
         })
 
         const {
-            userLogin: { userInfo },
+            userCookie: { userInfo },
         } = getState()
 
         const config = {

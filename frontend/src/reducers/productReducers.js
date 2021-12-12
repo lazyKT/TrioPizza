@@ -10,6 +10,7 @@ import {
     PRODUCT_DELETE_REQUEST,
     PRODUCT_DELETE_SUCCESS,
     PRODUCT_DELETE_FAIL,
+    PRODUCT_DELETE_RESET,
 
     PRODUCT_CREATE_REQUEST,
     PRODUCT_CREATE_SUCCESS,
@@ -78,10 +79,13 @@ export const productDeleteReducer = (state = {}, action) => {
             return { loading: true }
 
         case PRODUCT_DELETE_SUCCESS:
-            return { loading: false, success: true }
+            return { loadingDelete: false, successDelete: true }
 
         case PRODUCT_DELETE_FAIL:
-            return { loading: false, error: action.payload }
+            return { loading: false, errorDelete: action.payload }
+
+        case PRODUCT_DELETE_RESET:
+            return {}
 
         default:
             return state

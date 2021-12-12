@@ -192,7 +192,7 @@ export const updateUserProfile = (user) => async (dispatch, getState) => {
 
         const {
             userCookie: { userInfo },
-        } = getState()
+        } = getState();
 
         const config = {
             headers: {
@@ -276,13 +276,13 @@ export const deleteUser = (id) => async (dispatch, getState) => {
         })
 
         const {
-            userLogin: { userInfo },
+            userCookie: { userInfo },
         } = getState();
 
         const config = {
             headers: {
                 'Content-type': 'application/json',
-                // Authorization: `Bearer ${userInfo.token}`
+                Authorization: `Bearer ${userInfo.token}`
             }
         }
 

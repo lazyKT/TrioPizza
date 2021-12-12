@@ -103,7 +103,7 @@ def updateProduct(request, pk):
 
 
 @api_view(['DELETE'])
-@permission_classes([IsAdminUser])
+# @permission_classes([IsAdminUser])
 def deleteProduct(request, pk):
     try:
         product = Product.objects.get(_id=pk)
