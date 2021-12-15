@@ -108,7 +108,7 @@ class OrderList (APIView):
 
 
     def create_order (self, data, user, paid_time):
-        order = Order.objects.create(
+        return Order.objects.create(
             user=user,
             paymentMethod=data['paymentMethod'],
             taxPrice=data['taxPrice'],
@@ -119,8 +119,6 @@ class OrderList (APIView):
             isDelivered=data['isDelivered'],
             paidAt=paid_time
         )
-        serializer = OrderSerializer(order)
-        return serializer.data, order
 
 
     def create_order_items (self, items, order):
@@ -158,9 +156,10 @@ class OrderList (APIView):
             error, message = self.validate_order_items (data['orderItems'])
             if error:
                 return Response({'details' : message}, status=status.HTTP_400_BAD_REQUEST)
-            order_data, order_obj = self.create_order (data, user, paid_time)
-            self.create_order_items(data['orderItems'], order_obj)
-            return Response(order_data)
+            order = self.create_order (data, user, paid_time)
+            self.create_order_items(data['orderItems'], order)
+            serializer = OrderSerializer(order)
+            return Response(serializer.data)
         except Exception as e:
             error = 'Internal Sever Error!' if str(e) == '' else str(e)
             return Response({'details' : error}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
