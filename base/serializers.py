@@ -73,6 +73,7 @@ class OrderItemSerializer(serializers.ModelSerializer):
 class OrderSerializer(serializers.ModelSerializer):
     orderItems = serializers.SerializerMethodField(read_only=True)
     user = serializers.SerializerMethodField(read_only=True)
+    driver = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = Order
@@ -86,4 +87,9 @@ class OrderSerializer(serializers.ModelSerializer):
     def get_user(self, obj):
         user = obj.user
         serializer = UserSerializer(user, many=False)
+        return serializer.data
+
+    def get_driver (self, obj):
+        driver = obj.deliveredBy
+        serializer = UserSerializer(driver, many=False)
         return serializer.data

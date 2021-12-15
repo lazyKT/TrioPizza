@@ -107,9 +107,9 @@ class OrderList (APIView):
         return len(product)
 
 
-    def create_order (self, data, user, paid_time):
+    def create_order (self, data, customer, paid_time):
         return Order.objects.create(
-            user=user,
+            user=customer,
             paymentMethod=data['paymentMethod'],
             taxPrice=data['taxPrice'],
             shippingPrice=data['shippingPrice'],
@@ -117,7 +117,8 @@ class OrderList (APIView):
             totalPrice=data['totalPrice'],
             isPaid=data['isPaid'],
             isDelivered=data['isDelivered'],
-            paidAt=paid_time
+            paidAt=paid_time,
+            status='progress'
         )
 
 
@@ -193,115 +194,105 @@ class OrderDetails (APIView):
             return Response({'details' : str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-#
-# @api_view(['POST'])
+
+@api_view(['GET'])
 # @permission_classes([IsAuthenticated])
-# def addOrderItems(request):
-#     user = request.user
-#     data = request.data
-#
-#     orderItems = data['orderItems']
-#
-#     if orderItems and len(orderItems) == 0:
-#         return Response({'detail': 'No Order Items'}, status=status.HTTP_400_BAD_REQUEST)
-#     else:
-#
-#         # (1) Create order
-#
-#         order = Order.objects.create(
-#             user=user,
-#             paymentMethod=data['paymentMethod'],
-#             taxPrice=data['taxPrice'],
-#             shippingPrice=data['shippingPrice'],
-#             totalPrice=data['totalPrice']
-#         )
-#
-#         # (2) Create shipping address
-#
-#         shipping = ShippingAddress.objects.create(
-#             order=order,
-#             address=data['shippingAddress']['address'],
-#             city=data['shippingAddress']['city'],
-#             postalCode=data['shippingAddress']['postalCode'],
-#             country=data['shippingAddress']['country'],
-#         )
-#
-#         # (3) Create order items adn set order to orderItem relationship
-#         for i in orderItems:
-#             product = Product.objects.get(_id=i['product'])
-#
-#             item = OrderItem.objects.create(
-#                 product=product,
-#                 order=order,
-#                 name=product.name,
-#                 qty=i['qty'],
-#                 price=i['price'],
-#                 image=product.image.url,
-#             )
-#
-#             # (4) Update stock
-#
-#             product.countInStock -= item.qty
-#             product.save()
-#
-#         serializer = OrderSerializer(order, many=False)
-#         return Response(serializer.data)
+def get_user_orders (request, pk):
+    try:
+        user = User.objects.get(id=pk)
+        if user.profile.type != 'customer':
+            return Response({'details' : 'Invalid Customer!'}, status=status.HTTP_400_BAD_REQUEST)
+        orders = Order.objects.filter(user=user)
+        serializer = OrderSerializer(orders, many=True)
+        return Response(serializer.data)
+    except User.DoesNotExist:
+        return Response({'details' : 'User Not Found!'}, status=status.HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        error = 'Internal Server Error!' if str(e) == '' else str(e)
+        return Response({'details' : error}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 @api_view(['GET'])
-@permission_classes([IsAuthenticated])
-def getMyOrders(request):
-    user = request.user
-    orders = user.order_set.all()
-    serializer = OrderSerializer(orders, many=True)
-    return Response(serializer.data)
+def get_orders_by_driver (request, pk):
+    try:
+        driver = User.objects.get(id=pk)
+        if driver.profile.type != 'driver':
+            return Response({'details' : 'Invalid User!'}, status=status.HTTP_400_BAD_REQUEST)
+        orders = Order.objects.filter(deliveredBy=driver)
+        serializer = OrderSerializer(orders, many=True)
+        return Response(serializer.data)
+    except User.DoesNotExist:
+        return Response({'details' : 'Driver Not Found!'}, status=status.HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        error = 'Internal Server Error!' if str(e) == '' else str(e)
+        return Response({'details' : error}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-#
-# @api_view(['GET'])
-# @permission_classes([IsAdminUser])
-# def getOrders(request):
-#     orders = Order.objects.all()
-#     serializer = OrderSerializer(orders, many=True)
-#     return Response(serializer.data)
 
-#
-# @api_view(['GET'])
+# Assign Driver to Orders for delivery
+@api_view(['PUT'])
+def assign_driver_to_order (request):
+    try:
+        data = request.data
+        print(data)
+        if 'order' not in data or 'driver' not in data:
+            return Response({'detailss' : 'Missing Required Fields'}, status=status.HTTP_400_BAD_REQUEST)
+        order = Order.objects.get(_id=data['order'])
+        user = User.objects.get(id=data['driver'])
+        if user.profile.type != 'driver':
+            return Response({'details' : 'Invalid Driver!'}, status=status.HTTP_400_BAD_REQUEST)
+        order.deliveredBy = user
+        order.save()
+        serializer = OrderSerializer(order)
+        return Response(serializer.data)
+    except Order.DoesNotExist:
+        return Response({'details' : 'Order Not Found!'}, status=status.HTTP_400_BAD_REQUEST)
+    except User.DoesNotExist:
+        return Response({'details' : 'User Not Found!'}, status=status.HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        error = 'Internal Server Error' if str(e) == '' else str(e)
+        return Response({'details' : error}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+
+@api_view(['PUT'])
 # @permission_classes([IsAuthenticated])
-# def getOrderById(request, pk):
-#
-#     user = request.user
-#
-#     try:
-#         order = Order.objects.get(_id=pk)
-#         if user.is_staff or order.user == user:
-#             serializer = OrderSerializer(order, many=False)
-#             return Response(serializer.data)
-#         else:
-#             Response({'detail': 'Not authorized to view this order'},
-#                      status=status.HTTP_400_BAD_REQUEST)
-#     except:
-#         return Response({'detail': 'Order does not exist'}, status=status.HTTP_400_BAD_REQUEST)
-
-
-@api_view(['PUT'])
-@permission_classes([IsAuthenticated])
 def updateOrderToPaid(request, pk):
-    order = Order.objects.get(_id=pk)
-
-    order.isPaid = True
-    order.paidAt = datetime.now()
-    order.save()
-
-    return Response('Order was paid')
+    try:
+        order = Order.objects.get(_id=pk)
+        order.isPaid = True
+        order.status = 'completed'
+        order.paidAt = datetime.now()
+        order.save()
+        return Response('Order was paid')
+    except Order.DoesNotExist:
+        return Response({'details' : 'Order Not Found'}, status=status.HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        error = 'Internal Server Error!' if str(e) == '' else str(e)
+        return Response({'details' : error}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 @api_view(['PUT'])
-@permission_classes([IsAdminUser])
+# @permission_classes([IsAdminUser])
 def updateOrderToDelivered(request, pk):
-    order = Order.objects.get(_id=pk)
+    try:
+        order = Order.objects.get(_id=pk)
+        order.isDelivered = True
+        order.deliveredAt = datetime.now()
+        order.save()
+        return Response('Order was delivered')
+    except Order.DoesNotExist:
+        return Response({'details' : 'Order Not Found!'}, status=status.HTTP_400_BAD_REQUEST)
 
-    order.isDelivered = True
-    order.deliveredAt = datetime.now()
-    order.save()
 
-    return Response('Order was delivered')
+@api_view(['PUT'])
+def cancel_order (request, pk):
+    try:
+        order = Order.objects.get(_id=pk)
+        order.status = 'cancelled'
+        order.save()
+        return Response('Order is cancelled!')
+    except Order.DoesNotExist:
+        return Response({'details' : 'Order Not Found!'}, status=status.HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        error = 'Internal Server Error!' if str(e) == '' else str(e)
+        return Response({'details' : error}, status=status.HTTP_500_INTERNAL_SERVER_ERROR) 
