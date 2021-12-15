@@ -58,6 +58,7 @@ class Order(models.Model):
     paymentMethod = models.CharField(max_length=200, null=True, blank=True)
     taxPrice = models.DecimalField(
         max_digits=7, decimal_places=2, null=True, blank=True)
+    shippingAddress = models.TextField(null=True, blank=True)
     shippingPrice = models.DecimalField(
         max_digits=7, decimal_places=2, null=True, blank=True)
     totalPrice = models.DecimalField(
@@ -81,6 +82,8 @@ class OrderItem(models.Model):
     qty = models.IntegerField(null=True, blank=True, default=0)
     price = models.DecimalField(
         max_digits=7, decimal_places=2, null=True, blank=True)
+    remark = models.CharField(max_length=523, null=True, blank=True, default='')
+    totalPrice = models.DecimalField(decimal_places=2, max_digits=10)
     image = models.CharField(max_length=200, null=True, blank=True)
     _id = models.AutoField(primary_key=True, editable=False)
 
