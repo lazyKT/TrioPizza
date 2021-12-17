@@ -53,7 +53,7 @@ function OrderListScreen({ history }) {
     }
 
     useEffect(() => {
-        if (userInfo && userInfo.isAdmin) {
+        if (userInfo) {
             dispatch(listMyOrders())
         } else {
             history.push('/login')

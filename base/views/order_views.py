@@ -5,7 +5,7 @@ from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
-from base.models import Product, Order, OrderItem, ShippingAddress, User
+from base.models import Product, Order, OrderItem, ShippingAddress, User, DriverOrderStatus
 from base.serializers import ProductSerializer, OrderSerializer
 
 from rest_framework import status
@@ -221,6 +221,33 @@ def get_orders_by_driver (request, pk):
         return Response({'details' : error}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
+def update_driver_order_status (driver, order):
+    """
+    # Update the driver orders & status upon assigning new orders
+    """
+    try:
+        current_status = DriverOrderStatus.objects.get(driver=driver)
+        current_status.current_order = order
+        current_status.status = 'occupied'
+        current_status.total_order = current_status.total_order + 1
+        current_status.save()
+    except DriverOrderStatus.DoesNotExist:
+        raise Http404
+
+
+def driver_complete_delivery (driver):
+    """
+    # Driver Finished Delivering Products and Update driver status to 'Available'
+    """
+    try:
+        current_status = DriverOrderStatus.objects.get(driver=driver)
+        current_status.status = 'available'
+        current_status.current_order = None
+        current_status.save()
+    except DriverOrderStatus.DoesNotExist:
+        raise Http404
+
+
 # Assign Driver to Orders for delivery
 @api_view(['PUT'])
 def assign_driver_to_order (request):
@@ -235,6 +262,7 @@ def assign_driver_to_order (request):
             return Response({'details' : 'Invalid Driver!'}, status=status.HTTP_400_BAD_REQUEST)
         order.deliveredBy = user
         order.save()
+        update_driver_order_status(user, order)
         serializer = OrderSerializer(order)
         return Response(serializer.data)
     except Order.DoesNotExist:
@@ -273,9 +301,15 @@ def updateOrderToDelivered(request, pk):
         order.status = 'delivered'
         order.deliveredAt = datetime.now()
         order.save()
+        driver_complete_delivery (order.deliveredBy)
         return Response('Order was delivered')
     except Order.DoesNotExist:
         return Response({'details' : 'Order Not Found!'}, status=status.HTTP_400_BAD_REQUEST)
+    except User.DoesNotExist:
+        return Response({'details' : 'Dirver Not Found!'}, status=status.HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        error = 'Internal Server Error!' if str(e) == '' else str(e)
+        return Response({'details' : error}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 @api_view(['PUT'])

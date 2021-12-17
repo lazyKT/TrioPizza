@@ -252,9 +252,7 @@ export const listOrders = () => async (dispatch, getState) => {
             type: ORDER_LIST_REQUEST
         })
 
-        const {
-            userLogin: { userInfo },
-        } = getState()
+        const { userCookie: { userInfo } } = getState()
 
         const config = {
             headers: {
@@ -266,7 +264,9 @@ export const listOrders = () => async (dispatch, getState) => {
         const { data } = await axios.get(
             `/api/orders/`,
             config
-        )
+        );
+
+        console.log(data);
 
         dispatch({
             type: ORDER_LIST_SUCCESS,
@@ -275,10 +275,11 @@ export const listOrders = () => async (dispatch, getState) => {
 
 
     } catch (error) {
+        console.log(error.response);
         dispatch({
             type: ORDER_LIST_FAIL,
-            payload: error.response && error.response.data.detail
-                ? error.response.data.detail
+            payload: error.response && error.response.data.details
+                ? error.response.data.details
                 : error.message,
         })
     }

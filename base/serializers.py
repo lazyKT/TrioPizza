@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
 from rest_framework_simplejwt.tokens import RefreshToken
-from .models import Product, Order, OrderItem, ShippingAddress, Review
+from .models import Product, Order, OrderItem, ShippingAddress, Review, DriverOrderStatus
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -92,4 +92,17 @@ class OrderSerializer(serializers.ModelSerializer):
     def get_driver (self, obj):
         driver = obj.deliveredBy
         serializer = UserSerializer(driver, many=False)
+        return serializer.data
+
+
+class DriverOrderStatusSerializer(serializers.ModelSerializer):
+    driver = serializers.SerializerMethodField(read_only=True)
+
+    class Meta:
+        model = DriverOrderStatus
+        fields = '__all__'
+
+    def get_driver(self, obj):
+        driver = obj.driver
+        serializer = UserSerializer(driver)
         return serializer.data

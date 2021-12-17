@@ -10,7 +10,7 @@ import AdminDrawerMenu from './AdminDrawerMenu';
 import Dashboard from './Dashboard';
 import UserAdminDashboard from './users/UserAdminDashboard';
 import ProductDashboard from './products/ProductDashboard';
-import OrderList from './orders/OrderList';
+import OrderDashboard from './orders/OrderDashboard';
 import Profile from './Profile';
 import Setting from './Setting';
 import { logout } from '../actions/userActions';
@@ -58,7 +58,7 @@ function switchContents (page) {
 			case 'Products':
 				return <ProductDashboard />;
 			case 'Orders':
-				return <OrderList />;
+				return <OrderDashboard />;
       case 'Profile':
         return <Profile />
       case 'Setting':
