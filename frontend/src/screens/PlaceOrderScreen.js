@@ -2,10 +2,13 @@ import React, { useState, useEffect } from 'react'
 import { Button, Row, Col, ListGroup, Image, Card } from 'react-bootstrap'
 import { Link } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
-import Message from '../components/Message'
-import CheckoutSteps from '../components/CheckoutSteps'
-import { createOrder } from '../actions/orderActions'
-import { ORDER_CREATE_RESET } from '../constants/orderConstants'
+import Message from '../components/Message';
+import CheckoutSteps from '../components/CheckoutSteps';
+import { createOrder } from '../actions/orderActions';
+import { ORDER_CREATE_RESET } from '../constants/orderConstants';
+import { CART_CLEAR_ITEMS } from '../constants/cartConstants';
+
+
 
 function PlaceOrderScreen({ history }) {
 
@@ -27,24 +30,37 @@ function PlaceOrderScreen({ history }) {
         history.push('/payment')
     }
 
+    const placeOrder = (e) => {
+        e.preventDefault();
+        const { address, city, postalCode, country } = cart.shippingAddress;
+        const fullAddress = `${address}, ${city}, ${postalCode}, ${country}`;
+        dispatch(createOrder({
+            orderItems: cart.cartItems,
+            shippingAddress: fullAddress,
+            paymentMethod: cart.paymentMethod,
+            itemsPrice: parseFloat(cart.itemsPrice),
+            shippingPrice: parseFloat(cart.shippingPrice),
+            taxPrice: parseFloat(cart.taxPrice),
+            totalPrice: parseFloat(cart.totalPrice),
+            isPaid: cart.paymentMethod === 'Cash on Delivery' ? false : true
+        }));
+    }
+
+    const discardOrder = (e) => {
+      e.preventDefault();
+      dispatch({
+        type: CART_CLEAR_ITEMS
+      });
+      history.push('/');
+    }
+
     useEffect(() => {
         if (success) {
             history.push(`/order/${order._id}`)
             dispatch({ type: ORDER_CREATE_RESET })
         }
-    }, [success, history])
 
-    const placeOrder = () => {
-        dispatch(createOrder({
-            orderItems: cart.cartItems,
-            shippingAddress: cart.shippingAddress,
-            paymentMethod: cart.paymentMethod,
-            itemsPrice: cart.itemsPrice,
-            shippingPrice: cart.shippingPrice,
-            taxPrice: cart.taxPrice,
-            totalPrice: cart.totalPrice,
-        }))
-    }
+    }, [success, history, error]);
 
     return (
         <div>
@@ -152,6 +168,17 @@ function PlaceOrderScreen({ history }) {
                                     onClick={placeOrder}
                                 >
                                     Place Order
+                                </Button>
+                            </ListGroup.Item>
+
+                            <ListGroup.Item>
+                                <Button
+                                    type='button'
+                                    className='btn-block btn-secondary'
+                                    disabled={cart.cartItems === 0}
+                                    onClick={discardOrder}
+                                >
+                                    Discard Order
                                 </Button>
                             </ListGroup.Item>
 

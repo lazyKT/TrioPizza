@@ -41,28 +41,22 @@ class OrderList (APIView):
             return error, 'Payment Method is Required*'
         elif 'taxPrice' not in request_body:
             return error, 'Tax Price is Required*'
-        elif type(request_body['taxPrice']) != float:
-            return error, 'Tax Price must be a float type!'
+        elif type(request_body['taxPrice']) != float and type(request_body['taxPrice']) != int:
+            return error, 'Tax Price must be a number type!'
         elif 'shippingAddress' not in request_body:
             return error, 'Delivery Address is required*'
         elif 'shippingPrice' not in request_body:
             return error, 'Shipping Price is Required*'
-        elif type(request_body['taxPrice']) != float:
-            return error, 'Shipping Price must be a float type!'
+        elif type(request_body['taxPrice']) != float and type(request_body['shippingPrice']) != int:
+            return error, 'Shipping Price must be a number type!'
         elif 'totalPrice' not in request_body:
             return error, 'Total Price is Required*'
-        elif type(request_body['taxPrice']) != float:
-            return error, 'Total Price must be a float type!'
+        elif type(request_body['totalPrice']) != float and type(request_body['totalPrice']) != int:
+            return error, 'Total Price must be a number type!'
         elif 'isPaid' not in request_body:
             return error, 'Missing Required Field! isPaid'
         elif type(request_body['isPaid']) != bool:
             return error, 'Field, isPaid, must be a boolean type!'
-        elif 'paidAt' not in request_body:
-            return error, 'Missing Required Field! paidAt'
-        elif 'isDelivered' not in request_body:
-            return error, 'Missing Required Field! isDelivered'
-        elif type(request_body['isDelivered']) != bool:
-            return error, 'Field, isDelivered, must be a boolean type!'
         else:
             error = False
             return error, ""
@@ -93,11 +87,11 @@ class OrderList (APIView):
                 return error, 'Quantity value must be an Integer'
             elif 'price' not in item:
                 return error, 'Field, price, is required*'
-            elif type(item['price']) != float:
-                return error, 'Price value must be float type!'
+            elif type(item['price']) != float and type(item['price']) != int:
+                return error, 'Price value must be number type!'
             elif 'totalPrice' not in item:
                 return error, 'Field, totalPrice, is required*'
-            elif type(item['totalPrice']) != float:
+            elif type(item['totalPrice']) != float and type(item['totalPrice']) != int:
                 return error, 'Total Price value must be float type!'
         return False, ''
 
@@ -107,7 +101,7 @@ class OrderList (APIView):
         return len(product)
 
 
-    def create_order (self, data, customer, paid_time):
+    def create_order (self, data, customer):
         return Order.objects.create(
             user=customer,
             paymentMethod=data['paymentMethod'],
@@ -116,8 +110,8 @@ class OrderList (APIView):
             shippingAddress=data['shippingAddress'],
             totalPrice=data['totalPrice'],
             isPaid=data['isPaid'],
-            isDelivered=data['isDelivered'],
-            paidAt=paid_time,
+            isDelivered=False,
+            paidAt=datetime.now(),
             status='progress'
         )
 
@@ -152,12 +146,11 @@ class OrderList (APIView):
             if error:
                 return Response({'details' : message}, status=status.HTTP_400_BAD_REQUEST)
             user = self.check_user(data['user'])
-            paid_time = datetime.strptime (data['paidAt'], '%Y-%m-%d %H:%M:%S')
             # validate order items
             error, message = self.validate_order_items (data['orderItems'])
             if error:
                 return Response({'details' : message}, status=status.HTTP_400_BAD_REQUEST)
-            order = self.create_order (data, user, paid_time)
+            order = self.create_order (data, user)
             self.create_order_items(data['orderItems'], order)
             serializer = OrderSerializer(order)
             return Response(serializer.data)
@@ -277,6 +270,7 @@ def updateOrderToDelivered(request, pk):
     try:
         order = Order.objects.get(_id=pk)
         order.isDelivered = True
+        order.status = 'delivered'
         order.deliveredAt = datetime.now()
         order.save()
         return Response('Order was delivered')
@@ -295,4 +289,4 @@ def cancel_order (request, pk):
         return Response({'details' : 'Order Not Found!'}, status=status.HTTP_400_BAD_REQUEST)
     except Exception as e:
         error = 'Internal Server Error!' if str(e) == '' else str(e)
-        return Response({'details' : error}, status=status.HTTP_500_INTERNAL_SERVER_ERROR) 
+        return Response({'details' : error}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

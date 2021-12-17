@@ -12,16 +12,25 @@ function ShippingScreen({ history }) {
 
     const dispatch = useDispatch()
 
-    const [address, setAddress] = useState(shippingAddress.address)
-    const [city, setCity] = useState(shippingAddress.city)
-    const [postalCode, setPostalCode] = useState(shippingAddress.postalCode)
-    const [country, setCountry] = useState(shippingAddress.country)
+    const [address, setAddress] = useState('');
+    const [city, setCity] = useState('');
+    const [postalCode, setPostalCode] = useState('');
+    const [country, setCountry] = useState('');
 
     const submitHandler = (e) => {
-        e.preventDefault()
+        e.preventDefault();
         dispatch(saveShippingAddress({ address, city, postalCode, country }))
         history.push('/payment')
     }
+
+    useEffect(() => {
+      if (shippingAddress) {
+        setAddress(shippingAddress.address);
+        setCity(shippingAddress.city);
+        setPostalCode(shippingAddress.postalCode);
+        setCountry(shippingAddress.country);
+      }
+    }, [shippingAddress]);
 
     return (
         <FormContainer>
@@ -35,7 +44,7 @@ function ShippingScreen({ history }) {
                         required
                         type='text'
                         placeholder='Enter address'
-                        value={address ? address : ''}
+                        value={address}
                         onChange={(e) => setAddress(e.target.value)}
                     >
                     </Form.Control>
@@ -47,7 +56,7 @@ function ShippingScreen({ history }) {
                         required
                         type='text'
                         placeholder='Enter city'
-                        value={city ? city : ''}
+                        value={city}
                         onChange={(e) => setCity(e.target.value)}
                     >
                     </Form.Control>
@@ -59,7 +68,7 @@ function ShippingScreen({ history }) {
                         required
                         type='text'
                         placeholder='Enter postal code'
-                        value={postalCode ? postalCode : ''}
+                        value={postalCode}
                         onChange={(e) => setPostalCode(e.target.value)}
                     >
                     </Form.Control>
@@ -71,7 +80,7 @@ function ShippingScreen({ history }) {
                         required
                         type='text'
                         placeholder='Enter country'
-                        value={country ? country : ''}
+                        value={country}
                         onChange={(e) => setCountry(e.target.value)}
                     >
                     </Form.Control>
