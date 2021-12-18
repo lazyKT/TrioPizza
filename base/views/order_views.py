@@ -24,7 +24,7 @@ class OrderList (APIView):
         """
         # GET all orders
         """
-        orders = Order.objects.all()
+        orders = Order.objects.all().order_by('-_id')
         serializer = OrderSerializer(orders, many=True)
         return Response (serializer.data)
 

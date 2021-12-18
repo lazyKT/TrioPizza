@@ -91,6 +91,8 @@ class OrderSerializer(serializers.ModelSerializer):
 
     def get_driver (self, obj):
         driver = obj.deliveredBy
+        if driver is None:
+            return None
         serializer = UserSerializer(driver, many=False)
         return serializer.data
 

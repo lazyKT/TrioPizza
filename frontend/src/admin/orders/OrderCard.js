@@ -1,6 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Paper from '@mui/material/Paper';
 import Box from '@mui/material/Box';
+
+import OrderDetails from './OrderDetails';
 
 
 const styles = {
@@ -17,11 +19,16 @@ const styles = {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center'
+  },
+  status: {
+    padding: '10px',
+    borderRadius: '2px',
+    color: 'white'
   }
 }
 
 
-export default function OrderCard ({order}) {
+export default function OrderCard ({order, goToOrderDetails}) {
 
 
   const displayOrderItem = (items) => {
@@ -40,14 +47,32 @@ export default function OrderCard ({order}) {
     return `${dt.toLocaleDateString()}, ${dt.toLocaleTimeString()}`;
   }
 
+
+  const handleOnClick = (e) => {
+    e.preventDefault();
+    goToOrderDetails(order._id);
+  }
+
+
   return (
-    <Paper sx={styles.paper}>
+    <Paper
+      sx={styles.paper}
+      onClick={handleOnClick}
+    >
       <Box sx={styles.box}>
         <div>
           <h5>{displayOrderItem(order.orderItems)}</h5>
+          <h5>{order.totalPrice} $</h5>
           <h6>{toDate(order.createdAt)}</h6>
         </div>
-        <h5>{order.totalPrice} &nbsp;$</h5>
+        <Box
+          sx={{
+            ...styles.status,
+            backgroundColor: order.status === 'progress' ? 'coral' : 'dodgerBlue'
+          }}
+        >
+          {order.status}
+        </Box>
       </Box>
     </Paper>
   )

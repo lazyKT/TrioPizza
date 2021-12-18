@@ -23,6 +23,7 @@ import {
     userListReducer,
     userDeleteReducer,
     userUpdateReducer,
+    availableDriversListReducer
 } from './reducers/userReducers'
 
 import {
@@ -54,6 +55,7 @@ const reducer = combineReducers({
     userList: userListReducer,
     userDelete: userDeleteReducer,
     userUpdate: userUpdateReducer,
+    availableDriverList: availableDriversListReducer,
 
     orderCreate: orderCreateReducer,
     orderDetails: orderDetailsReducer,
