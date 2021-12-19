@@ -6,16 +6,10 @@ urlpatterns = [
     path('', views.UserList.as_view()),
     path('login/', views.MyTokenObtainPairView.as_view(),
          name='token_obtain_pair'),
-
-    # path('register/', views.registerUser, name='register'),
-
-    path('profile/', views.getUserProfile, name="users-profile"),
-    path('profile/update/', views.updateUserProfile, name="user-profile-update"),
-    path('', views.getUsers, name="users"),
-
+    path('addresses/', views.ShippingAddressList.as_view(), name="user-saved-addresses"),
+    path('drivers/status', views.get_all_driver_status, name='get-driver-status'),
+    path('drivers/status/save', views.create_new_driver_record, name='get-driver-status'),
+    path('drivers/status/available', views.get_all_avaialble_drivers, name='create-new-driver'),
+    path('<int:pk>/addresses/', views.get_user_saved_addresses, name='user-saved-addresses'),
     path('<int:pk>/', views.UserDetails.as_view(), name='user'),
-
-    path('update/<str:pk>/', views.updateUser, name='user-update'),
-
-    path('delete/<str:pk>/', views.deleteUser, name='user-delete'),
 ]

@@ -47,6 +47,7 @@ function App() {
           <Route path='/shipping' component={ShippingScreen} />
           <Route path='/placeorder' component={PlaceOrderScreen} />
           <Route path='/order/:id' component={OrderScreen} />
+          <Route path='/myorders' component={OrderListScreen} />
           <Route path='/payment' component={PaymentScreen} />
           <Route path='/product/:id' component={ProductScreen} />
           <Route path='/cart/:id?' component={CartScreen} />
@@ -56,8 +57,6 @@ function App() {
 
           <Route path='/admin/productlist' component={ProductListScreen} />
           <Route path='/admin/product/:id/edit' component={ProductEditScreen} />
-
-          <Route path='/admin/orderlist' component={OrderListScreen} />
 
           <Route path='/driver' component={DriverDashboard} />
         </Container>

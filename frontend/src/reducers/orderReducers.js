@@ -2,8 +2,12 @@ import {
     ORDER_CREATE_REQUEST,
     ORDER_CREATE_SUCCESS,
     ORDER_CREATE_FAIL,
-
     ORDER_CREATE_RESET,
+
+    ORDER_CANCEL_REQUEST,
+    ORDER_CANCEL_SUCCESS,
+    ORDER_CANCEL_FAIL,
+    ORDER_CANCEL_RESET,
 
     ORDER_DETAILS_REQUEST,
     ORDER_DETAILS_SUCCESS,
@@ -57,6 +61,33 @@ export const orderCreateReducer = (state = {}, action) => {
         default:
             return state
     }
+}
+
+
+export const orderCancelReducer = (state = {}, action) => {
+  switch (action.type) {
+    case ORDER_CANCEL_REQUEST:
+      return {
+        ...state,
+        loadingCancelOrder: true
+      };
+    case ORDER_CANCEL_SUCCESS:
+      return {
+        ...state,
+        loadingCancelOrder: false,
+        cancelOrderMessage: 'Your Order has been cancelled!'
+      };
+    case ORDER_CANCEL_FAIL:
+      return {
+        ...state,
+        loadingCancelOrder: false,
+        errorCancelOrder: action.payload
+      };
+    case ORDER_CANCEL_RESET:
+      return {}
+    default:
+      return state
+  }
 }
 
 
@@ -143,7 +174,7 @@ export const orderDeliverReducer = (state = {}, action) => {
 }
 
 
-export const orderListMyReducer = (state = { orders: [] }, action) => {
+export const myOrderListReducer = (state = { orders: [] }, action) => {
     switch (action.type) {
         case ORDER_LIST_MY_REQUEST:
             return {

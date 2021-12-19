@@ -33,6 +33,11 @@ import {
     USER_UPDATE_SUCCESS,
     USER_UPDATE_FAIL,
 
+    AVAILABLE_DRIVERS_REQUEST,
+    AVAILABLE_DRIVERS_SUCCESS,
+    AVAILABLE_DRIVERS_FAIL,
+    AVAILABLE_DRIVERS_RESET
+
 } from '../constants/userConstants'
 
 import { ORDER_LIST_MY_RESET } from '../constants/orderConstants';
@@ -347,4 +352,35 @@ export const updateUser = (id, user) => async (dispatch, getState) => {
                 : error.message,
         })
     }
+}
+
+
+export const getAvailableDrivers = () => async (dispatch, getState) => {
+  try {
+    dispatch ({
+      type: AVAILABLE_DRIVERS_REQUEST
+    });
+
+    const { userCookie: userInfo } = getState();
+
+    const { data } = await axios.get(`api/users/drivers/status/available`, {
+      headers: {
+        'Content-Type' : 'Application/json',
+        Authorization: `Bearer ${userInfo.token}`
+      }
+    });
+
+    dispatch({
+      type: AVAILABLE_DRIVERS_SUCCESS,
+      payload: data
+    });
+  }
+  catch (error) {
+    dispatch({
+      type: AVAILABLE_DRIVERS_FAIL,
+      payload: error.response && error.response.data.details
+            ? error.response.data.details
+            : error.message
+    })
+  }
 }

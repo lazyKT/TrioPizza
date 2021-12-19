@@ -54,19 +54,19 @@ class Review(models.Model):
 
 
 class Order(models.Model):
-    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='customer')
     paymentMethod = models.CharField(max_length=200, null=True, blank=True)
     taxPrice = models.DecimalField(
         max_digits=7, decimal_places=2, null=True, blank=True)
-    shippingPrice = models.DecimalField(
-        max_digits=7, decimal_places=2, null=True, blank=True)
-    totalPrice = models.DecimalField(
-        max_digits=7, decimal_places=2, null=True, blank=True)
+    shippingAddress = models.TextField(null=True, blank=True)
+    shippingPrice = models.DecimalField(max_digits=7, decimal_places=2, null=True, blank=True)
+    totalPrice = models.DecimalField(max_digits=7, decimal_places=2, null=True, blank=True)
     isPaid = models.BooleanField(default=False)
     paidAt = models.DateTimeField(auto_now_add=False, null=True, blank=True)
     isDelivered = models.BooleanField(default=False)
-    deliveredAt = models.DateTimeField(
-        auto_now_add=False, null=True, blank=True)
+    deliveredAt = models.DateTimeField(auto_now_add=False, null=True, blank=True)
+    deliveredBy = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='driver')
+    status = models.CharField(max_length=10)
     createdAt = models.DateTimeField(auto_now_add=True)
     _id = models.AutoField(primary_key=True, editable=False)
 
@@ -81,6 +81,8 @@ class OrderItem(models.Model):
     qty = models.IntegerField(null=True, blank=True, default=0)
     price = models.DecimalField(
         max_digits=7, decimal_places=2, null=True, blank=True)
+    remark = models.CharField(max_length=523, null=True, blank=True, default='')
+    totalPrice = models.DecimalField(decimal_places=2, max_digits=10)
     image = models.CharField(max_length=200, null=True, blank=True)
     _id = models.AutoField(primary_key=True, editable=False)
 
@@ -89,15 +91,24 @@ class OrderItem(models.Model):
 
 
 class ShippingAddress(models.Model):
-    order = models.OneToOneField(
-        Order, on_delete=models.CASCADE, null=True, blank=True)
+    name = models.CharField(max_length=64)
     address = models.CharField(max_length=200, null=True, blank=True)
     city = models.CharField(max_length=200, null=True, blank=True)
     postalCode = models.CharField(max_length=200, null=True, blank=True)
     country = models.CharField(max_length=200, null=True, blank=True)
-    shippingPrice = models.DecimalField(
-        max_digits=7, decimal_places=2, null=True, blank=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     _id = models.AutoField(primary_key=True, editable=False)
 
     def __str__(self):
         return str(self.address)
+
+
+class DriverOrderStatus (models.Model):
+    _id = models.AutoField(primary_key=True)
+    driver = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    current_order = models.ForeignKey(Order, on_delete=models.CASCADE, null=True, blank=True)
+    status = models.CharField(max_length=10, default='available')
+    total_order = models.IntegerField(default=0)
+
+    def __str__(self):
+        return 'driver name: %s, status: %s' % (self.driver.name, self.status)

@@ -12,16 +12,21 @@ function PaymentScreen({ history }) {
 
     const dispatch = useDispatch()
 
-    const [paymentMethod, setPaymentMethod] = useState('PayPal')
+    const [paymentMethod, setPaymentMethod] = useState('Visa')
 
     if (!shippingAddress.address) {
         history.push('/shipping')
     }
 
+    const handleOnChange = e => {
+      console.log(e.target.value);
+      setPaymentMethod(e.target.value);
+    }
+
     const submitHandler = (e) => {
-        e.preventDefault()
-        dispatch(savePaymentMethod(paymentMethod))
-        history.push('/placeorder')
+        e.preventDefault();
+        dispatch(savePaymentMethod(paymentMethod));
+        history.push('/placeorder');
     }
 
     return (
@@ -34,14 +39,41 @@ function PaymentScreen({ history }) {
                     <Col>
                         <Form.Check
                             type='radio'
-                            label='PayPal or Credit Card'
+                            label='Visa'
+                            id='Visa'
+                            name='paymentMethod'
+                            value='Visa'
+                            onChange={handleOnChange}
+                            checked={paymentMethod === 'Visa'}
+                        />
+                    </Col>
+                </Form.Group>
+
+                <Form.Group>
+                    <Col>
+                        <Form.Check
+                            type='radio'
+                            label='Master Card'
+                            id='master'
+                            name='paymentMethod'
+                            value='Master Card'
+                            onChange={handleOnChange}
+                            checked={paymentMethod === 'Master Card'}
+                        />
+                    </Col>
+                </Form.Group>
+
+                <Form.Group>
+                    <Col>
+                        <Form.Check
+                            type='radio'
+                            label='Cash on Delivery'
                             id='paypal'
                             name='paymentMethod'
-                            checked
-                            onChange={(e) => setPaymentMethod(e.target.value)}
-                        >
-
-                        </Form.Check>
+                            onChange={handleOnChange}
+                            value='Cash on Delivery'
+                            checked={paymentMethod === 'Cash on Delivery'}
+                        />
                     </Col>
                 </Form.Group>
 

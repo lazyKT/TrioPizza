@@ -17,12 +17,13 @@ export const addToCart = (id, qty) => async (dispatch, getState) => {
             product: data._id,
             name: data.name,
             image: data.image,
-            price: data.price,
+            price: parseFloat(data.price),
             countInStock: data.countInStock,
+            totalPrice: parseFloat(parseInt(qty) * parseFloat(data.price)),
             qty
         }
     })
-    localStorage.setItem('cartItems', JSON.stringify(getState().cart.cartItems))
+    // localStorage.setItem('cartItems', JSON.stringify(getState().cart.cartItems));
 }
 
 
@@ -33,7 +34,7 @@ export const removeFromCart = (id) => (dispatch, getState) => {
         payload: id,
     })
 
-    localStorage.setItem('cartItems', JSON.stringify(getState().cart.cartItems))
+    // localStorage.setItem('cartItems', JSON.stringify(getState().cart.cartItems));
 }
 
 
@@ -43,7 +44,7 @@ export const saveShippingAddress = (data) => (dispatch) => {
         payload: data,
     })
 
-    localStorage.setItem('shippingAddress', JSON.stringify(data))
+    // localStorage.setItem('shippingAddress', JSON.stringify(data));
 }
 
 export const savePaymentMethod = (data) => (dispatch) => {
@@ -52,5 +53,5 @@ export const savePaymentMethod = (data) => (dispatch) => {
         payload: data,
     })
 
-    localStorage.setItem('paymentMethod', JSON.stringify(data))
+    // localStorage.setItem('paymentMethod', JSON.stringify(data));
 }

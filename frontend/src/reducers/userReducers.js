@@ -36,6 +36,10 @@ import {
     USER_UPDATE_FAIL,
     USER_UPDATE_RESET,
 
+    AVAILABLE_DRIVERS_REQUEST,
+    AVAILABLE_DRIVERS_SUCCESS,
+    AVAILABLE_DRIVERS_FAIL,
+    AVAILABLE_DRIVERS_RESET
 } from '../constants/userConstants';
 
 
@@ -199,4 +203,20 @@ export const userUpdateReducer = (state = { user: {} }, action) => {
         default:
             return state
     }
+}
+
+
+export const availableDriversListReducer = (state = {}, action) => {
+  switch (action.type) {
+    case AVAILABLE_DRIVERS_REQUEST:
+      return { loading: true };
+    case AVAILABLE_DRIVERS_SUCCESS:
+      return { loading: false, data: action.payload };
+    case AVAILABLE_DRIVERS_FAIL:
+      return { loading: false, error: action.payload };
+    case AVAILABLE_DRIVERS_RESET:
+      return {};
+    default:
+      return state;
+  }
 }

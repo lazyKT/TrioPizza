@@ -14,8 +14,7 @@ import { listProducts } from '../actions/productActions'
 
 function HomeScreen ({displayHeader}) {
     const dispatch = useDispatch()
-    const productList = useSelector(state => state.productList);
-    const { error, loading, products, page, pages } = productList;
+    const { error, loading, products, page, pages } = useSelector(state => state.productList);
 
     const history = useHistory();
     let keyword = history.location.search
@@ -48,10 +47,9 @@ function HomeScreen ({displayHeader}) {
               }
             }
         }
-        else {
-          dispatch(listProducts(keyword))
-          displayHeader();
-        }
+
+        dispatch(listProducts(keyword))
+        displayHeader();
     }, [dispatch, keyword, displayHeader]);
 
     return (
