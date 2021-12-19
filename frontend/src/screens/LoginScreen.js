@@ -33,27 +33,25 @@ function LoginScreen({ location, history }) {
 
     useEffect(() => {
 
-        console.log('userInfo', userInfo);
+      if (userInfo) {
+          // set cookies
+          Cookies.set('user', JSON.stringify(userInfo));
 
-        if (userInfo) {
-            // set cookies
-            Cookies.set('user', JSON.stringify(userInfo));
-
-            if (userInfo.isAdmin === 'No') {
-              history.push(redirect);
-            }
-            else if (userInfo.isAdmin === 'Yes') {
-              history.push('/admin');
-            }
-        }
-
-        return(() => {
-          if (userInfo) {
-            dispatch({
-              type:USER_LOGIN_CLEAR
-            })
+          if (userInfo.isAdmin === 'No') {
+            history.push(redirect);
           }
-        });
+          else if (userInfo.isAdmin === 'Yes') {
+            history.push('/admin');
+          }
+      }
+
+      return(() => {
+        if (userInfo) {
+          dispatch({
+            type:USER_LOGIN_CLEAR
+          })
+        }
+      });
     }, [history, userInfo, redirect]);
 
     return (

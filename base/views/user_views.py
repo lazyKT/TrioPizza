@@ -17,13 +17,11 @@ from base.serializers import ProductSerializer, UserSerializer, UserSerializerWi
 
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
     def validate(self, attrs):
-        print ('attrs', attrs)
         data = super().validate(attrs)
 
         serializer = UserSerializerWithToken(self.user).data
         for k, v in serializer.items():
             data[k] = v
-            print(k, v)
         return data
 
 

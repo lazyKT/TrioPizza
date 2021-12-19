@@ -11,7 +11,8 @@ export default function AsignDriver ({id, driver}) {
 
   const [ drivers, setDrivers ] = useState([]);
   const [ error, setError ] = useState(null);
-  const [ selected, setSelected ] = useState(-1)
+  const [ selected, setSelected ] = useState(-1);
+  const [ orderDriver, setOrderDriver ] = useState(null);
 
   const dispatch = useDispatch();
   const { userInfo } = useSelector(state => state.userCookie);
@@ -36,7 +37,9 @@ export default function AsignDriver ({id, driver}) {
       });
 
       if (response.status === 200) {
-        console.log('Asign Driver Success!');
+        console.log('Asign Driver Success!', selected);
+        const selectedDriver = drivers.filter(d => d.driver.id === parseInt(selected));
+        setOrderDriver(selectedDriver[0].driver);
       }
     }
     catch (error) {
@@ -78,6 +81,8 @@ export default function AsignDriver ({id, driver}) {
       (async () => await fetchAvailableDrivers(userInfo.token, abortController.signal)) ()
     }
 
+    setOrderDriver(driver);
+
     return(() => abortController.abort());
   }, [id, driver, userInfo]);
 
@@ -94,7 +99,7 @@ export default function AsignDriver ({id, driver}) {
           marginTop: '10px'
         }}
       >
-        {!driver ?
+        {!orderDriver ?
           (
             <>
               <select
@@ -123,7 +128,7 @@ export default function AsignDriver ({id, driver}) {
               </div>
             </>
           ) :
-          <h6>{driver.name}</h6>
+          <h6>{orderDriver.name}</h6>
         }
       </Box>
     </>

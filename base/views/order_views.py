@@ -195,7 +195,7 @@ def get_user_orders (request, pk):
         user = User.objects.get(id=pk)
         if user.profile.type != 'customer':
             return Response({'details' : 'Invalid Customer!'}, status=status.HTTP_400_BAD_REQUEST)
-        orders = Order.objects.filter(user=user)
+        orders = Order.objects.filter(user=user).order_by('-_id')
         serializer = OrderSerializer(orders, many=True)
         return Response(serializer.data)
     except User.DoesNotExist:
@@ -302,7 +302,8 @@ def updateOrderToDelivered(request, pk):
         order.deliveredAt = datetime.now()
         order.save()
         driver_complete_delivery (order.deliveredBy)
-        return Response('Order was delivered')
+        serializer = OrderSerializer(order)
+        return Response(serializer.data)
     except Order.DoesNotExist:
         return Response({'details' : 'Order Not Found!'}, status=status.HTTP_400_BAD_REQUEST)
     except User.DoesNotExist:
@@ -318,7 +319,8 @@ def cancel_order (request, pk):
         order = Order.objects.get(_id=pk)
         order.status = 'cancelled'
         order.save()
-        return Response('Order is cancelled!')
+        serializer = OrderSerializer(order)
+        return Response(serializer.data)
     except Order.DoesNotExist:
         return Response({'details' : 'Order Not Found!'}, status=status.HTTP_400_BAD_REQUEST)
     except Exception as e:
