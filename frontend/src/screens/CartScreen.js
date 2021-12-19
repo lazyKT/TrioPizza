@@ -10,6 +10,8 @@ function CartScreen({ match, location, history }) {
     const qty = location.search ? Number(location.search.split('=')[1]) : 1
     const dispatch = useDispatch()
 
+    const { userInfo } = useSelector(state => state.userCookie);
+
     const cart = useSelector(state => state.cart)
     const { cartItems } = cart
 
@@ -25,7 +27,10 @@ function CartScreen({ match, location, history }) {
     }
 
     const checkoutHandler = () => {
-        history.push('/login?redirect=shipping')
+        if (userInfo)
+          history.push('/payment');
+        else
+          history.push('/login?redirect=shipping');
     }
 
     return (

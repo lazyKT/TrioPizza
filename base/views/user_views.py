@@ -11,19 +11,17 @@ from django.contrib.auth.models import User
 from django.contrib.auth.hashers import make_password
 from rest_framework import status
 
-from base.models import Profile
-from base.serializers import ProductSerializer, UserSerializer, UserSerializerWithToken
+from base.models import Profile, ShippingAddress, DriverOrderStatus
+from base.serializers import ProductSerializer, UserSerializer, UserSerializerWithToken, ShippingAddressSerializer, DriverOrderStatusSerializer
 
 
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
     def validate(self, attrs):
-        print ('attrs', attrs)
         data = super().validate(attrs)
 
         serializer = UserSerializerWithToken(self.user).data
         for k, v in serializer.items():
             data[k] = v
-            print(k, v)
         return data
 
 
@@ -74,38 +72,50 @@ class UserList (APIView):
         return Response(serializer.data)
 
 
+    def create_new_driver_record (self, driver):
+        try:
+            record = DriverOrderStatus.objects.create(
+                driver=driver,
+                current_order=None,
+                total_order=0
+            )
+        except Exception as e:
+            raise e
+
+
     def post (self, request, *args, **kwargs):
         """
         # Create New Users
         """
-        try:
-            data = request.data
-            error, message = self.validate_request_body(data)
-            if error:
-                return Response ({'details': message}, status=status.HTTP_400_BAD_REQUEST)
-            # Check user by username
-            user = self.get_user_by_username(data['username'])
-            if len(user) > 0:
-                error = 'User already exists with username, %s' % data['username']
-                return Response ({'details' : error}, status=status.HTTP_400_BAD_REQUEST)
+        # try:
+        data = request.data
+        error, message = self.validate_request_body(data)
+        if error:
+            return Response ({'details': message}, status=status.HTTP_400_BAD_REQUEST)
+        # Check user by username
+        user = self.get_user_by_username(data['username'])
+        if len(user) > 0:
+            error = 'User already exists with username, %s' % data['username']
+            return Response ({'details' : error}, status=status.HTTP_400_BAD_REQUEST)
 
-            user = User.objects.create(
-                username=data['username'],
-                password=make_password(data['password'])
-            )
+        user = User.objects.create(
+            username=data['username'],
+            password=make_password(data['password'])
+        )
 
-            profile = user.profile
-            profile.type = data['type']
-            profile.name = data['name']
-            profile.mobile = data['mobile']
-            profile.save()
-            print('user profile saved!')
-            serializer = UserSerializer (user)
-            print('serializer.data', serializer.data)
-            return Response(serializer.data)
-        except Exception as e:
-            error = repr(e)
-            return Response ({'details' : error}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        profile = user.profile
+        profile.type = data['type']
+        profile.name = data['name']
+        profile.mobile = data['mobile']
+        profile.save()
+        if data['type'] == 'driver':
+            self.create_new_driver_record (user)
+        serializer = UserSerializer (user)
+
+        return Response(serializer.data)
+        # except Exception as e:
+        #     error = repr(e)
+        #     return Response ({'details' : error}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 
@@ -176,12 +186,10 @@ class UserDetails (APIView):
             data = request.data
 
             error, message = self.validate_request_body (data)
-            print('1st Check', message)
             if error:
                 return Response ({'details': message}, status=status.HTTP_400_BAD_REQUEST)
 
             is_valid, message = self.validate_username(user.username, data['username'])
-            print('2nd Check', message)
             if is_valid is not True:
                 return Response ({'details' : message}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -194,7 +202,6 @@ class UserDetails (APIView):
                 profile.mobile = data['mobile']
                 profile.save()
                 return Response (serializer.data)
-            print('3rd Check', 'Failed')
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             error = repr(e)
@@ -208,114 +215,213 @@ class UserDetails (APIView):
 
 
 
-# @api_view(['POST'])
-# def registerUser(request):
-#     data = request.data
-#     try:
-#
-#         user = User.objects.filter(username=data['username'])
-#         if user:
-#             error = 'User already exists with username, %s' % data['username']
-#             return Response ({'details' : error}, status=status.HTTP_400_BAD_REQUEST)
-#
-#         user = User.objects.filter(email=data['email'])
-#         if user:
-#             error = 'User already exists with email, %s' % data['email']
-#             return Response ({'details' : error}, status=status.HTTP_400_BAD_REQUEST)
-#
-#         if 'type' not in data:
-#             error = 'Type is required*'
-#             return Response ({'details' : error}, status=status.HTTP_400_BAD_REQUEST)
-#
-#         if data['type'] != 'customer' and data['type'] != 'driver':
-#             error = 'Invalid User Type, %s' % data['type']
-#             return Response ({'details' : error}, status=status.HTTP_400_BAD_REQUEST)
-#
-#         user = User.objects.create(
-#             first_name=data['first_name'],
-#             last_name=data['last_name'],
-#             username=data['username'],
-#             email=data['email'],
-#             password=make_password(data['password'])
-#         )
-#         profile = user.profile
-#         profile.type = data['type']
-#         profile.save()
-#
-#         serializer = UserSerializerWithToken(user, many=False)
-#         return Response(serializer.data)
-#
-#     except Exception as e:
-#         print (e)
-#         message = {'detail': repr(e)}
-#         return Response(message, status=status.HTTP_400_BAD_REQUEST)
+class ShippingAddressList (APIView):
+    """
+    # Users' saved shipping address
+    """
+
+    def get (self, request, format=None):
+        return ShippingAddress.objects.all()
 
 
-@api_view(['PUT'])
-@permission_classes([IsAuthenticated])
-def updateUserProfile(request):
-    user = request.user
-    serializer = UserSerializerWithToken(user, many=False)
+    def get_user (self, pk):
+        try:
+            return User.objects.get(id=pk)
+        except User.DoesNotExist:
+            raise Http404
 
-    data = request.data
-    user.first_name = data['name']
-    user.username = data['email']
-    user.email = data['email']
 
-    if data['password'] != '':
-        user.password = make_password(data['password'])
+    def gen_address_name (self, user):
+        addresses = self.ShippingAddress.objects.filter(user=user)
+        addr_len = len(addresses)
+        return 'My Address %s' % str(addr_len+1)
 
-    user.save()
 
-    return Response(serializer.data)
+    def validate_request_body (self, request_body):
+        error = True
+        if 'user' not in request_body:
+            return error, 'User field is required*'
+        elif 'name' not in request_body:
+            return error, 'Address Name Field is required*'
+        elif 'address' not in request_body:
+            return error, 'Address Field is required*'
+        elif 'city' not in request_body:
+            return error, 'City is required*'
+        elif 'postalCode' not in request_body:
+            return error, 'Postal Code is required*'
+        elif 'country' not in request_body:
+            return error, 'Country is required*'
+        else:
+            error = False
+            return error, ''
+
+
+    def post (self, request, format=None):
+        try:
+            data = request.data
+            # validate request body
+            error, message = self.validate_request_body(data)
+            if error:
+                return Response({'details' : message}, status=status.HTTP_400_BAD_REQUEST)
+            user = self.get_user(data['user'])
+            addr_name = data['name']
+            if addr_name == '':
+                addr_name = self.gen_address_name(user)
+            # save new address
+            address = ShippingAddress.objects.create(
+                user=user,
+                name=addr_name,
+                address=data['address'],
+                country=data['country'],
+                postalCode=data['postalCode'],
+                city=data['city']
+            )
+            serializer = ShippingAddressSerializer(address)
+            return Response(serializer.data)
+        except Exception as e:
+            error = 'Internal Server Error!' if str(e) == '' else str(e)
+            return Response({'details' : error}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+
+class ShippingAddressDetails (APIView):
+    """
+    # GET/EDIT/DELETE shipping address
+    """
+
+    def get_object (self, pk):
+        try:
+            return ShippingAddress.objects.get(_id=pk)
+        except ShippingAddress.DoesNotExist:
+            raise Http404
+
+
+    def get_user (self, pk):
+        try:
+            return User.objects.get(id=pk)
+        except User.DoesNotExist:
+            raise Http404
+
+
+    def gen_address_name (self, user):
+        addresses = self.ShippingAddress.objects.filter(user=user)
+        addr_len = len(addresses)
+        return 'My Address %s' % str(addr_len+1)
+
+
+    def validate_request_body (self, request_body):
+        error = True
+        if 'user' not in request_body:
+            return error, 'User field is required*'
+        elif 'name' not in request_body:
+            return error, 'Address Name Field is required*'
+        elif 'address' not in request_body:
+            return error, 'Address Field is required*'
+        elif 'city' not in request_body:
+            return error, 'City is required*'
+        elif 'postalCode' not in request_body:
+            return error, 'Postal Code is required*'
+        elif 'country' not in request_body:
+            return error, 'Country is required*'
+        else:
+            error = False
+            return error, ''
+
+
+    def get (self, request, pk, format=None):
+        address = self.get_object(self, pk)
+        serializer = ShippingAddressSerializer(address)
+        return Response(serializer.data)
+
+
+    def put (self, request, pk, format=None):
+        try:
+            address = self.get_object(pk)
+            data = request.data
+            # validate reqeuest data
+            error, message = self.validate_request_body (data)
+            if error:
+                return Response({'details' : error}, status=status.HTTP_400_BAD_REQUEST)
+            user = self.get_user(data['user'])
+            addr_name = data['name']
+            if addr_name == '':
+                addr_name = self.gen_address_name(user)
+                data['name'] = addr_name
+
+            serializer = ShippingAddressSerializer(address, data=data)
+            if serializer.is_valid:
+                serializer.save()
+                return Response(serializer.data)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        except Exception as e:
+            error = 'Internal Server Error!' if str(e) == '' else str(e)
+            return Response({'details' : error}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 @api_view(['GET'])
-@permission_classes([IsAuthenticated])
-def getUserProfile(request):
-    user = request.user
-    serializer = UserSerializer(user, many=False)
-    return Response(serializer.data)
+def get_user_saved_addresses (request, pk):
+    """
+    # Get User Saved Addresses
+    """
+    try:
+        user = User.objects.get(id=pk)
+        addresses = ShippingAddress.objects.filter(user=user)
+        serializer = ShippingAddressSerializer(addresses, many=True)
+        return Response(serializer.data)
+    except User.DoesNotExist:
+        return Response({'details' : 'User Not Found!'}, status=status.HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        error = 'Internal Server Error' if str(e) == '' else str(e)
+        return Response({'details' : str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['POST'])
+def create_new_driver_record (request):
+    try:
+        if 'driver' not in request.data:
+            return Response({'details' : 'Field, driver, is required*'}, status=status.HTTP_400_BAD_REQUEST)
+        if type(request.data['driver']) != int:
+            return Response({'details' : 'Content of field, driver, must be int*'}, status=status.HTTP_400_BAD_REQUEST)
+        driver_id = request.data['driver']
+        driver = User.objects.get(id=driver_id)
+        if driver.profile.type != 'driver':
+            return Response({'details' : 'Invalid Driver!'}, status=status.HTTP_400_BAD_REQUEST)
+        existing_records = DriverOrderStatus.objects.filter(driver=driver)
+        if len(existing_records) > 0:
+            return Response({'details' : 'Driver record already exists'}, status=status.HTTP_400_BAD_REQUEST)
+        new_record = DriverOrderStatus.objects.create(
+            driver = driver,
+            current_order = None,
+            total_order = 0
+        )
+        serializer = DriverOrderStatusSerializer(new_record)
+        return Response(serializer.data)
+    except DriverOrderStatus.DoesNotExist:
+        return Response({'details' : 'Driver Not Found!'}, status=status.HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        error = 'Internal Server Error' if str(e) == '' else str(e)
+        return Response({'details' : str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 
 
 @api_view(['GET'])
-@permission_classes([IsAdminUser])
-def getUsers(request):
-    users = User.objects.all()
-    serializer = UserSerializer(users, many=True)
-    return Response(serializer.data)
+def get_all_driver_status (request):
+    try:
+        statuses = DriverOrderStatus.objects.all()
+        serializer = DriverOrderStatusSerializer(statuses, many=True)
+        return Response(serializer.data)
+    except Exception as e:
+        error = 'Internal Server Error!' if str(e) == '' else str(e)
+        return Response({'details' : error}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 @api_view(['GET'])
-@permission_classes([IsAdminUser])
-def getUserById(request, pk):
-    user = User.objects.get(id=pk)
-    serializer = UserSerializer(user, many=False)
-    return Response(serializer.data)
-
-
-@api_view(['PUT'])
-@permission_classes([IsAuthenticated])
-def updateUser(request, pk):
-    user = User.objects.get(id=pk)
-
-    data = request.data
-
-    user.first_name = data['name']
-    user.username = data['email']
-    user.email = data['email']
-    user.is_staff = data['isAdmin']
-
-    user.save()
-
-    serializer = UserSerializer(user, many=False)
-
-    return Response(serializer.data)
-
-
-@api_view(['DELETE'])
-@permission_classes([IsAdminUser])
-def deleteUser(request, pk):
-    userForDeletion = User.objects.get(id=pk)
-    userForDeletion.delete()
-    return Response('User was deleted')
+def get_all_avaialble_drivers (request):
+    try:
+        drivers = DriverOrderStatus.objects.filter(status='available')
+        serializer = DriverOrderStatusSerializer(drivers, many=True)
+        return Response(serializer.data)
+    except Exception as e:
+        error = 'Internal Server Error!' if str(e) == '' else str(e)
+        return Response({'details' : error}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

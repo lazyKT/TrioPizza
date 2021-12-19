@@ -1,32 +1,151 @@
-import React, { useState, useEffect } from 'react'
-import { Form, Button } from 'react-bootstrap'
-import { useDispatch, useSelector } from 'react-redux'
-import FormContainer from '../components/FormContainer'
-import CheckoutSteps from '../components/CheckoutSteps'
-import { saveShippingAddress } from '../actions/cartActions'
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import { Form, Button } from 'react-bootstrap';
+import Box from '@mui/material/Box';
+import Paper from '@mui/material/Paper';
+import { useDispatch, useSelector } from 'react-redux';
+import FormContainer from '../components/FormContainer';
+import CheckoutSteps from '../components/CheckoutSteps';
+import { saveShippingAddress } from '../actions/cartActions';
+
+
+const styles = {
+  box: {
+    display: 'flex',
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+    padding: '20px'
+  },
+  paper: {
+    borderRadius: '5px',
+    padding: '15px',
+    marginRight: '10px',
+    '&:hover': {
+      backgroundColor: '#f9f9f9',
+      cursor: 'pointer'
+    },
+  }
+}
+
 
 function ShippingScreen({ history }) {
 
-    const cart = useSelector(state => state.cart)
-    const { shippingAddress } = cart
+    const { shippingAddress } = useSelector(state => state.cart);
+    const { userInfo } = useSelector(state => state.userCookie);
 
     const dispatch = useDispatch()
 
-    const [address, setAddress] = useState(shippingAddress.address)
-    const [city, setCity] = useState(shippingAddress.city)
-    const [postalCode, setPostalCode] = useState(shippingAddress.postalCode)
-    const [country, setCountry] = useState(shippingAddress.country)
+    // const [address, setAddress] = useState('');
+    // const [city, setCity] = useState('');
+    // const [postalCode, setPostalCode] = useState('');
+    // const [country, setCountry] = useState('');
+    const [ address, setAddress ] = useState({
+      address: '',
+      city: '',
+      postalCode: '',
+      country: ''
+    });
+    const [ savedAddress, setSavedAddress ] = useState(null);
+    const [ error, setError ] = useState(null);
 
     const submitHandler = (e) => {
-        e.preventDefault()
-        dispatch(saveShippingAddress({ address, city, postalCode, country }))
+        e.preventDefault();
+        dispatch(saveShippingAddress(address))
         history.push('/payment')
     }
+
+    // fetch user's saved address
+    const fetchSavedAddresses = async (userId, token, signal) => {
+      try {
+        const { data } = await axios.get(`/api/users/${userId}/addresses`, {
+          headers: {
+            'Content-Type' : 'application/json',
+            Authorization : `Bearer ${token}`
+          },
+          signal
+        });
+
+        setSavedAddress(data);
+
+        setError(null);
+      }
+      catch (error) {
+        console.log(error);
+        if (error.response && error.response.data.details)
+          setError(error.response.data.details);
+        else
+          setError(error.message);
+      }
+    }
+
+    const handleSavedAddressClick = (idx) => {
+      // console.log(savedAddress[idx]);
+      setAddress({
+        address: savedAddress[idx].address,
+        city: savedAddress[idx].city,
+        postalCode: savedAddress[idx].postalCode,
+        country: savedAddress[idx].country
+      });
+    }
+
+    const handleOnChange = (e) => {
+      setAddress({
+        ...address,
+        [e.target.name] : e.target.value
+      });
+    }
+
+    useEffect(() => {
+      if (shippingAddress) {
+        setAddress({
+          address: shippingAddress.address,
+          city: shippingAddress.city,
+          postalCode: shippingAddress.postalCode,
+          country: shippingAddress.country
+        });
+      }
+    }, [shippingAddress]);
+
+
+    useEffect(() => {
+      const controller = new AbortController();
+
+      if (history && userInfo) {
+        (async () => fetchSavedAddresses(userInfo.id, userInfo.token, controller.signal))();
+      }
+
+      return(() => controller.abort());
+
+    }, [history, userInfo]);
+
+    useEffect(() => {
+      console.log('savedAddress', savedAddress);
+    }, [savedAddress]);
 
     return (
         <FormContainer>
             <CheckoutSteps step1 step2 />
             <h1>Shipping</h1>
+
+            { savedAddress && (
+              <>
+                <h6>Saved Addresses</h6>
+                <Box
+                  sx={styles.box}
+                >
+                  {savedAddress.map( (addr, idx) => (
+                    <Paper
+                      sx={styles.paper}
+                      key={idx}
+                      onClick={() => handleSavedAddressClick(idx)}
+                    >
+                      {addr.name}
+                    </Paper>
+                  ))}
+                </Box>
+              </>
+          )}
+
             <Form onSubmit={submitHandler}>
 
                 <Form.Group controlId='address'>
@@ -35,8 +154,9 @@ function ShippingScreen({ history }) {
                         required
                         type='text'
                         placeholder='Enter address'
-                        value={address ? address : ''}
-                        onChange={(e) => setAddress(e.target.value)}
+                        name='address'
+                        value={address.address}
+                        onChange={handleOnChange}
                     >
                     </Form.Control>
                 </Form.Group>
@@ -47,8 +167,9 @@ function ShippingScreen({ history }) {
                         required
                         type='text'
                         placeholder='Enter city'
-                        value={city ? city : ''}
-                        onChange={(e) => setCity(e.target.value)}
+                        name='city'
+                        value={address.city}
+                        onChange={handleOnChange}
                     >
                     </Form.Control>
                 </Form.Group>
@@ -59,8 +180,9 @@ function ShippingScreen({ history }) {
                         required
                         type='text'
                         placeholder='Enter postal code'
-                        value={postalCode ? postalCode : ''}
-                        onChange={(e) => setPostalCode(e.target.value)}
+                        name='postalCode'
+                        value={address.postalCode}
+                        onChange={handleOnChange}
                     >
                     </Form.Control>
                 </Form.Group>
@@ -71,8 +193,9 @@ function ShippingScreen({ history }) {
                         required
                         type='text'
                         placeholder='Enter country'
-                        value={country ? country : ''}
-                        onChange={(e) => setCountry(e.target.value)}
+                        name='country'
+                        value={address.country}
+                        onChange={handleOnChange}
                     >
                     </Form.Control>
                 </Form.Group>
