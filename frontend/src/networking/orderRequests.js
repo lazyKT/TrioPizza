@@ -12,7 +12,7 @@ export const getOrderDetails = async (orderId, token, signal) => {
       signal
     });
 
-    return {error: false, data: data};
+    return {error: false, data };
   }
   catch (error) {
     if (error.response && error.response.data.details)
@@ -32,7 +32,7 @@ export const cancelOrder = async (orderId, token) => {
       }
     });
 
-    return {error: false, data: data};
+    return {error: false, data };
   }
   catch (error) {
     console.log(error);
@@ -53,7 +53,7 @@ export const completeOrder = async (orderId, token) => {
       }
     });
 
-    return {error: false, data: data};
+    return {error: false, data };
   }
   catch (error) {
     console.log(error);

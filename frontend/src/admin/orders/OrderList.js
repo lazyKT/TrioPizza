@@ -31,11 +31,10 @@ export default function OrderList () {
 
 
   useEffect(() => {
-    console.log(orders);
     if (userInfo && userInfo.isAdmin) {
       dispatch(listOrders());
     }
-  }, [userInfo]);
+  }, [userInfo, showOrderDetails]);
 
 
   return (

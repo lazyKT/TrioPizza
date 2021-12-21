@@ -127,8 +127,8 @@ export const register = (user) => async (dispatch) => {
             headers: {
                 'Content-type': 'application/json'
             }
-        }
-        console.log(user);
+        };
+
         const { data } = await axios.post ( '/api/users/',
             user,
             config
@@ -170,7 +170,7 @@ export const getUserDetails = (id) => async (dispatch, getState) => {
             `/api/users/${id}/`,
             config
         );
-
+        
         dispatch({
             type: USER_DETAILS_SUCCESS,
             payload: data

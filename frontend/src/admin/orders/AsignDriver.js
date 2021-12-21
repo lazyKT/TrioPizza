@@ -7,7 +7,7 @@ import axios from 'axios';
 import Message from '../../components/Message';
 
 
-export default function AsignDriver ({id, driver}) {
+export default function AsignDriver ({id, driver, status}) {
 
   const [ drivers, setDrivers ] = useState([]);
   const [ error, setError ] = useState(null);
@@ -37,7 +37,6 @@ export default function AsignDriver ({id, driver}) {
       });
 
       if (response.status === 200) {
-        console.log('Asign Driver Success!', selected);
         const selectedDriver = drivers.filter(d => d.driver.id === parseInt(selected));
         setOrderDriver(selectedDriver[0].driver);
       }
@@ -52,7 +51,6 @@ export default function AsignDriver ({id, driver}) {
 
   const fetchAvailableDrivers = async (token, signal) => {
     try {
-      console.log('Fetching Available Drivers');
       const { data } = await axios.get('api/users/drivers/status/available', {
         headers: {
           'Content-Type' : 'application/json',
@@ -84,7 +82,7 @@ export default function AsignDriver ({id, driver}) {
     setOrderDriver(driver);
 
     return(() => abortController.abort());
-  }, [id, driver, userInfo]);
+  }, [id, driver, userInfo, status]);
 
 
   return (
@@ -99,7 +97,7 @@ export default function AsignDriver ({id, driver}) {
           marginTop: '10px'
         }}
       >
-        {!orderDriver ?
+        {(!orderDriver && status === 'progress') ?
           (
             <>
               <select
@@ -128,7 +126,7 @@ export default function AsignDriver ({id, driver}) {
               </div>
             </>
           ) :
-          <h6>{orderDriver.name}</h6>
+          <h6>{orderDriver ? orderDriver.name : '--'}</h6>
         }
       </Box>
     </>
