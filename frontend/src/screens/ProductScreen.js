@@ -90,21 +90,13 @@ function ProductScreen({ match, history }) {
 
 
                                 <Col md={3}>
-                                    <Card>
+                                    <Card className='mt-5'>
                                         <ListGroup variant='flush'>
                                             <ListGroup.Item>
                                                 <Row>
                                                     <Col>Price:</Col>
                                                     <Col>
                                                         <strong>${product.price}</strong>
-                                                    </Col>
-                                                </Row>
-                                            </ListGroup.Item>
-                                            <ListGroup.Item>
-                                                <Row>
-                                                    <Col>Status:</Col>
-                                                    <Col>
-                                                        {product.countInStock > 0 ? 'In Stock' : 'Out of Stock'}
                                                     </Col>
                                                 </Row>
                                             </ListGroup.Item>

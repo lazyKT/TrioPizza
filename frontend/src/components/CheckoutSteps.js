@@ -1,13 +1,22 @@
-import React from 'react'
-import { Nav } from 'react-bootstrap'
-import { LinkContainer } from 'react-router-bootstrap'
+import React, { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
+import { Nav } from 'react-bootstrap';
+import { LinkContainer } from 'react-router-bootstrap';
 
 function CheckoutSteps({ step1, step2, step3, step4 }) {
+
+  const { userInfo } = useSelector(state => state.userCookie);
+  const [ auth, setAuth ] = useState(false);
+
+  useEffect(() => {
+    if (userInfo) setAuth (true);
+    else  setAuth (false);
+  }, [userInfo]);
 
     return (
         <Nav className='justify-content-center mb-4'>
             <Nav.Item>
-                {step1 ? (
+                {!auth ? (
                     <LinkContainer to='/login'>
                         <Nav.Link>Login</Nav.Link>
                     </LinkContainer>

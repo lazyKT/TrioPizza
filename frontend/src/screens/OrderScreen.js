@@ -23,7 +23,14 @@ function OrderScreen({ match, history }) {
     const toDate = (date) => {
       const dt = new Date(date);
       return `${dt.toLocaleDateString()}, ${dt.toLocaleTimeString()}`;
+    };
+
+
+    const calculateItemPrice = () => {
+      let itemPrice = Number(order.totalPrice) - (Number(order.taxPrice) + Number(order.shippingPrice));
+      return itemPrice.toFixed(2);
     }
+
 
     const deliverHandler = async (e) => {
       e.preventDefault();
@@ -164,7 +171,9 @@ function OrderScreen({ match, history }) {
                             <ListGroup.Item>
                                 <Row>
                                     <Col>Items:</Col>
-                                    <Col>${order.itemsPrice}</Col>
+                                    <Col>
+                                      ${calculateItemPrice()}
+                                    </Col>
                                 </Row>
                             </ListGroup.Item>
 

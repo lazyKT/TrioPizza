@@ -81,6 +81,13 @@ function OrderListScreen({ history }) {
                               <div>
                                 <h5>{displayOrderItem(order.orderItems)}</h5>
                                 <h6>{toDate(order.createdAt)}</h6>
+                                <h6 style={{
+                                  padding: '10px',
+                                  width: 'fit-content',
+                                  background: order.status === 'progress' ? 'dodgerblue' : 'gainsboro', 
+                                }}>
+                                  {order.status}
+                                </h6>
                               </div>
                               <h5>{order.totalPrice}&nbsp;$</h5>
                             </Box>

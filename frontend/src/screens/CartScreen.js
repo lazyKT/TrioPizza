@@ -28,7 +28,7 @@ function CartScreen({ match, location, history }) {
 
     const checkoutHandler = () => {
         if (userInfo)
-          history.push('/payment');
+          history.push('/shipping');
         else
           history.push('/login?redirect=shipping');
     }
@@ -58,31 +58,28 @@ function CartScreen({ match, location, history }) {
                                         </Col>
 
                                         <Col md={3}>
-                                            <Form.Control
-                                                as="select"
-                                                value={item.qty}
-                                                onChange={(e) => dispatch(addToCart(item.product, Number(e.target.value)))}
-                                            >
-                                                {
-
-                                                    [...Array(item.countInStock).keys()].map((x) => (
-                                                        <option key={x + 1} value={x + 1}>
-                                                            {x + 1}
-                                                        </option>
-                                                    ))
-                                                }
-
-                                            </Form.Control>
+                                          <Form.Control
+                                              as="select"
+                                              value={item.qty}
+                                              onChange={(e) => dispatch(addToCart(item.product, parseInt(e.target.value)))}
+                                          >
+                                            <option value={1}>1</option>
+                                            <option value={2}>2</option>
+                                            <option value={3}>3</option>
+                                            <option value={4}>4</option>
+                                            <option value={5}>5</option>
+                                            <option value={6}>6</option>
+                                          </Form.Control>
                                         </Col>
 
                                         <Col md={1}>
-                                            <Button
-                                                type='button'
-                                                variant='light'
-                                                onClick={() => removeFromCartHandler(item.product)}
-                                            >
-                                                <i className='fas fa-trash'></i>
-                                            </Button>
+                                          <Button
+                                              type='button'
+                                              variant='light'
+                                              onClick={() => removeFromCartHandler(item.product)}
+                                          >
+                                              <i className='fas fa-trash'></i>
+                                          </Button>
                                         </Col>
                                     </Row>
                                 </ListGroup.Item>

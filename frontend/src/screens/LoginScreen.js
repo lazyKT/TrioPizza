@@ -44,6 +44,9 @@ function LoginScreen({ location, history }) {
             history.push('/admin');
           }
       }
+      else {
+        history.push('/');
+      }
 
       return(() => {
         if (userInfo) {

@@ -7,12 +7,13 @@ import { savePaymentMethod } from '../actions/cartActions'
 
 function PaymentScreen({ history }) {
 
-    const cart = useSelector(state => state.cart)
-    const { shippingAddress } = cart
+    const { shippingAddress } = useSelector(state => state.cart);
+    const { userInfo } = useSelector(state => state.userCookie);
 
     const dispatch = useDispatch()
 
-    const [paymentMethod, setPaymentMethod] = useState('Visa')
+    const [paymentMethod, setPaymentMethod] = useState('Visa');
+    const [ showLogin, setShowLogin ] = useState(true);
 
     if (!shippingAddress.address) {
         history.push('/shipping')
@@ -29,9 +30,16 @@ function PaymentScreen({ history }) {
         history.push('/placeorder');
     }
 
+    useEffect(() => {
+      if (userInfo)
+        setShowLogin (false);
+      else
+        setShowLogin (true);
+    }, [userInfo]);
+
     return (
         <FormContainer>
-            <CheckoutSteps step1 step2 step3 />
+            <CheckoutSteps step1={showLogin} step2 step3 />
 
             <Form onSubmit={submitHandler}>
                 <Form.Group>
