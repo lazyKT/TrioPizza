@@ -5,9 +5,10 @@ import { useHistory } from 'react-router-dom';
 import FormContainer from './FormContainer';
 
 
-export default function AddNewPlaceForm ({user, dismissForm}) {
+export default function AddNewPlaceForm ({dismissForm, handleOnSubmit}) {
 
   const [ place, setPlace ] = useState ({
+    name: '',
     address: '',
     city: '',
     postalCode: '',
@@ -27,19 +28,28 @@ export default function AddNewPlaceForm ({user, dismissForm}) {
 
   const submitHandler = (e) => {
     e.preventDefault();
+    handleOnSubmit(place);
   };
-
-  useEffect(() => {
-    if (!user)
-      history.push('/');
-
-  }, [user, dismissForm]);
 
   return (
     <Card className="p-2 m-2 mb-3">
       <FormContainer>
         <Form onSubmit={submitHandler}>
           <h3>Add New Place</h3>
+
+          <Form.Group controlId='address'>
+              <Form.Label>Name</Form.Label>
+              <Form.Control
+                  required
+                  type='text'
+                  placeholder='Eg. Home, Work'
+                  name='name'
+                  value={place.name}
+                  onChange={handleOnChange}
+              >
+              </Form.Control>
+          </Form.Group>
+
           <Form.Group controlId='address'>
               <Form.Label>Address</Form.Label>
               <Form.Control
@@ -92,8 +102,8 @@ export default function AddNewPlaceForm ({user, dismissForm}) {
               </Form.Control>
           </Form.Group>
 
-          <Button type='submit' variant='primary'>
-              Continue
+          <Button className='mr-2' type='submit' variant='primary'>
+              Save
           </Button>
           <Button onClick={dismissForm}
             type='submit' variant='secondary'>

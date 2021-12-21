@@ -6,7 +6,7 @@ import Loader from '../components/Loader';
 import Message from '../components/Message';
 import AddressCard from '../components/AddressCard';
 import AddNewPlaceForm from '../components/AddNewPlaceForm';
-import { getUserSavedAddresses } from '../networking/addressRequests';
+import { getUserSavedAddresses, saveNewAddress } from '../networking/addressRequests';
 
 
 export default function SavedPlaces () {
@@ -19,6 +19,27 @@ export default function SavedPlaces () {
 
   const { userInfo } = useSelector(state => state.userCookie);
 
+  const saveNewAddressRequest = async (newPlace) => {
+    try {
+      setLoading(true);
+      const { data, message, error } = await saveNewAddress(newPlace, userInfo.id, userInfo.token);
+
+      if (error) {
+        setError(error);
+      }
+      else {
+        setAddNewPlace(false);
+        setAddresses([
+          ...addresses,
+          data
+        ]);
+      }
+      setLoading(false);
+    }
+    catch (error) {
+      setError(error.message);
+    }
+  }
 
   useEffect(() => {
 
@@ -62,8 +83,8 @@ export default function SavedPlaces () {
       <h2>Saved Places</h2>
       { addNewPlace ? (
         <AddNewPlaceForm
-          user={userInfo}
           dismissForm={() => setAddNewPlace(false)}
+          handleOnSubmit={(newPlace) => saveNewAddressRequest(newPlace)}
         />
       ) : (
         <Button
