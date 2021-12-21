@@ -61,7 +61,10 @@ export default function OrderCard ({order, goToOrderDetails}) {
     >
       <Box sx={styles.box}>
         <div>
-          <h5>{displayOrderItem(order.orderItems)}</h5>
+          <p>Order # {order._id}</p>
+          { order.orderItems.map( (item, idx) => (
+            <h6 key={idx}>{item.name} x {item.qty}</h6>
+          ))}
           <h5>{order.totalPrice} $</h5>
           <h6>{toDate(order.createdAt)}</h6>
         </div>

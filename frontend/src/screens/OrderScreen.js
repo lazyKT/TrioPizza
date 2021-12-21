@@ -131,8 +131,9 @@ function OrderScreen({ match, history }) {
                                         {order.orderItems.map((item, index) => (
                                             <ListGroup.Item key={index}>
                                                 <Row>
-                                                    <Col md={1}>
-                                                        <Image src={item.image} alt={item.name} fluid rounded />
+                                                    <Col md={2}>
+                                                        <Image style={{width: '50px', height: '50px'}}
+                                                          src={item.product.image} alt={item.name} fluid rounded />
                                                     </Col>
 
                                                     <Col>

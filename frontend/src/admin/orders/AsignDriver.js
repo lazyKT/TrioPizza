@@ -82,7 +82,7 @@ export default function AsignDriver ({id, driver, status}) {
     setOrderDriver(driver);
 
     return(() => abortController.abort());
-  }, [id, driver, userInfo]);
+  }, [id, driver, userInfo, status]);
 
 
   return (

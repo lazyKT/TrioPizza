@@ -6,7 +6,7 @@ import Box from '@mui/material/Box';
 import MaterialButton from '@mui/material/Button';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
-import { getOrderDetails } from '../../networking/orderRequests';
+import { getOrderDetails, completeOrder, cancelOrder } from '../../networking/orderRequests';
 import { getAvailableDrivers } from '../../actions/userActions';
 import Loader from '../../components/Loader';
 import Message from '../../components/Message';
@@ -44,6 +44,8 @@ export default function OrderDetails ({id, backToOrderList}) {
   const [ driver, setDriver ] = useState(-1);
   const [ drivers, setDrives ] = useState([]);
   const [ showConfirmation, setShowConfirmation ] = useState(false);
+  const [ actionType, setActionType ] = useState('');
+  const [ confirmationText, setConfirmationText ] = useState('');
 
   const dispatch = useDispatch();
 
@@ -61,10 +63,58 @@ export default function OrderDetails ({id, backToOrderList}) {
   };
 
 
-  const cancelOrder = () => {
-    console.log('cancel order #', id);
-    setShowConfirmation(false);
+  const handleCancelClick = (e) => {
+    e.preventDefault();
+    setActionType('cancel');
+    setConfirmationText('Are you sure you want to cancel the order?')
+    setShowConfirmation(true);
+  };
+
+
+  const handleDeliverClick = (e) => {
+    e.preventDefault();
+    setActionType('deliver');
+    setConfirmationText('Mark the order as delivered?')
+    setShowConfirmation(true);
   }
+
+
+  const confirmActionClick = async () => {
+    console.log(actionType, 'order #', id);
+    setShowConfirmation(false);
+    setLoading(true);
+    if (actionType === 'cancel')
+      await cancelOrderRequest();
+    else if (actionType === 'deliver')
+      await deliverOrderRequest();
+  };
+
+
+  const cancelOrderRequest = async () => {
+    const { error, message, data } = await cancelOrder(id, userInfo.token);
+
+    if (error) {
+      setError(message);
+    }
+    else {
+      setOrder(data);
+    }
+    setLoading(false);
+  }
+
+
+  const deliverOrderRequest = async () => {
+    const { error, message, data } = await completeOrder(id, userInfo.token);
+
+    if (error) {
+      setError(message);
+    }
+    else {
+      setOrder(data);
+    }
+    setLoading(false);
+  }
+
 
   useEffect(() => {
 
@@ -107,8 +157,8 @@ export default function OrderDetails ({id, backToOrderList}) {
               {showConfirmation && (
                 <ConfirmationBox
                   dismiss={() => setShowConfirmation(false)}
-                  action={cancelOrder}
-                  text={'Are you sure you want to cancel the order?'}
+                  action={confirmActionClick}
+                  text={confirmationText}
                 />
               )}
               <Box
@@ -127,6 +177,7 @@ export default function OrderDetails ({id, backToOrderList}) {
               <AsignDriver
                 id={id}
                 driver={order.driver}
+                status={order.status}
               />
 
               <Box
@@ -151,14 +202,17 @@ export default function OrderDetails ({id, backToOrderList}) {
                 <Box
                   sx={styles.rowStart}
                 >
-                  <Button
-                    className="btn btn-success mr-1"
-                  >
-                    Mark as Derlivered
-                  </Button>
+                  { order.driver && (
+                    <Button
+                      className="btn btn-success mr-1"
+                      onClick={handleDeliverClick}
+                    >
+                      Mark as Derlivered
+                    </Button>
+                  )}
                   <Button
                     className="btn btn-secondary mx-1"
-                    onClick={() => setShowConfirmation(true)}
+                    onClick={handleCancelClick}
                   >
                     Cancel Order
                   </Button>
