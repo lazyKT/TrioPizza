@@ -9,7 +9,9 @@ import AdminAppbar from './AdminAppbar';
 import AdminDrawerMenu from './AdminDrawerMenu';
 import Dashboard from './Dashboard';
 import UserAdminDashboard from './users/UserAdminDashboard';
+import DriverDashboard from './drivers/DriverDashboard';
 import ProductDashboard from './products/ProductDashboard';
+import ReservationDashboard from './reservations/ReservationDashboard';
 import OrderDashboard from './orders/OrderDashboard';
 import Profile from './Profile';
 import Setting from './Setting';
@@ -55,10 +57,14 @@ function switchContents (page) {
 				return <Dashboard />;
 			case 'Users':
 				return <UserAdminDashboard />;
+      case 'Drivers':
+        return <DriverDashboard />;
 			case 'Products':
 				return <ProductDashboard />;
 			case 'Orders':
 				return <OrderDashboard />;
+      case 'Reservations':
+        return <ReservationDashboard />;
       case 'Profile':
         return <Profile />
       case 'Setting':

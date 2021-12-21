@@ -266,8 +266,6 @@ export const listOrders = () => async (dispatch, getState) => {
             config
         );
 
-        console.log(data);
-
         dispatch({
             type: ORDER_LIST_SUCCESS,
             payload: data
