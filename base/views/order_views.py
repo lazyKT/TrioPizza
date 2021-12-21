@@ -320,6 +320,8 @@ def cancel_order (request, pk):
         order.status = 'cancelled'
         order.save()
         serializer = OrderSerializer(order)
+        if order.deliveredBy is not None:
+            driver_complete_delivery (order.deliveredBy)
         return Response(serializer.data)
     except Order.DoesNotExist:
         return Response({'details' : 'Order Not Found!'}, status=status.HTTP_400_BAD_REQUEST)

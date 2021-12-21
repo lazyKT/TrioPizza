@@ -106,12 +106,17 @@ class OrderSerializer(serializers.ModelSerializer):
 
 class DriverOrderStatusSerializer(serializers.ModelSerializer):
     driver = serializers.SerializerMethodField(read_only=True)
+    name = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = DriverOrderStatus
-        fields = '__all__'
+        fields = ['_id', 'driver', 'name', 'total_order', 'current_order', 'status']
 
-    def get_driver(self, obj):
+    def get_driver (self, obj):
         driver = obj.driver
         serializer = UserSerializer(driver)
         return serializer.data
+
+    def get_name (self, obj):
+        driver = obj.driver
+        return driver.profile.name

@@ -57,7 +57,7 @@ function switchContents (page) {
 				return <Dashboard />;
 			case 'Users':
 				return <UserAdminDashboard />;
-      case 'Drivers':
+      case 'Drivers Status':
         return <DriverDashboard />;
 			case 'Products':
 				return <ProductDashboard />;

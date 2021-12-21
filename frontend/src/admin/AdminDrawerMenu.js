@@ -86,7 +86,7 @@ function renderDrawerMenu (text, selected) {
       return (
         <GroupIcon color={text === selected ? "primary" : "gray"}/>
       );
-    case 'Drivers':
+    case 'Drivers Status':
       return (
         <DeliveryDiningIcon color={text === selected ? 'primary' : 'gray'} />
       );
@@ -139,7 +139,7 @@ export default function AdminDrawerMenu (props) {
       </DrawerHeader>
       <Divider />
       <List>
-        {['Dashboard', 'Users', 'Drivers', 'Products', 'Orders', 'Reservations'].map((text, index) => (
+        {['Dashboard', 'Users', 'Drivers Status', 'Products', 'Orders', 'Reservations'].map((text, index) => (
           <ListItem button key={text} onClick={() => onChangePage(text)}>
             <ListItemIcon>
               { renderDrawerMenu(text, page) }
