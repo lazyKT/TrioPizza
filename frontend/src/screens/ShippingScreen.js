@@ -70,7 +70,6 @@ function ShippingScreen({ history }) {
         setError(null);
       }
       catch (error) {
-        console.log(error);
         if (error.response && error.response.data.details)
           setError(error.response.data.details);
         else
@@ -98,10 +97,10 @@ function ShippingScreen({ history }) {
     useEffect(() => {
       if (shippingAddress) {
         setAddress({
-          address: shippingAddress.address,
-          city: shippingAddress.city,
-          postalCode: shippingAddress.postalCode,
-          country: shippingAddress.country
+          address: shippingAddress.address ? shippingAddress.address : '',
+          city: shippingAddress.city ? shippingAddress.city : '',
+          postalCode: shippingAddress.postalCode ? shippingAddress.postalCode : '',
+          country: shippingAddress.country ? shippingAddress.country : ''
         });
       }
     }, [shippingAddress]);
@@ -117,10 +116,6 @@ function ShippingScreen({ history }) {
       return(() => controller.abort());
 
     }, [history, userInfo]);
-
-    useEffect(() => {
-      console.log('savedAddress', savedAddress);
-    }, [savedAddress]);
 
     return (
         <FormContainer>

@@ -47,6 +47,8 @@ function getCellData (type) {
         return ['id', 'name', 'username', 'mobile', 'type', 'isAdmin'];
       case 'products':
         return ['_id', 'name', 'description', 'price', 'numReviews', 'rating'];
+      case 'driver':
+        return ['_id', 'name', 'status', 'current_order', 'total_order'];
       default:
         throw new Error ("Invalid Data Type")
     }

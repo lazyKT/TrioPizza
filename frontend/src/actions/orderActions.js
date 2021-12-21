@@ -58,8 +58,6 @@ export const createOrder = (order) => async (dispatch, getState) => {
           user: userInfo.id
         };
 
-        console.log(body);
-
         const { data } = await axios.post(
             `/api/orders/`,
             body,
@@ -266,8 +264,6 @@ export const listOrders = () => async (dispatch, getState) => {
             config
         );
 
-        console.log(data);
-
         dispatch({
             type: ORDER_LIST_SUCCESS,
             payload: data
@@ -275,7 +271,6 @@ export const listOrders = () => async (dispatch, getState) => {
 
 
     } catch (error) {
-        console.log(error.response);
         dispatch({
             type: ORDER_LIST_FAIL,
             payload: error.response && error.response.data.details
