@@ -170,7 +170,7 @@ export const getUserDetails = (id) => async (dispatch, getState) => {
             `/api/users/${id}/`,
             config
         );
-
+        console.log('getUserDetails', data);
         dispatch({
             type: USER_DETAILS_SUCCESS,
             payload: data
