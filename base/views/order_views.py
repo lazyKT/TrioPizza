@@ -211,7 +211,7 @@ def get_orders_by_driver (request, pk):
         driver = User.objects.get(id=pk)
         if driver.profile.type != 'driver':
             return Response({'details' : 'Invalid User!'}, status=status.HTTP_400_BAD_REQUEST)
-        orders = Order.objects.filter(deliveredBy=driver)
+        orders = Order.objects.filter(deliveredBy=driver).order_by('-_id')
         serializer = OrderSerializer(orders, many=True)
         return Response(serializer.data)
     except User.DoesNotExist:
