@@ -50,10 +50,12 @@ export default function ProfileScreen({ history }) {
           variant='subtitle1' sx={styles.link}>
           Profile
         </Typography>
-        <Typography onClick={() => setPage('SavedPlaces')}
-          variant='subtitle1' sx={styles.link}>
-          Saved Places
-        </Typography>
+        { userInfo?.type !== 'driver' &&
+          (<Typography onClick={() => setPage('SavedPlaces')}
+            variant='subtitle1' sx={styles.link}>
+            Saved Places
+          </Typography>)
+        }
       </Col>
       <Col>
         {switchContents(page)}

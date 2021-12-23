@@ -19,7 +19,7 @@ function LoginScreen({ location, history }) {
 
     const redirect = location.search ? location.search.split('=')[1] : '/'
 
-    const { error, loading, userInfo } = useSelector(state => state.userCookie);
+    const { error, loading, userInfo } = useSelector(state => state.userLogin);
 
 
     const submitHandler = (e) => {
