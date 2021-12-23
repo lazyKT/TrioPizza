@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
-import { Card, Row, Col } from 'react-bootstrap';
+import { Card, Row, Col, Button } from 'react-bootstrap';
 
 import { getOrdersByDriver } from '../networking/orderRequests';
 import Loader from '../components/Loader';
@@ -17,6 +17,11 @@ export default function DriverDashboard () {
   const [ loading, setLoading ] = useState(false);
   const [ error, setError ] = useState(null);
   const [ message, setMessage ] = useState(null);
+
+
+  const seeOrderDetails = (id) => {
+    history.push(`/order/${id}`);
+  }
 
   useEffect(() => {
 
@@ -74,7 +79,11 @@ export default function DriverDashboard () {
           {loading && <Loader />}
           {message && <Message variant={error ? 'danger' : 'info'}>{message}</Message>}
           {deliveries.map( (order, idx) => (
-            <Card key={idx} className='mx-1 mb-2'>
+            <Card
+              key={idx}
+              className='mx-1 mb-2'
+              onClick={() => seeOrderDetails(order._id)}
+            >
               <Card.Body>
                 <Row>
                   <Col>
@@ -83,7 +92,19 @@ export default function DriverDashboard () {
                     <p>{order.user.mobile}</p>
                   </Col>
                   <Col lg={3}>
-                    <h6>Status : {order.status}</h6>
+                    {order.status === 'progress' ? (
+                      <h5 style={{
+                        padding: '10px',
+                        background: 'coral',
+                        width: 'fit-content',
+                        margin: 'auto',
+                        color: 'white'
+                      }}>
+                        Active
+                      </h5>
+                    ) : (
+                      <h6>Status : {order.status}</h6>
+                    )}
                   </Col>
                 </Row>
               </Card.Body>

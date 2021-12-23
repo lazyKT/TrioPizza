@@ -38,7 +38,7 @@ function Header(props) {
 
               <Navbar.Toggle aria-controls="basic-navbar-nav" />
               <Navbar.Collapse id="basic-navbar-nav">
-                { userInfo && userInfo.type === 'customer' && <SearchBox />}
+                { userInfo?.type !== 'driver' && <SearchBox />}
                 <Nav className="ml-auto">
 
                   { userInfo && userInfo.type === 'customer' && <LinkContainer to='/cart'>
