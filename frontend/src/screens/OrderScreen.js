@@ -1,10 +1,12 @@
-import React, { useState, useEffect } from 'react'
-import { Button, Row, Col, ListGroup, Image, Card } from 'react-bootstrap'
-import { Link } from 'react-router-dom'
-import { useDispatch, useSelector } from 'react-redux'
-import Message from '../components/Message'
-import Loader from '../components/Loader'
-import { payOrder, deliverOrder } from '../actions/orderActions'
+import React, { useState, useEffect } from 'react';
+import { Button, Row, Col, ListGroup, Image, Card } from 'react-bootstrap';
+import { Link } from 'react-router-dom';
+import MaterialButton from '@mui/material/Button';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import { useDispatch, useSelector } from 'react-redux';
+import Message from '../components/Message';
+import Loader from '../components/Loader';
+import { payOrder, deliverOrder } from '../actions/orderActions';
 import { ORDER_PAY_RESET, ORDER_DELIVER_RESET } from '../constants/orderConstants';
 import { getOrderDetails, cancelOrder, completeOrder } from '../networking/orderRequests';
 
@@ -62,6 +64,10 @@ function OrderScreen({ match, history }) {
       }
     }
 
+    const handleBackButtonClick = () => {
+      history.goBack();
+    }
+
 
     useEffect(() => {
 
@@ -99,6 +105,12 @@ function OrderScreen({ match, history }) {
     ) : (
       order ? (
         <div>
+          <MaterialButton
+            onClick={handleBackButtonClick}
+            startIcon={<ArrowBackIcon />}
+          >
+            Back
+          </MaterialButton>
             <h1>Order: #{order._id}</h1>
             <Row>
                 <Col md={8}>
@@ -111,6 +123,7 @@ function OrderScreen({ match, history }) {
                                 <strong>Delivered Address: </strong>
                                 {order.shippingAddress}
                             </p>
+                            <p><strong>Mobile: </strong>{order.user.mobile}</p>
 
                             <Message variant='info'>{ order.status }</Message>
                         </ListGroup.Item>

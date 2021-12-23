@@ -38,12 +38,12 @@ function Header(props) {
 
               <Navbar.Toggle aria-controls="basic-navbar-nav" />
               <Navbar.Collapse id="basic-navbar-nav">
-                <SearchBox />
+                { userInfo?.type !== 'driver' && <SearchBox />}
                 <Nav className="ml-auto">
 
-                  <LinkContainer to='/cart'>
+                  { userInfo && userInfo.type === 'customer' && <LinkContainer to='/cart'>
                     <Nav.Link ><i className="fas fa-shopping-cart"></i>Cart</Nav.Link>
-                  </LinkContainer>
+                  </LinkContainer>}
 
                   {userInfo ? (
                     <NavDropdown title={userInfo.name} id='username'>
@@ -51,9 +51,11 @@ function Header(props) {
                         <NavDropdown.Item>Profile</NavDropdown.Item>
                       </LinkContainer>
 
-                      <LinkContainer to='/myorders'>
+                      {userInfo.type === 'customer' &&
+                      (<LinkContainer to='/myorders'>
                         <NavDropdown.Item>My Orders</NavDropdown.Item>
-                      </LinkContainer>
+                      </LinkContainer>)
+                      }
 
                       <NavDropdown.Item onClick={logoutHandler}>Logout</NavDropdown.Item>
 

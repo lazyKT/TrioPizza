@@ -89,7 +89,7 @@ export default function SavedPlaces () {
       ) : (
         <Button
           onClick={() => setAddNewPlace(true)}
-          className='btn btn-info'>
+          className='btn btn-info mb-3'>
           Add New Place
         </Button>
       )}
