@@ -34,7 +34,10 @@ import {
     orderListReducer,
     orderDeliverReducer,
     orderCancelReducer
-} from './reducers/orderReducers'
+} from './reducers/orderReducers';
+
+
+import { reservationReducer } from './reducers/reservationReducer';
 
 const reducer = combineReducers({
     productList: productListReducer,
@@ -64,6 +67,8 @@ const reducer = combineReducers({
     orderList: orderListReducer,
     orderDeliver: orderDeliverReducer,
     orderCancel: orderCancelReducer,
+
+    reservation: reservationReducer
 })
 
 
@@ -79,8 +84,13 @@ const shippingAddressFromStorage = localStorage.getItem('shippingAddress') ?
 
 const initialState = {
     cart: {
-        cartItems: cartItemsFromStorage,
-        shippingAddress: shippingAddressFromStorage,
+      cartItems: cartItemsFromStorage,
+      shippingAddress: shippingAddressFromStorage,
+    },
+    reservation: {
+      preOrder: false,
+      preOrderItems: [],
+      info: {}
     },
     userCookie: { userInfo: userInfoFromStorage },
 }
