@@ -164,7 +164,6 @@ class OrderDetails (APIView):
     """
     # GET Order Details by Id
     # Edit/Update Orders by Id
-    # Delete Orders by Id
     """
 
     def get_object (self, pk):

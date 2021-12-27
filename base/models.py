@@ -116,10 +116,11 @@ class DriverOrderStatus (models.Model):
 
 class Reservation (models.Model):
     _id = models.AutoField(primary_key=True)
-    customer = models.ForeignKey(User, on_delete=models.CASCADE)
-    num_of_pax = models.IntegerField(min_value=1)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    num_of_pax = models.IntegerField()
     status = models.CharField(max_length=16, default='active')
-    date = models.DateTimeField()
+    pre_order = models.BooleanField(default=False)
+    reservedDateTime = models.DateTimeField()
     created_at = models.DateTimeField(auto_now_add=True)
 
 

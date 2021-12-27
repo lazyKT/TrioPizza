@@ -1,10 +1,10 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
 from rest_framework_simplejwt.tokens import RefreshToken
-from .models import Product, Order, OrderItem, ShippingAddress, Review, DriverOrderStatus
+from .models import Product, Order, OrderItem, ShippingAddress, Review, DriverOrderStatus, Reservation
 
 
-class UserSerializer(serializers.ModelSerializer):
+class UserSerializer (serializers.ModelSerializer):
     name = serializers.SerializerMethodField(read_only=True)
     isAdmin = serializers.SerializerMethodField(read_only=True)
     mobile = serializers.SerializerMethodField(read_only=True)
@@ -27,7 +27,7 @@ class UserSerializer(serializers.ModelSerializer):
         return obj.profile.type
 
 
-class UserSerializerWithToken(UserSerializer):
+class UserSerializerWithToken (UserSerializer):
     token = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
@@ -39,13 +39,13 @@ class UserSerializerWithToken(UserSerializer):
         return str(token.access_token)
 
 
-class ReviewSerializer(serializers.ModelSerializer):
+class ReviewSerializer (serializers.ModelSerializer):
     class Meta:
         model = Review
         fields = '__all__'
 
 
-class ProductSerializer(serializers.ModelSerializer):
+class ProductSerializer (serializers.ModelSerializer):
     reviews = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
@@ -58,13 +58,13 @@ class ProductSerializer(serializers.ModelSerializer):
         return serializer.data
 
 
-class ShippingAddressSerializer(serializers.ModelSerializer):
+class ShippingAddressSerializer (serializers.ModelSerializer):
     class Meta:
         model = ShippingAddress
         fields = '__all__'
 
 
-class OrderItemSerializer(serializers.ModelSerializer):
+class OrderItemSerializer (serializers.ModelSerializer):
     product = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
@@ -77,7 +77,7 @@ class OrderItemSerializer(serializers.ModelSerializer):
         return serializer.data
 
 
-class OrderSerializer(serializers.ModelSerializer):
+class OrderSerializer (serializers.ModelSerializer):
     orderItems = serializers.SerializerMethodField(read_only=True)
     user = serializers.SerializerMethodField(read_only=True)
     driver = serializers.SerializerMethodField(read_only=True)
@@ -104,7 +104,7 @@ class OrderSerializer(serializers.ModelSerializer):
         return serializer.data
 
 
-class DriverOrderStatusSerializer(serializers.ModelSerializer):
+class DriverOrderStatusSerializer (serializers.ModelSerializer):
     driver = serializers.SerializerMethodField(read_only=True)
     name = serializers.SerializerMethodField(read_only=True)
 
@@ -120,3 +120,16 @@ class DriverOrderStatusSerializer(serializers.ModelSerializer):
     def get_name (self, obj):
         driver = obj.driver
         return driver.profile.name
+
+
+class ReservationSerializer (serializers.ModelSerializer):
+    customer = serializers.SerializerMethodField(read_only=True)
+
+    class Meta:
+        model = Reservation
+        fields = ['_id', 'customer', 'num_of_pax', 'status', 'reservedDateTime', 'created_at']
+
+    def get_customer (self, obj):
+        customer = obj.user
+        serializer = UserSerializer(customer)
+        return serializer.data
