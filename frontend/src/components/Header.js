@@ -59,10 +59,16 @@ function Header(props) {
                       </LinkContainer>
 
                       {userInfo.type === 'customer' &&
-                      (<LinkContainer to='/myorders'>
-                        <NavDropdown.Item>My Orders</NavDropdown.Item>
-                      </LinkContainer>)
-                      }
+                      (
+                        <>
+                          <LinkContainer to='/myorders'>
+                            <NavDropdown.Item>My Orders</NavDropdown.Item>
+                          </LinkContainer>
+                          <LinkContainer to='/my-reservations'>
+                            <NavDropdown.Item>My Reservations</NavDropdown.Item>
+                          </LinkContainer>
+                        </>
+                      )}
 
                       <NavDropdown.Item onClick={logoutHandler}>Logout</NavDropdown.Item>
 

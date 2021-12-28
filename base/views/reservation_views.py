@@ -65,7 +65,7 @@ class ReservationList (APIView):
             if user.profile.type != 'customer':
                 return Response({'details' : 'Invalid User Type'}, status=status.HTTP_400_BAD_REQUEST)
 
-            reservedDateTime = datetime.strptime(data['reservedDateTime'], '%Y-%m-%d %H:%M')
+            reservedDateTime = datetime.strptime(data['reservedDateTime'], '%Y-%m-%d %I:%M %p')
             reservation = Reservation.objects.create(
                 user=user,
                 num_of_pax=data['num_of_pax'],
@@ -121,7 +121,7 @@ class ReservationDetails (APIView):
             if 'status' in data:
                 reservation.status = data['status']
             if 'reservedDateTime' in data:
-                reservedDateTime = datetime.strptime(data['reservedDateTime'], '%Y-%m-%d %H:%M')
+                reservedDateTime = datetime.strptime(data['reservedDateTime'], '%Y-%m-%d %I:%M %p')
                 reservation.reservedDateTime = reservedDateTime
             if 'num_of_pax' in data and self.validate_num_pax(data['num_of_pax']):
                 reservation.num_of_pax = data['num_of_pax']

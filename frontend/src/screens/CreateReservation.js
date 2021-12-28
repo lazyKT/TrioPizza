@@ -83,7 +83,7 @@ export default function CreateReservation ({history}) {
 
   return (
     <>
-      <ReservationSteps selected='reserve'/>
+      <ReservationSteps step1={true}/>
       <FormContainer>
         <h5>Create Reservation</h5>
         { error && <Message variant='info'>{ error }</Message>}

@@ -1,3 +1,4 @@
+from datetime import datetime
 from rest_framework import serializers
 from django.contrib.auth.models import User
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -32,7 +33,7 @@ class UserSerializerWithToken (UserSerializer):
 
     class Meta:
         model = User
-        fields = ['id', 'username', 'name', 'isAdmin', 'type', 'token']
+        fields = ['id', 'username', 'name', 'isAdmin', 'type', 'token', 'mobile']
 
     def get_token(self, obj):
         token = RefreshToken.for_user(obj)
@@ -124,6 +125,7 @@ class DriverOrderStatusSerializer (serializers.ModelSerializer):
 
 class ReservationSerializer (serializers.ModelSerializer):
     customer = serializers.SerializerMethodField(read_only=True)
+    reservedDateTime = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = Reservation
@@ -133,3 +135,7 @@ class ReservationSerializer (serializers.ModelSerializer):
         customer = obj.user
         serializer = UserSerializer(customer)
         return serializer.data
+
+    def get_reservedDateTime (self, obj):
+        reservedDateTime = obj.reservedDateTime
+        return datetime.strftime(reservedDateTime, '%Y-%m-%d %I:%M %p')

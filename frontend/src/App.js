@@ -20,6 +20,9 @@ import ProductEditScreen from './screens/ProductEditScreen';
 import OrderListScreen from './screens/OrderListScreen';
 import CreateReservation from './screens/CreateReservation';
 import PreOrder from './screens/PreOrder';
+import ReserveConfirm from './screens/ReserveConfirm';
+import ReservationListScreen from './screens/ReservationListScreen';
+import ReservationScreen from './screens/ReservationScreen';
 
 import Admin from './admin/Admin';
 import DriverDashboard from './driver/Dashboard';
@@ -53,8 +56,12 @@ function App() {
           <Route path='/payment' component={PaymentScreen} />
           <Route path='/product/:id' component={ProductScreen} />
           <Route path='/cart/:id?' component={CartScreen} />
+
           <Route path='/reserve-table' component={CreateReservation} />
           <Route path='/reserve-add-ons' component={PreOrder} />
+          <Route path='/reserve-confirm' component={ReserveConfirm} />
+          <Route path='/my-reservations' component={ReservationListScreen} />
+          <Route path='/reservations/:id' component={ReservationScreen} />
 
           <Route path='/admin/userlist' component={UserListScreen} />
           <Route path='/admin/user/:id/edit' component={UserEditScreen} />
