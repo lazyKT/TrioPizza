@@ -14,7 +14,7 @@ export const includePreOrder = () => (dispatch, getState) => {
 };
 
 
-export const addPreOrderItems = (id) => (dispatch, getState) => {
+export const addPreOrderItems = (id) => async (dispatch, getState) => {
 
   const { product } = await axios.get(`/api/products/${id}`);
 
@@ -25,7 +25,8 @@ export const addPreOrderItems = (id) => (dispatch, getState) => {
 };
 
 
-export const saveReservationInfo = (info) => (dispatch, getState) => {
+export const saveReservationInfo = (info) => (dispatch) => {
+  console.log('saveReservationInfo', info);
   dispatch({
     type: RESERVATION_INFO,
     payload: info

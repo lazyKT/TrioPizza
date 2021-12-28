@@ -6,15 +6,15 @@ import {
 } from '../constants/reservationConstants';
 
 
-export const reservationReducer = (
+
+export function reservationReducer (
   state = {
-    preOrder: false,
-    preOrderItems: [],
-    info: {}
+    preOrder: false, preOrderItems: [], info: {}
   },
   action
-) => {
-  switch(action.Type) {
+) {
+
+  switch(action.type) {
     case RESERVATION_MAKE_PREORDER:
       return {
         ...state,
@@ -41,10 +41,10 @@ export const reservationReducer = (
         }
 
     case RESERVATION_INFO:
-      const info = action.payload;
+      console.log('reservation reducer', action.payload);
       return {
         ...state,
-        info
+        info : action.payload
       }
 
     case RESERVATION_CLEAR_DATA:

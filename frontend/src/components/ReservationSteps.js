@@ -17,10 +17,10 @@ export default function ReservationSteps ({selected}) {
       <LinkContainer to='/reserve-table'>
           <Nav.Link disabled={!(active === 'reserve')} >Reserve</Nav.Link>
       </LinkContainer>
-      <LinkContainer to='/reserve-table'>
-          <Nav.Link disabled={!(active === 'add-ons')}>Add Ons</Nav.Link>
+      <LinkContainer to='/reserve-add-ons'>
+          <Nav.Link>Add Ons</Nav.Link>
       </LinkContainer>
-      <LinkContainer to='/reserve-table'>
+      <LinkContainer to='/reserve-confirm'>
           <Nav.Link disabled={!(active === 'confirm')}>Confirm</Nav.Link>
       </LinkContainer>
     </Nav>

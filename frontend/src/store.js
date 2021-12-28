@@ -12,7 +12,8 @@ import {
     productTopRatedReducer,
 } from './reducers/productReducers'
 
-import { cartReducer } from './reducers/cartReducers'
+import { cartReducer } from './reducers/cartReducers';
+import { reservationReducer } from './reducers/reservationReducer';
 
 import {
     userCookieReducer,
@@ -37,8 +38,6 @@ import {
 } from './reducers/orderReducers';
 
 
-import { reservationReducer } from './reducers/reservationReducer';
-
 const reducer = combineReducers({
     productList: productListReducer,
     productDetails: productDetailsReducer,
@@ -49,6 +48,7 @@ const reducer = combineReducers({
     productTopRated: productTopRatedReducer,
 
     cart: cartReducer,
+    reservation: reservationReducer,
 
     userCookie: userCookieReducer,
     userLogin: userLoginReducer,
@@ -67,8 +67,6 @@ const reducer = combineReducers({
     orderList: orderListReducer,
     orderDeliver: orderDeliverReducer,
     orderCancel: orderCancelReducer,
-
-    reservation: reservationReducer
 })
 
 

@@ -8,6 +8,7 @@ import Message from '../components/Message';
 import Loader from '../components/Loader';
 import ReservationSteps from '../components/ReservationSteps';
 import { RESERVATION_INFO, RESERVATION_CLEAR_DATA } from '../constants/reservationConstants';
+import { saveReservationInfo } from '../actions/reservationActions';
 
 
 const reservationTimeSlots = [
@@ -63,12 +64,13 @@ export default function CreateReservation ({history}) {
   }
 
 
-  const saveReservationInfo = (e) => {
+  const submitHandler = (e) => {
     e.preventDefault();
-    dispatch({
-      type: RESERVATION_INFO,
-      payload: reservation
-    });
+    const { numOfPax, date, time } = reservation;
+    if ( parseInt(numOfPax) > 1 || date !== '' || time !== '') {
+      dispatch(saveReservationInfo(reservation));
+      history.push('/reserve-add-ons');
+    }
   };
 
 
@@ -86,13 +88,14 @@ export default function CreateReservation ({history}) {
         <h5>Create Reservation</h5>
         { error && <Message variant='info'>{ error }</Message>}
         { loading && <Loader/>}
-        <Form>
+        <Form onSubmit={submitHandler}>
 
           <Form.Group controlId='numOfPax'>
             <Form.Label>Number of Pax</Form.Label>
             <Form.Control
               type='number'
               name='numOfPax'
+              min='1'
               value={reservation.numOfPax}
               onChange={handleOnChange}
               required
@@ -129,6 +132,7 @@ export default function CreateReservation ({history}) {
           <Button
             variant='primary'
             className='mr-1'
+            type='submit'
           >
             Preceed
           </Button>

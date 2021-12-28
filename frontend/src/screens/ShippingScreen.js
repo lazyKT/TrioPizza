@@ -35,10 +35,6 @@ function ShippingScreen({ history }) {
 
     const dispatch = useDispatch()
 
-    // const [address, setAddress] = useState('');
-    // const [city, setCity] = useState('');
-    // const [postalCode, setPostalCode] = useState('');
-    // const [country, setCountry] = useState('');
     const [ address, setAddress ] = useState({
       address: '',
       city: '',
@@ -48,11 +44,6 @@ function ShippingScreen({ history }) {
     const [ savedAddress, setSavedAddress ] = useState(null);
     const [ error, setError ] = useState(null);
 
-    const submitHandler = (e) => {
-        e.preventDefault();
-        dispatch(saveShippingAddress(address))
-        history.push('/payment')
-    }
 
     // fetch user's saved address
     const fetchSavedAddresses = async (userId, token, signal) => {
@@ -92,6 +83,12 @@ function ShippingScreen({ history }) {
         ...address,
         [e.target.name] : e.target.value
       });
+    }
+
+    const submitHandler = (e) => {
+        e.preventDefault();
+        dispatch(saveShippingAddress(address))
+        history.push('/payment')
     }
 
     useEffect(() => {
