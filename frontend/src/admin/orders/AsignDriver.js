@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { Form, Button } from 'react-bootstrap';
+import { useSelector } from 'react-redux';
+import { Button } from 'react-bootstrap';
 import Box from '@mui/material/Box';
 import axios from 'axios';
 
 import Message from '../../components/Message';
+import { asignDriverToOrder } from '../../networking/orderRequests';
 
 
 export default function AsignDriver ({id, driver, status}) {
@@ -14,40 +15,32 @@ export default function AsignDriver ({id, driver, status}) {
   const [ selected, setSelected ] = useState(-1);
   const [ orderDriver, setOrderDriver ] = useState(null);
 
-  const dispatch = useDispatch();
   const { userInfo } = useSelector(state => state.userCookie);
 
   const handleOnChange = (e) => {
     setSelected(e.target.value);
   }
 
-  const asignDriverRequest = async (e) => {
 
-    const body = {
-      driver: selected,
-      order: id
-    };
-
+  const assignDriver = async (e) => {
     try {
-      const response = await axios.put('api/orders/assign-driver/', body,{
-        headers: {
-          'Content-Type' : 'application/json',
-          Authorization: `Bearer ${userInfo.token}`
-        }
-      });
+      e.preventDefault();
+      const { error, message } = await asignDriverToOrder(selected, id, userInfo.token);
 
-      if (response.status === 200) {
+      if (error) {
+        setError(message);
+      }
+      else {
+        setError(null);
         const selectedDriver = drivers.filter(d => d.driver.id === parseInt(selected));
         setOrderDriver(selectedDriver[0].driver);
       }
     }
     catch (error) {
-      if (error.response && error.response.data.details)
-        setError(error);
-      else
-        setError(error.message);
+      setError(error.message);
     }
   }
+
 
   const fetchAvailableDrivers = async (token, signal) => {
     try {
@@ -118,7 +111,7 @@ export default function AsignDriver ({id, driver, status}) {
               <div>
                 <Button
                   variant='primary'
-                  onClick={asignDriverRequest}
+                  onClick={assignDriver}
                 >
                   Assign
                 </Button>

@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Card, Form, Button } from 'react-bootstrap';
-import { useHistory } from 'react-router-dom';
 
 import FormContainer from './FormContainer';
 
@@ -14,10 +13,6 @@ export default function AddNewPlaceForm ({dismissForm, handleOnSubmit}) {
     postalCode: '',
     country: ''
   });
-
-
-  const history = useHistory();
-
 
   const handleOnChange = (e) => {
     setPlace({

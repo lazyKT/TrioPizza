@@ -12,7 +12,8 @@ import {
     productTopRatedReducer,
 } from './reducers/productReducers'
 
-import { cartReducer } from './reducers/cartReducers'
+import { cartReducer } from './reducers/cartReducers';
+import { reservationReducer } from './reducers/reservationReducer';
 
 import {
     userCookieReducer,
@@ -34,7 +35,8 @@ import {
     orderListReducer,
     orderDeliverReducer,
     orderCancelReducer
-} from './reducers/orderReducers'
+} from './reducers/orderReducers';
+
 
 const reducer = combineReducers({
     productList: productListReducer,
@@ -46,6 +48,7 @@ const reducer = combineReducers({
     productTopRated: productTopRatedReducer,
 
     cart: cartReducer,
+    reservation: reservationReducer,
 
     userCookie: userCookieReducer,
     userLogin: userLoginReducer,
@@ -79,8 +82,13 @@ const shippingAddressFromStorage = localStorage.getItem('shippingAddress') ?
 
 const initialState = {
     cart: {
-        cartItems: cartItemsFromStorage,
-        shippingAddress: shippingAddressFromStorage,
+      cartItems: cartItemsFromStorage,
+      shippingAddress: shippingAddressFromStorage,
+    },
+    reservation: {
+      preOrder: false,
+      preOrderItems: [],
+      info: {}
     },
     userCookie: { userInfo: userInfoFromStorage },
 }

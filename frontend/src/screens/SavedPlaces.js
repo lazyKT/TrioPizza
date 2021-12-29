@@ -25,7 +25,7 @@ export default function SavedPlaces () {
       const { data, message, error } = await saveNewAddress(newPlace, userInfo.id, userInfo.token);
 
       if (error) {
-        setError(error);
+        setError(message);
       }
       else {
         setAddNewPlace(false);
@@ -52,7 +52,7 @@ export default function SavedPlaces () {
           userInfo.token,
           abortController.signal);
         if (error) {
-          setError(error);
+          setError(message);
         }
         else {
           setAddresses(data);

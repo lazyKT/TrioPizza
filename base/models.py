@@ -112,3 +112,19 @@ class DriverOrderStatus (models.Model):
 
     def __str__(self):
         return 'driver name: %s, status: %s' % (self.driver.name, self.status)
+
+
+class Reservation (models.Model):
+    _id = models.AutoField(primary_key=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    num_of_pax = models.IntegerField()
+    status = models.CharField(max_length=16, default='active')
+    pre_order = models.BooleanField(default=False)
+    reservedDateTime = models.DateTimeField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+
+class PreOrder (models.Model):
+    _id = models.AutoField(primary_key=True)
+    product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True)
+    reservation = models.ForeignKey(Reservation, on_delete=models.CASCADE)
