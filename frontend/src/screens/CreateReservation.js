@@ -4,10 +4,8 @@ import { Form, Button } from 'react-bootstrap';
 
 
 import FormContainer from '../components/FormContainer';
-import Message from '../components/Message';
-import Loader from '../components/Loader';
 import ReservationSteps from '../components/ReservationSteps';
-import { RESERVATION_INFO, RESERVATION_CLEAR_DATA } from '../constants/reservationConstants';
+import { RESERVATION_CLEAR_DATA } from '../constants/reservationConstants';
 import { saveReservationInfo } from '../actions/reservationActions';
 
 
@@ -34,8 +32,6 @@ export default function CreateReservation ({history}) {
   const { userInfo } = useSelector(state => state.userCookie);
   const dispatch = useDispatch();
 
-  const [ loading, setLoading ] = useState(false);
-  const [ error, setError ] = useState(null);
   const [ reservation, setReservation ] = useState({
     numOfPax: 1,
     date: '',
@@ -86,8 +82,6 @@ export default function CreateReservation ({history}) {
       <ReservationSteps step1={true}/>
       <FormContainer>
         <h5>Create Reservation</h5>
-        { error && <Message variant='info'>{ error }</Message>}
-        { loading && <Loader/>}
         <Form onSubmit={submitHandler}>
 
           <Form.Group controlId='numOfPax'>

@@ -50,6 +50,27 @@ export async function getReservationById (reservationId, token, signal) {
       headers: {
         'Content-Type' : 'application/json',
         Authorization : `Bearer ${token}`
+      },
+      signal
+    });
+
+    return { error : false, data };
+  }
+  catch (error) {
+    if (error.response && error.response.data.details)
+      return { error : true, message : error.response.data.details };
+    else
+      return { error : true, message : error.message };
+  }
+}
+
+
+export async function editReservationById (reservationId, body, token) {
+  try {
+    const { data } = await axios.put(`api/reservations/${reservationId}/`, body, {
+      headers: {
+        'Content-Type' : 'application/json',
+        Authorization : `Bearer ${token}`
       }
     });
 

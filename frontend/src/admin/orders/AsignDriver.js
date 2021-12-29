@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { Form, Button } from 'react-bootstrap';
+import { useSelector } from 'react-redux';
+import { Button } from 'react-bootstrap';
 import Box from '@mui/material/Box';
 import axios from 'axios';
 
@@ -15,7 +15,6 @@ export default function AsignDriver ({id, driver, status}) {
   const [ selected, setSelected ] = useState(-1);
   const [ orderDriver, setOrderDriver ] = useState(null);
 
-  const dispatch = useDispatch();
   const { userInfo } = useSelector(state => state.userCookie);
 
   const handleOnChange = (e) => {
@@ -41,7 +40,7 @@ export default function AsignDriver ({id, driver, status}) {
       setError(error.message);
     }
   }
-  
+
 
   const fetchAvailableDrivers = async (token, signal) => {
     try {

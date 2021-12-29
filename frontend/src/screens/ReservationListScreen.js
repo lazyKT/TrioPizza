@@ -13,7 +13,27 @@ const styles = {
     padding: '10px',
     display: 'flex',
     justifyContent: 'space-between',
-    alignItems: 'center'
+    alignItems: 'center',
+    '&:hover': {
+      backgroundColor: 'gainsboro',
+      color: 'darkblue',
+      cursor: 'pointer'
+    },
+  },
+  active: {
+    padding: '5px',
+    background: 'tomato',
+    color: 'white'
+  },
+  done: {
+    padding: '5px',
+    background: 'green',
+    color: 'white'
+  },
+  cancel: {
+    padding: '5px',
+    background: 'lightgray',
+    color: 'black'
   }
 }
 
@@ -93,6 +113,10 @@ export default function ReservationListScreen ({history}) {
     }
   }
 
+  const showReservationDetails = (id) => {
+    history.push(`/reservations/${id}`);
+  }
+
 
   useEffect(() => {
 
@@ -111,7 +135,7 @@ export default function ReservationListScreen ({history}) {
       abortController.abort();
     });
 
-  }, [userInfo]);
+  }, [userInfo, history]);
 
   useEffect(() => {
     setLoading(false);
@@ -127,15 +151,24 @@ export default function ReservationListScreen ({history}) {
         <Paper
           sx={styles.paper}
           key={r._id}
+          onClick={() => showReservationDetails(r._id)}
         >
           <div>
             <h6>Date : <strong>{toDate(r.reservedDateTime)}</strong></h6>
             <h6>
-              <i class="fas fa-user"></i>&nbsp;
+              <i className="fas fa-user"></i>&nbsp;
               <strong>{r.num_of_pax} people</strong>
             </h6>
           </div>
-          <h6>Status : <strong>{r.status}</strong></h6>
+          <h6
+            style={
+              r.status === 'active' ? styles.active : (
+                r.status === 'done' ? styles.done : styles.cancel
+              )
+            }
+          >
+            <strong>{r.status}</strong>
+          </h6>
         </Paper>
       ))}
     </>

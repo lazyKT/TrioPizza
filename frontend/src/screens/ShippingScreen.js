@@ -5,6 +5,7 @@ import Box from '@mui/material/Box';
 import Paper from '@mui/material/Paper';
 import { useDispatch, useSelector } from 'react-redux';
 import FormContainer from '../components/FormContainer';
+import Message from '../components/Message';
 import CheckoutSteps from '../components/CheckoutSteps';
 import { saveShippingAddress } from '../actions/cartActions';
 
@@ -139,7 +140,7 @@ function ShippingScreen({ history }) {
           )}
 
             <Form onSubmit={submitHandler}>
-
+                { error && <Message variant='danger'>{error}</Message>}
                 <Form.Group controlId='address'>
                     <Form.Label>Address</Form.Label>
                     <Form.Control

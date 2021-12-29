@@ -9,7 +9,7 @@ import {
 
 export function reservationReducer (
   state = {
-    preOrder: false, preOrderItems: [], info: {}
+    preOrder: false, preOrderItems: [], info: {}, new : false
   },
   action
 ) {

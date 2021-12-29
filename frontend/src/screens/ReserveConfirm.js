@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import { Button } from 'react-bootstrap';
 
@@ -8,18 +8,20 @@ import Loader from '../components/Loader';
 import FormContainer from '../components/FormContainer';
 import ReservationSteps from '../components/ReservationSteps';
 import { createNewReservationRequest } from '../networking/reservationRequests';
+import { RESERVATION_CLEAR_DATA } from '../constants/reservationConstants';
 
 
 export default function ReserveConfirm () {
 
   const [ loading, setLoading ] = useState(false);
   const [ error, setError ] = useState(null);
+  const [ reservationCreated, setReservationCreated ] = useState(false);
 
   const { userInfo } = useSelector(state => state.userCookie);
   const { info, preOrder } = useSelector(state => state.reservation);
 
   const history = useHistory();
-
+  const dispatch = useDispatch();
 
   const confirmReservationClick = async (e) => {
     try {
@@ -28,7 +30,7 @@ export default function ReserveConfirm () {
 
       const body = {
         user : userInfo.id,
-        num_of_pax : info.numOfPax,
+        num_of_pax : parseInt(info.numOfPax),
         reservedDateTime : `${info.date} ${info.time}`
       }
 
@@ -38,27 +40,35 @@ export default function ReserveConfirm () {
         setError(message);
       }
       else {
+        setReservationCreated(true);
         setError(null);
-        console.log(data);
+        dispatch({
+          type : RESERVATION_CLEAR_DATA
+        });
+        history.push(`/reservations/${data._id}`);
       }
     }
     catch (error) {
       console.error(error.message);
       setError(error.message);
     }
-    finally {
-      setLoading(false);
-    }
   }
 
 
   useEffect(() => {
-    console.log('userInfo', userInfo);
-    console.log('reservation', info);
+
     if (!userInfo) {
       history.push('/');
     }
-  }, [info, userInfo, error, loading]);
+
+    if (info && !(info.date) && !reservationCreated) {
+      history.push('/reserve-table')
+    }
+  }, [info, userInfo]);
+
+  useEffect(() => {
+    setLoading(false);
+  }, [error, loading, history, reservationCreated])
 
   return (
     <>

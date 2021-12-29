@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import { Button } from 'react-bootstrap';
@@ -24,7 +24,7 @@ export default function PreOrder () {
     console.log('reservation', info);
     if (!userInfo)
       history.push('/');
-  }, [userInfo, info]);
+  }, [userInfo, info, history]);
 
 
   return (
