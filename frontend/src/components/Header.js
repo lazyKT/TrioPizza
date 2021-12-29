@@ -41,9 +41,16 @@ function Header(props) {
                 { userInfo?.type !== 'driver' && <SearchBox />}
                 <Nav className="ml-auto">
 
-                  { userInfo && userInfo.type === 'customer' && <LinkContainer to='/cart'>
-                    <Nav.Link ><i className="fas fa-shopping-cart"></i>Cart</Nav.Link>
-                  </LinkContainer>}
+                  { userInfo && userInfo.type === 'customer' &&
+                    <>
+                    <LinkContainer to='/reserve-table'>
+                      <Nav.Link >Reservation</Nav.Link>
+                    </LinkContainer>
+                    <LinkContainer to='/cart'>
+                      <Nav.Link ><i className="fas fa-shopping-cart"></i>Cart</Nav.Link>
+                    </LinkContainer>
+                    </>
+                  }
 
                   {userInfo ? (
                     <NavDropdown title={userInfo.name} id='username'>
@@ -52,10 +59,16 @@ function Header(props) {
                       </LinkContainer>
 
                       {userInfo.type === 'customer' &&
-                      (<LinkContainer to='/myorders'>
-                        <NavDropdown.Item>My Orders</NavDropdown.Item>
-                      </LinkContainer>)
-                      }
+                      (
+                        <>
+                          <LinkContainer to='/myorders'>
+                            <NavDropdown.Item>My Orders</NavDropdown.Item>
+                          </LinkContainer>
+                          <LinkContainer to='/my-reservations'>
+                            <NavDropdown.Item>My Reservations</NavDropdown.Item>
+                          </LinkContainer>
+                        </>
+                      )}
 
                       <NavDropdown.Item onClick={logoutHandler}>Logout</NavDropdown.Item>
 

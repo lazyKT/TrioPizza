@@ -5,6 +5,7 @@ import Box from '@mui/material/Box';
 import Paper from '@mui/material/Paper';
 import { useDispatch, useSelector } from 'react-redux';
 import FormContainer from '../components/FormContainer';
+import Message from '../components/Message';
 import CheckoutSteps from '../components/CheckoutSteps';
 import { saveShippingAddress } from '../actions/cartActions';
 
@@ -35,10 +36,6 @@ function ShippingScreen({ history }) {
 
     const dispatch = useDispatch()
 
-    // const [address, setAddress] = useState('');
-    // const [city, setCity] = useState('');
-    // const [postalCode, setPostalCode] = useState('');
-    // const [country, setCountry] = useState('');
     const [ address, setAddress ] = useState({
       address: '',
       city: '',
@@ -48,11 +45,6 @@ function ShippingScreen({ history }) {
     const [ savedAddress, setSavedAddress ] = useState(null);
     const [ error, setError ] = useState(null);
 
-    const submitHandler = (e) => {
-        e.preventDefault();
-        dispatch(saveShippingAddress(address))
-        history.push('/payment')
-    }
 
     // fetch user's saved address
     const fetchSavedAddresses = async (userId, token, signal) => {
@@ -92,6 +84,12 @@ function ShippingScreen({ history }) {
         ...address,
         [e.target.name] : e.target.value
       });
+    }
+
+    const submitHandler = (e) => {
+        e.preventDefault();
+        dispatch(saveShippingAddress(address))
+        history.push('/payment')
     }
 
     useEffect(() => {
@@ -142,7 +140,7 @@ function ShippingScreen({ history }) {
           )}
 
             <Form onSubmit={submitHandler}>
-
+                { error && <Message variant='danger'>{error}</Message>}
                 <Form.Group controlId='address'>
                     <Form.Label>Address</Form.Label>
                     <Form.Control
