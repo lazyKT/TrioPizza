@@ -18,7 +18,7 @@ export default function CreateProduct ({backToProductList}) {
   const [ newProduct, setNewProduct ] = useState({
     description: '',
     name: '',
-    price: '0.00'
+    price: ''
   });
 
   const dispatch = useDispatch();
@@ -38,8 +38,9 @@ export default function CreateProduct ({backToProductList}) {
 
   const handleFormSubmit = (e) => {
     e.preventDefault();
+    console.log('new product', newProduct);
     const { error, errorMessage } = validateNewProduct(newProduct);
-
+    console.log(error, errorMessage);
     if (error) {
       setMessage(errorMessage);
     }
@@ -52,13 +53,13 @@ export default function CreateProduct ({backToProductList}) {
 
   const validateNewProduct = (newProduct) => {
     if (newProduct.description && newProduct.description === '')
-      return { error : true, errorMessage: 'Empty Description*' };
+      return { error : true, errorMessage: '*Empty Description*' };
 
     if (newProduct.name && newProduct.name === '')
-      return { error : true, errorMessage: 'Empty Name*' };
+      return { error : true, errorMessage: '*Empty Name*' };
 
-    if (newProduct.price && (newProduct.price === '' || parseInt(newProduct.price) < 0) )
-      return { error : true, errorMessage: 'Invalid Price*'};
+    if (newProduct.price && (newProduct.price === '' || parseInt(newProduct.price) <= 0) )
+      return { error : true, errorMessage: '*Invalid Price*'};
 
     return { error: false };
   }
@@ -96,8 +97,7 @@ export default function CreateProduct ({backToProductList}) {
       <Paper sx={{ paddingTop: '20px', paddingBottom: '50px'}}>
         <FormContainer>
           <h4>Create Product</h4>
-          {message !== '' && <Message variant='success'>{message}</Message>}
-          {error && <Message variant='danger'>{error}</Message>}
+          {message !== '' && <Message variant='info'>{message}</Message>}
           {loading && <Loader />}
           <Form onSubmit={handleFormSubmit}>
 

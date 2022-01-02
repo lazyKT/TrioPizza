@@ -56,7 +56,7 @@ export default function EditProduct ({editingID, backToProductList}) {
     if (editingProduct.name && editingProduct.name === '')
       return { error : true, errorMessage: 'Error: Empty Name*' };
 
-    if (editingProduct.price && (editingProduct.price === '' || parseInt(editingProduct.price) < 0) )
+    if (editingProduct.price && (editingProduct.price === '' || parseInt(editingProduct.price) <= 0) )
       return { error : true, errorMessage: 'Error: Invalid Price*'};
 
     return { error: false };
@@ -78,9 +78,9 @@ export default function EditProduct ({editingID, backToProductList}) {
   useEffect(() => {
     if (product) {
       setEditingProduct({
-        name: product.name,
-        description: product.description,
-        price: product.price
+        name: product.name ? product.name : 'Failed to fetch',
+        description: product.description ? product.description : 'Failed to fetch',
+        price: product.price ? product.price : ''
       });
     }
     else if (error) {
