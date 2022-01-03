@@ -89,37 +89,41 @@ export default function CustomTable (props) {
   };
 
   const handleSelectAllClick = (event) => {
-    if (event.target.checked) {
-      const newSelecteds = rows.map((n) => {
-        if (n.id)
-          return n.id;
-        else
-          return n._id;
-      });
-      setSelected(newSelecteds);
-      return;
+    if (type !== 'driver') {
+      if (event.target.checked) {
+        const newSelecteds = rows.map((n) => {
+          if (n.id)
+            return n.id;
+          else
+            return n._id;
+        });
+        setSelected(newSelecteds);
+        return;
+      }
+      setSelected([]);
     }
-    setSelected([]);
   };
 
   const handleClick = (event, name) => {
-    const selectedIndex = selected.indexOf(name);
-    let newSelected = [];
+    if (type !== 'driver') {
+      const selectedIndex = selected.indexOf(name);
+      let newSelected = [];
 
-    if (selectedIndex === -1) {
-      newSelected = newSelected.concat(selected, name);
-    } else if (selectedIndex === 0) {
-      newSelected = newSelected.concat(selected.slice(1));
-    } else if (selectedIndex === selected.length - 1) {
-      newSelected = newSelected.concat(selected.slice(0, -1));
-    } else if (selectedIndex > 0) {
-      newSelected = newSelected.concat(
-        selected.slice(0, selectedIndex),
-        selected.slice(selectedIndex + 1),
-      );
+      if (selectedIndex === -1) {
+        newSelected = newSelected.concat(selected, name);
+      } else if (selectedIndex === 0) {
+        newSelected = newSelected.concat(selected.slice(1));
+      } else if (selectedIndex === selected.length - 1) {
+        newSelected = newSelected.concat(selected.slice(0, -1));
+      } else if (selectedIndex > 0) {
+        newSelected = newSelected.concat(
+          selected.slice(0, selectedIndex),
+          selected.slice(selectedIndex + 1),
+        );
+      }
+
+      setSelected(newSelected);
     }
-
-    setSelected(newSelected);
   };
 
   const handleChangePage = (event, newPage) => {
@@ -169,6 +173,7 @@ export default function CustomTable (props) {
                     onSelectAllClick={handleSelectAllClick}
                     onRequestSort={handleRequestSort}
                     rowCount={rows.length}
+                    type={type}
                   />
                   <CustomTableBody
                     rows={rows}

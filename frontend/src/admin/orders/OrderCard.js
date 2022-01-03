@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import Paper from '@mui/material/Paper';
 import Box from '@mui/material/Box';
+import { Row, Col } from 'react-bootstrap';
 
 import OrderDetails from './OrderDetails';
 
@@ -23,7 +24,8 @@ const styles = {
   status: {
     padding: '10px',
     borderRadius: '2px',
-    color: 'white'
+    color: 'white',
+    width: 'fit-content'
   }
 }
 
@@ -54,29 +56,41 @@ export default function OrderCard ({order, goToOrderDetails}) {
   }
 
 
+  React.useEffect(() => {
+    if (order._id === 25) {
+      console.log(order);
+    }
+  });
+
   return (
     <Paper
       sx={styles.paper}
       onClick={handleOnClick}
     >
-      <Box sx={styles.box}>
-        <div>
+      <Row>
+        <Col md={8}>
           <p>Order # {order._id}</p>
           { order.orderItems.map( (item, idx) => (
             <h6 key={idx}>{item.name} x {item.qty}</h6>
           ))}
           <h5>{order.totalPrice} $</h5>
           <h6>{toDate(order.createdAt)}</h6>
-        </div>
-        <Box
-          sx={{
-            ...styles.status,
-            backgroundColor: order.status === 'progress' ? 'coral' : 'dodgerBlue'
-          }}
-        >
-          {order.status}
-        </Box>
-      </Box>
+        </Col>
+        <Col md={4}>
+          <Box
+            sx={{
+              ...styles.status,
+              backgroundColor: order.status === 'progress' ? 'coral' : 'dodgerBlue'
+            }}
+          >
+            {order.status}
+          </Box>
+          {order.status === 'progress' &&
+          <h6 style={{marginTop: '10px'}}>
+            { order.driver ? "Assigned" : "Un-assigned"}
+          </h6>}
+        </Col>
+      </Row>
     </Paper>
   )
 }

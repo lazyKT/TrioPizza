@@ -154,6 +154,8 @@ class OrderList (APIView):
             self.create_order_items(data['orderItems'], order)
             serializer = OrderSerializer(order)
             return Response(serializer.data)
+        except Http404:
+            return Response({'details' : 'User Not Found!'}, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             error = 'Internal Sever Error!' if str(e) == '' else str(e)
             return Response({'details' : error}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

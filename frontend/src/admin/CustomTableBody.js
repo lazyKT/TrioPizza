@@ -93,6 +93,7 @@ export default function CustomTableBody (props) {
               key={row[cells[0]]}
               selected={isItemSelected}
             >
+              {dataType !== 'driver' &&
               <TableCell padding="checkbox">
                 <Checkbox
                   color="primary"
@@ -101,7 +102,7 @@ export default function CustomTableBody (props) {
                     'aria-labelledby': labelId,
                   }}
                 />
-              </TableCell>
+              </TableCell>}
               { cells.map( (cell, idx) =>
                   <TableCell key={idx}>{row[cell]}</TableCell>
               )}
