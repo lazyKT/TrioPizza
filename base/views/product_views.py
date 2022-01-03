@@ -68,6 +68,13 @@ def createProduct(request):
         data = request.data
         print(data);
 
+        if 'name' not in data:
+            return Response({'deatils' : 'Name is required*'}, status=status.HTTP_400_BAD_REQUEST)
+        elif 'price' not in data:
+            return Response({'details' : 'Price is required*'}, status=status.HTTP_400_BAD_REQUEST)
+        elif 'description' not in data:
+            return Response({'details' : 'Description is required*'}, status=status.HTTP_400_BAD_REQUEST)
+
         product = Product.objects.create(
             name=data['name'],
             price=data['price'],

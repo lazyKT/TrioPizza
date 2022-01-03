@@ -127,6 +127,7 @@ export default function OrderDetails ({id, backToOrderList}) {
           setError(message);
         }
         else {
+          console.log(data);
           setOrder(data);
         }
         setLoading(false);

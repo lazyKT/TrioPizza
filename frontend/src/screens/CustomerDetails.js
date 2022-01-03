@@ -13,15 +13,19 @@ export default function CustomerDetails () {
 
   const [ user, setUser ] = useState({
     name: '',
-    email: '',
+    username: '',
     mobile: ''
   });
+  const [ editing, setEditing ] = useState(false);
+  const [ message, setMessage ] = useState(null);
 
   const history = useHistory();
   const dispatch = useDispatch();
 
   const { userInfo } = useSelector(state => state.userCookie );
   const { loading, error, userDetails } = useSelector(state => state.userDetails);
+  const { error: errorUpdate, loading: loadingUpdate, success } = useSelector( state =>
+                                                                      state.userUpdateProfile);
 
 
   const handleOnChange = (e) => {
@@ -32,8 +36,44 @@ export default function CustomerDetails () {
   }
 
 
+  const handleCancelClick = (e) => {
+    e.preventDefault();
+    setEditing(false);
+    setMessage(null);
+  }
+
+
+  const handleEditClick = (e) => {
+    e.preventDefault();
+    setEditing(true);
+    setMessage(null);
+  }
+
+
   const submitHandler = (e) => {
     e.preventDefault();
+    const { isValidate, validateMessage } = validateOnSubmit();
+
+    if (isValidate) {
+      dispatch(updateUserProfile(user));
+    }
+    else {
+      setMessage({
+        error: true,
+        text: validateMessage
+      });
+    }
+  }
+
+
+  const validateOnSubmit = () => {
+    const { name, email, mobile } = user;
+    if (name && name.length < 4)
+      return { isValidate : false, validateMessage : 'Full Name must have at least 4 characters!'};
+    else if (mobile && mobile.length !== 8)
+      return { isValidate : false, validateMessage : 'Invalid Mobile Number. Mobile number must have 8 digits!' }
+    else
+      return { isValidate : true }
   }
 
 
@@ -44,35 +84,53 @@ export default function CustomerDetails () {
     else {
       dispatch(getUserDetails(userInfo.id));
     }
-  }, [userInfo]);
+
+    if (success) {
+      setMessage({
+        error: false,
+        text: 'User Updated Successfully!'
+      });
+      setEditing(false);
+    }
+
+  }, [userInfo, success]);
 
 
   useEffect(() => {
     if (userDetails) {
       setUser({
         name: userDetails.name,
-        email: userDetails.username,
+        username: userDetails.username,
         mobile: userDetails.mobile
       });
     }
-  }, [userDetails]);
+  }, [userDetails, editing]);
 
   return (
     <>
       <h2>User Profile</h2>
 
+      {(errorUpdate && editing) && <Message variant='danger'>{errorUpdate}</Message>}
       {error && <Message variant='danger'>{error}</Message>}
       {loading && <Loader />}
+      {message && (
+        <Message
+          variant={ message.error ? 'danger' : 'success'}
+        >
+          {message.text}
+        </Message>
+      )}
       <Form onSubmit={submitHandler}>
 
           <Form.Group controlId='name'>
               <Form.Label>Name</Form.Label>
               <Form.Control
                   required
-                  type='name'
+                  name='name'
                   placeholder='Enter name'
                   value={user.name}
                   onChange={handleOnChange}
+                  readOnly={!editing}
               >
               </Form.Control>
           </Form.Group>
@@ -81,9 +139,9 @@ export default function CustomerDetails () {
               <Form.Label>Email Address</Form.Label>
               <Form.Control
                   required
-                  type='email'
+                  name='username'
                   placeholder='Enter Email'
-                  value={user.email}
+                  value={user.username}
                   onChange={handleOnChange}
               >
               </Form.Control>
@@ -93,17 +151,40 @@ export default function CustomerDetails () {
               <Form.Label>Mobile Number</Form.Label>
               <Form.Control
                   required
-                  type='mobile'
+                  name='mobile'
                   placeholder='Mobile Number 1234 5678'
                   value={user.mobile}
                   onChange={handleOnChange}
+                  readOnly={!editing}
               >
               </Form.Control>
           </Form.Group>
 
-          <Button type='submit' variant='primary'>
-              Update
-          </Button>
+          { editing ? (
+            <>
+              <Button
+                className='mr-1'
+                variant='success'
+                type='submit'
+              >
+                Save Changes
+              </Button>
+              <Button
+                variant='secondary'
+                className='mx-2'
+                onClick={handleCancelClick}
+              >
+                Cancel
+              </Button>
+            </>
+          ) : (
+            <Button
+              variant='primary'
+              onClick={handleEditClick}
+            >
+                Edit Profile
+            </Button>
+          )}
 
       </Form>
     </>

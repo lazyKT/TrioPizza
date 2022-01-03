@@ -25,8 +25,7 @@ export default function EditUser ({closeEditUser, editingID}) {
   });
 
   const dispatch = useDispatch();
-  const userDetails = useSelector(state => state.userDetails);
-  const { error, loading, userInfo } = userDetails;
+  const { error, loading, userDetails } = useSelector(state => state.userDetails);
 
   const userUpdate = useSelector(state => state.userUpdate);
   const { success } = userUpdate;
@@ -60,17 +59,18 @@ export default function EditUser ({closeEditUser, editingID}) {
   }, [editingID]);
 
   useEffect(() => {
-    if (userInfo) {
+    console.log('userInfo', userDetails);
+    if (userDetails) {
+      
       if (success)
         setMessage('User Updated Successfully!');
-      else {
+      else
         setUser({
-          name: userInfo.name,
-          username: userInfo.username,
-          mobile: userInfo.mobile,
-          type: userInfo.type
+          name: userDetails.name,
+          username: userDetails.username,
+          mobile: userDetails.mobile,
+          type: userDetails.type
         });
-      }
     }
 
     return (() => {
@@ -79,7 +79,7 @@ export default function EditUser ({closeEditUser, editingID}) {
           type: USER_UPDATE_RESET,
         });
     });
-  }, [userInfo, success]);
+  }, [userDetails, success]);
 
 
   useEffect(() => {

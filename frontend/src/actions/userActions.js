@@ -170,7 +170,7 @@ export const getUserDetails = (id) => async (dispatch, getState) => {
             `/api/users/${id}/`,
             config
         );
-        
+
         dispatch({
             type: USER_DETAILS_SUCCESS,
             payload: data
@@ -194,7 +194,7 @@ export const updateUserProfile = (user) => async (dispatch, getState) => {
         dispatch({
             type: USER_UPDATE_PROFILE_REQUEST
         })
-
+        console.log(user);
         const {
             userCookie: { userInfo },
         } = getState();
@@ -207,8 +207,8 @@ export const updateUserProfile = (user) => async (dispatch, getState) => {
         }
 
         const { data } = await axios.put(
-            `/api/users/profile/update/`,
-            user,
+            `/api/users/${userInfo.id}/`,
+            { ...user, type: userInfo.type },
             config
         )
 
@@ -222,7 +222,10 @@ export const updateUserProfile = (user) => async (dispatch, getState) => {
             payload: data
         })
 
-        localStorage.setItem('userInfo', JSON.stringify(data))
+        setUserCookie({
+          ...userInfo,
+          ...data
+        });
 
     } catch (error) {
         dispatch({
