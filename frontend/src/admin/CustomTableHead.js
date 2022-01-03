@@ -28,7 +28,8 @@ export default function CustomTableHead (props) {
     numSelected,
     rowCount,
     onRequestSort,
-    headCells
+    headCells,
+    type
   } = props;
 
   const createSortHandler = (property) => (event) => {
@@ -38,6 +39,7 @@ export default function CustomTableHead (props) {
   return (
     <TableHead>
       <TableRow>
+        {type !== 'driver' &&
         <TableCell padding="checkbox">
           <Checkbox
             color="primary"
@@ -48,7 +50,7 @@ export default function CustomTableHead (props) {
               'aria-label': 'select all desserts',
             }}
           />
-        </TableCell>
+        </TableCell>}
         {headCells.map((headCell) => (
           <TableCell
             key={headCell.id}

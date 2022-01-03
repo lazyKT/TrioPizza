@@ -54,7 +54,7 @@ export function userCookieReducer (state = {}, action) {
     case 'remove_user_cookie':
       return {}
     default:
-      return state
+      return state;
   }
 }
 

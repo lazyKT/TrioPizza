@@ -37,6 +37,7 @@ export default function CreateReservation ({history}) {
     date: '',
     time: ''
   });
+  const [ minDate, setMinDate ] = useState(null);
 
 
   const handleOnChange = (e) => {
@@ -70,11 +71,30 @@ export default function CreateReservation ({history}) {
   };
 
 
+  const setMinimumDate = () => {
+    const date = new Date();
+    const yyyy = date.getFullYear();
+
+    let mm = date.getMonth() + 1;
+    if (mm < 10)
+      mm = '0' + mm;
+
+    let dd = date.getDate() + 1;
+    if (dd < 10)
+      dd = '0' + dd;
+    console.log(`${yyyy}-${mm}-${dd}`);
+    setMinDate(`${yyyy}-${mm}-${dd}`)
+  }
+
+
   useEffect(() => {
+    console.log('create reservation');
     if (!userInfo) {
       // if no credentials found in cookie, log out the account
       history.push('/');
     }
+
+    setMinimumDate();
   }, [userInfo]);
 
   return (
@@ -101,6 +121,7 @@ export default function CreateReservation ({history}) {
             <Form.Control
               type='date'
               name='date'
+              min={minDate}
               value={reservation.date}
               onChange={handleOnChange}
               required

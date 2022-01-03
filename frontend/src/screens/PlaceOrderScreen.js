@@ -12,8 +12,7 @@ import { CART_CLEAR_ITEMS } from '../constants/cartConstants';
 
 function PlaceOrderScreen({ history }) {
 
-    const orderCreate = useSelector(state => state.orderCreate)
-    const { order, error, success } = orderCreate
+    const { order, error, success } = useSelector(state => state.orderCreate);
 
     const dispatch = useDispatch()
 
@@ -61,6 +60,12 @@ function PlaceOrderScreen({ history }) {
         }
 
     }, [success, history, error]);
+
+    useEffect(() => {
+      if (cart.cartItems.length === 0) {
+        history.push('/');
+      }
+    }, [cart]);
 
     return (
         <div>
