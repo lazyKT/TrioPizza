@@ -12,45 +12,27 @@ import { listProducts } from '../actions/productActions'
 
 
 
-function HomeScreen ({displayHeader}) {
+function HomeScreen () {
     const dispatch = useDispatch()
     const { error, loading, products, page, pages } = useSelector(state => state.productList);
+    const { userInfo } = useSelector(state => state.userCookie);
 
     const history = useHistory();
     let keyword = history.location.search
 
 
-    const readCookies = () => {
-      try {
-        const cookies = JSON.parse(Cookies.get('user'));
-
-        return cookies;
-      }
-      catch (error) {
-        return undefined;
-      }
-    }
-
     useEffect(() => {
 
-        const cookies = readCookies();
-
-        if (cookies) {
-            if (cookies.isAdmin === 'Yes')
-              history.push('/admin');
-            else if (cookies.isAdmin === 'No') {
-              if (cookies.type === 'customer') {
-                history.push('/');
-              }
-              else if (cookies.type === 'driver') {
-                history.push('/driver');
-              }
-            }
+        if (userInfo) {
+          if (userInfo.type === 'admin')
+            history.push('/admin');
+          else if (userInfo.type === 'driver')
+            history.push('/driver');
         }
 
         dispatch(listProducts(keyword))
-        displayHeader();
-    }, [dispatch, keyword, displayHeader]);
+
+    }, [dispatch, keyword, userInfo]);
 
     return (
         <div>

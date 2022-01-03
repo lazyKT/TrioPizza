@@ -7,12 +7,11 @@ import { LinkContainer } from 'react-router-bootstrap'
 import SearchBox from './SearchBox'
 import { logout } from '../actions/userActions'
 
-function Header(props) {
+function Header() {
 
-  const [ showHeader, setShowHeader ] = useState(false);
+  const [ showHeader, setShowHeader ] = useState(true);
 
-  const userCookies = useSelector(state => state.userCookie);
-  const { userInfo } = userCookies;
+  const { userInfo } = useSelector(state => state.userCookie);
 
   const dispatch = useDispatch();
   const history = useHistory();
@@ -23,8 +22,17 @@ function Header(props) {
   }
 
   useEffect(() => {
-    setShowHeader(props.show);
-  }, [showHeader, props.show, userInfo]);
+    
+    if (userInfo) {
+      if (userInfo.type === 'admin')
+        setShowHeader(false);
+      else
+        setShowHeader(true);
+    }
+    else {
+      setShowHeader(true);
+    }
+  }, [userInfo]);
 
   return (
     <>

@@ -38,12 +38,12 @@ function App() {
 
   return (
     <Router>
-      <Header show={showHeader}/>
+      <Header/>
       <main className="py-3">
         <Container>
           <Route path='/' exact
             render={props =>
-              <HomeScreen displayHeader={displayHeader} />
+              <HomeScreen />
             }
           />
           <Route path='/login' component={LoginScreen} />
