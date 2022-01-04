@@ -241,7 +241,7 @@ export const listMyOrders = (page = 1) => async (dispatch, getState) => {
 }
 
 
-export const listOrders = () => async (dispatch, getState) => {
+export const listOrders = (page=1) => async (dispatch, getState) => {
     try {
         dispatch({
             type: ORDER_LIST_REQUEST
@@ -257,7 +257,7 @@ export const listOrders = () => async (dispatch, getState) => {
         }
 
         const { data } = await axios.get(
-            `/api/orders/`,
+            `/api/orders?page=${page}`,
             config
         );
 

@@ -26,8 +26,9 @@ class OrderList (APIView):
         # GET all orders
         """
         orders = Order.objects.all().order_by('-_id')
+        num_orders = len(orders)
 
-        page = requst.query_params.get('page')
+        page = request.query_params.get('page')
         if page is None:
             page = 1
 
@@ -43,7 +44,7 @@ class OrderList (APIView):
             orders = paginator.page(paginator.num_pages)
 
         serializer = OrderSerializer(orders, many=True)
-        return Response (serializer.data)
+        return Response ({'orders' : serializer.data, 'page': page, 'pages' : paginator.num_pages, 'count' : num_orders });
 
 
     def validate_cretae_order_request (self, request_body):
