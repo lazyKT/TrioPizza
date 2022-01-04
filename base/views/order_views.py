@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from django.http import Http404
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.views import APIView
@@ -25,6 +26,22 @@ class OrderList (APIView):
         # GET all orders
         """
         orders = Order.objects.all().order_by('-_id')
+
+        page = requst.query_params.get('page')
+        if page is None:
+            page = 1
+
+        page = int(page)
+
+        paginator = Paginator(orders, 5)
+
+        try:
+            orders = paginator.page(page)
+        except PageNotAnInteger:
+            orders = paginator.page(1)
+        except EmptyPage:
+            orders = paginator.page(paginator.num_pages)
+
         serializer = OrderSerializer(orders, many=True)
         return Response (serializer.data)
 
@@ -192,18 +209,34 @@ class OrderDetails (APIView):
 @api_view(['GET'])
 # @permission_classes([IsAuthenticated])
 def get_user_orders (request, pk):
+    # try:
+    user = User.objects.get(id=pk)
+    if user.profile.type != 'customer':
+        return Response({'details' : 'Invalid Customer!'}, status=status.HTTP_400_BAD_REQUEST)
+    orders = Order.objects.filter(user=user).order_by('-_id')
+
+    page = request.query_params.get('page')
+    if page is None:
+        page = 1
+
+    page = int(page)
+
+    paginator = Paginator(orders, 5)
+
     try:
-        user = User.objects.get(id=pk)
-        if user.profile.type != 'customer':
-            return Response({'details' : 'Invalid Customer!'}, status=status.HTTP_400_BAD_REQUEST)
-        orders = Order.objects.filter(user=user).order_by('-_id')
-        serializer = OrderSerializer(orders, many=True)
-        return Response(serializer.data)
-    except User.DoesNotExist:
-        return Response({'details' : 'User Not Found!'}, status=status.HTTP_400_BAD_REQUEST)
-    except Exception as e:
-        error = 'Internal Server Error!' if str(e) == '' else str(e)
-        return Response({'details' : error}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        orders = paginator.page(page)
+    except PageNotAnInteger:
+        orders = paginator.page(1)
+    except EmptyPage:
+        orders = paginator.page(paginator.num_pages)
+
+    serializer = OrderSerializer(orders, many=True)
+    return Response({'orders' : serializer.data, 'page' : page, 'pages' : paginator.num_pages})
+    # except User.DoesNotExist:
+    #     return Response({'details' : 'User Not Found!'}, status=status.HTTP_400_BAD_REQUEST)
+    # except Exception as e:
+    #     error = 'Internal Server Error!' if str(e) == '' else str(e)
+    #     return Response({'details' : error}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 @api_view(['GET'])
