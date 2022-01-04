@@ -64,9 +64,9 @@ function PaymentScreen({ history }) {
                             label='Master Card'
                             id='master'
                             name='paymentMethod'
-                            value='Master Card'
+                            value='Master'
                             onChange={handleOnChange}
-                            checked={paymentMethod === 'Master Card'}
+                            checked={paymentMethod === 'Master'}
                         />
                     </Col>
                 </Form.Group>
@@ -79,8 +79,8 @@ function PaymentScreen({ history }) {
                             id='paypal'
                             name='paymentMethod'
                             onChange={handleOnChange}
-                            value='Cash on Delivery'
-                            checked={paymentMethod === 'Cash on Delivery'}
+                            value='Cash'
+                            checked={paymentMethod === 'Cash'}
                         />
                     </Col>
                 </Form.Group>

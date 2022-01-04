@@ -33,6 +33,7 @@ function PlaceOrderScreen({ history }) {
         e.preventDefault();
         const { address, city, postalCode, country } = cart.shippingAddress;
         const fullAddress = `${address}, ${city}, ${postalCode}, ${country}`;
+        console.log('cart', cart);
         dispatch(createOrder({
             orderItems: cart.cartItems,
             shippingAddress: fullAddress,
@@ -41,7 +42,7 @@ function PlaceOrderScreen({ history }) {
             shippingPrice: parseFloat(cart.shippingPrice),
             taxPrice: parseFloat(cart.taxPrice),
             totalPrice: parseFloat(cart.totalPrice),
-            isPaid: cart.paymentMethod === 'Cash on Delivery' ? false : true
+            isPaid: cart.paymentMethod === 'Cash' ? false : true
         }));
     }
 
