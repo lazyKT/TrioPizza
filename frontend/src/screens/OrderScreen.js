@@ -80,7 +80,6 @@ function OrderScreen({ match, history }) {
             setError(message);
           }
           else {
-            console.log(data);
             setOrder(data);
           }
           setLoading(false);
@@ -213,10 +212,10 @@ function OrderScreen({ match, history }) {
                             </ListGroup.Item>
 
                         </ListGroup>
-                        {userInfo &&
-                            order.isPaid && !order.isDelivered && order.status === 'progress' && (
+                        {userInfo && userInfo.type !== 'customer' &&
+                          !order.isDelivered && order.status === 'progress' && (
                             <ListGroup.Item>
-                                { order.driver && <Button
+                                {  order.driver && <Button
                                     type='button'
                                     className='btn btn-block'
                                     onClick={deliverHandler}
@@ -234,6 +233,17 @@ function OrderScreen({ match, history }) {
 
                             </ListGroup.Item>
                         )}
+                        { userInfo && userInfo.type === 'customer' && !order.driver && order.status === 'progress' &&
+                          <ListGroup.Item>
+                            <Button
+                                type='button'
+                                className='btn btn-block btn-secondary'
+                                onClick={cancelOrderHandler}
+                            >
+                                Cancel Order
+                            </Button>
+                          </ListGroup.Item>
+                        }
                     </Card>
                 </Col>
             </Row>
