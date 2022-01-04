@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { LinkContainer } from 'react-router-bootstrap';
-import { Table, Button } from 'react-bootstrap';
+import { Table, Button, Pagination } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
 import Paper from '@mui/material/Paper';
 import Box from '@mui/material/Box';
+
 import Loader from '../components/Loader';
 import Message from '../components/Message';
+import Paginate from '../components/Paginate';
 import { listMyOrders } from '../actions/orderActions';
 
 
@@ -52,6 +54,10 @@ function OrderListScreen({ history }) {
       return `${dt.toLocaleDateString()}, ${dt.toLocaleTimeString()}`;
     }
 
+    const handlePagination = (page) => {
+      dispatch(listMyOrders(page))
+    }
+
     useEffect(() => {
         if (userInfo) {
             dispatch(listMyOrders())
@@ -64,36 +70,48 @@ function OrderListScreen({ history }) {
 
     return (
         <div>
-            <h1>My Orders</h1>
-            {loading
-                ? (<Loader />)
-                : error
-                    ? (<Message variant='danger'>{error}</Message>)
-                    : (
-                        orders && orders.map(order => (
-                          <Paper
-                            elevation={2}
-                            key={order._id}
-                            sx={styles.container}
-                            onClick={() => orderOnClick(order._id)}
-                          >
-                            <Box sx={styles.row}>
-                              <div>
-                                <h5>{displayOrderItem(order.orderItems)}</h5>
-                                <h6>{toDate(order.createdAt)}</h6>
-                                <h6 style={{
-                                  padding: '10px',
-                                  width: 'fit-content',
-                                  background: order.status === 'progress' ? 'dodgerblue' : 'gainsboro', 
-                                }}>
-                                  {order.status}
-                                </h6>
-                              </div>
-                              <h5>{order.totalPrice}&nbsp;$</h5>
-                            </Box>
-                          </Paper>
-                        ))
-                    )}
+          <h1>My Orders</h1>
+          {loading
+          ? (<Loader />)
+          : error
+              ? (<Message variant='danger'>{error}</Message>)
+              : (
+                <>
+                  {orders && orders.orders.map(order => (
+                    <Paper
+                      elevation={2}
+                      key={order._id}
+                      sx={styles.container}
+                      onClick={() => orderOnClick(order._id)}
+                    >
+                      <Box sx={styles.row}>
+                        <div>
+                          <h5>{displayOrderItem(order.orderItems)}</h5>
+                          <h6>{toDate(order.createdAt)}</h6>
+                          <h6 style={{
+                            padding: '10px',
+                            width: 'fit-content',
+                            background: order.status === 'progress' ? 'dodgerblue' : 'gainsboro',
+                          }}>
+                            {order.status}
+                          </h6>
+                        </div>
+                        <h5>{order.totalPrice}&nbsp;$</h5>
+                      </Box>
+                    </Paper>
+                  ))}
+                  <Pagination>
+                    {[...Array(orders.pages).keys()].map(p => (
+                      <Pagination.Item
+                        active={p + 1 === orders.page}
+                        onClick={() => handlePagination(p + 1)}
+                      >
+                      { p + 1 }
+                      </Pagination.Item>
+                    ))}
+                  </Pagination>
+                </>
+              )}
         </div>
     )
 }
