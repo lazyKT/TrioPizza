@@ -22,9 +22,9 @@ export async function createNewReservationRequest (reservation, token) {
 
 
 
-export async function getUsersReservations (userId, token, signal) {
+export async function getUsersReservations (userId, token, signal, page=1) {
   try {
-    const { data } = await axios.get(`api/reservations/users/${userId}/`, {
+    const { data } = await axios.get(`api/reservations/users/${userId}?page=${page}`, {
       headers: {
         'Content-Type' : 'application/json',
         Authorization : `Bearer ${token}`
