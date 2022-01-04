@@ -80,6 +80,7 @@ function OrderScreen({ match, history }) {
             setError(message);
           }
           else {
+            console.log(data);
             setOrder(data);
           }
           setLoading(false);
@@ -212,7 +213,7 @@ function OrderScreen({ match, history }) {
                             </ListGroup.Item>
 
                         </ListGroup>
-                        {userInfo && userInfo.isAdmin &&
+                        {userInfo &&
                             order.isPaid && !order.isDelivered && order.status === 'progress' && (
                             <ListGroup.Item>
                                 { order.driver && <Button
