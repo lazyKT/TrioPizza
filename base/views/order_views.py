@@ -247,8 +247,24 @@ def get_orders_by_driver (request, pk):
         if driver.profile.type != 'driver':
             return Response({'details' : 'Invalid User!'}, status=status.HTTP_400_BAD_REQUEST)
         orders = Order.objects.filter(deliveredBy=driver).order_by('-_id')
+
+        page = request.query_params.get('page')
+        if page is None:
+            page = 1
+
+        page = int(page)
+
+        paginator = Paginator(orders, 5)
+
+        try:
+            orders = paginator.page(page)
+        except PageNotAnInteger:
+            orders = paginator.page(1)
+        except EmptyPage:
+            orders = paginator.page(paginator.num_pages)
+
         serializer = OrderSerializer(orders, many=True)
-        return Response(serializer.data)
+        return Response({'deliveries' : serializer.data, 'page' : page, 'pages' : paginator.num_pages})
     except User.DoesNotExist:
         return Response({'details' : 'Driver Not Found!'}, status=status.HTTP_400_BAD_REQUEST)
     except Exception as e:

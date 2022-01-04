@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
-import { Card, Row, Col, Button } from 'react-bootstrap';
+import { Card, Row, Col, Button, Pagination } from 'react-bootstrap';
 
 import { getOrdersByDriver } from '../networking/orderRequests';
 import Loader from '../components/Loader';
@@ -13,7 +13,7 @@ export default function DriverDashboard () {
   const { userInfo } = useSelector(state => state.userCookie);
   const history = useHistory();
 
-  const [ deliveries, setDeliveries ] = useState([]);
+  const [ deliveries, setDeliveries ] = useState(null);
   const [ loading, setLoading ] = useState(false);
   const [ error, setError ] = useState(null);
   const [ message, setMessage ] = useState(null);
@@ -23,27 +23,37 @@ export default function DriverDashboard () {
     history.push(`/order/${id}`);
   }
 
+  const handlePagination = async (page) => {
+    await fetchOrders(userInfo.id, userInfo.token, null, page);
+  }
+
+  const fetchOrders = async (id, token, signal, page = 1) => {
+    try {
+      setLoading(true);
+
+      const { error, message, data } = await getOrdersByDriver (id, token, signal, page);
+
+      if (error) {
+        setError(message);
+        setDeliveries(null);
+      }
+      else {
+        setDeliveries(data);
+        setError(null);
+      }
+    }
+    catch (error) {
+      setError(error.message);
+      setDeliveries(null);
+    }
+  }
+
   useEffect(() => {
 
     const abortController = new AbortController();
 
     if (userInfo) {
-      ( async () => {
-
-        setLoading(true);
-
-        const { error, message, data } = await getOrdersByDriver (userInfo.id, userInfo.token, abortController.signal);
-
-        if (error) {
-          setError(message);
-          setDeliveries([]);
-        }
-        else {
-          setDeliveries(data);
-          setError(null);
-        }
-        setLoading(false);
-      })()
+      ( async () => fetchOrders(userInfo.id, userInfo.token, abortController.signal))()
     }
     else
       history.push('/');
@@ -57,14 +67,16 @@ export default function DriverDashboard () {
       setMessage(error);
     }
     else {
-      if (deliveries.length === 0) {
+      if (deliveries?.deliveries?.length === 0) {
         setMessage("You have not made any deliveries yet.");
       }
       else
         setMessage(null);
     }
 
-  }, [error, loading]);
+    setLoading(false);
+
+  }, [error, deliveries]);
 
 
   return (
@@ -78,7 +90,7 @@ export default function DriverDashboard () {
         <Card.Body>
           {loading && <Loader />}
           {message && <Message variant={error ? 'danger' : 'info'}>{message}</Message>}
-          {deliveries.map( (order, idx) => (
+          {deliveries?.deliveries?.map( (order, idx) => (
             <Card
               key={idx}
               className='mx-1 mb-2'
@@ -112,6 +124,17 @@ export default function DriverDashboard () {
           ))}
         </Card.Body>
       </Card>
+      <Pagination>
+        {[...Array(deliveries?.pages).keys()].map(p => (
+          <Pagination.Item
+            key={p}
+            active={p+1 === deliveries?.page}
+            onClick={() => handlePagination(p + 1)}
+          >
+            {p + 1}
+          </Pagination.Item>
+        ))}
+      </Pagination>
     </>
   )
 }
