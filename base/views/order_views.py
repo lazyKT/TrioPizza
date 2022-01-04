@@ -111,7 +111,7 @@ class OrderList (APIView):
             totalPrice=data['totalPrice'],
             isPaid=data['isPaid'],
             isDelivered=False,
-            paidAt=datetime.now(),
+            paidAt=datetime.now() if data['isPaid'] else None,
             status='progress'
         )
 
@@ -301,6 +301,9 @@ def updateOrderToDelivered(request, pk):
         order.isDelivered = True
         order.status = 'delivered'
         order.deliveredAt = datetime.now()
+        if order.isPaid == False:
+            order.isPaid = True
+            order.paidAt = datetime.now()
         order.save()
         driver_complete_delivery (order.deliveredBy)
         serializer = OrderSerializer(order)

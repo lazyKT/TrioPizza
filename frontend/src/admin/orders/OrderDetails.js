@@ -127,7 +127,6 @@ export default function OrderDetails ({id, backToOrderList}) {
           setError(message);
         }
         else {
-          console.log(data);
           setOrder(data);
         }
         setLoading(false);
@@ -192,6 +191,21 @@ export default function OrderDetails ({id, backToOrderList}) {
                   <p>Date & Time</p>
                   <h6>{toDate(order.createdAt)}</h6>
                 </div>
+              </Box>
+
+              <Box
+                sx={styles.row}
+              >
+                <div>
+                  <p>Payment Method</p>
+                  <h6>{order.paymentMethod}</h6>
+                </div>
+                { order.isPaid && (
+                  <div>
+                    <p>Paid On</p>
+                    <h6>{toDate(order.paidAt)}</h6>
+                  </div>
+                )}
               </Box>
 
               <Box>

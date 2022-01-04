@@ -80,7 +80,9 @@ export default function OrderCard ({order, goToOrderDetails}) {
           <Box
             sx={{
               ...styles.status,
-              backgroundColor: order.status === 'progress' ? 'coral' : 'dodgerBlue'
+              backgroundColor: order.status === 'progress' ? 'coral' : (
+                order.status === 'delivered' ? 'dodgerBlue' : 'gray'
+              )
             }}
           >
             {order.status}
