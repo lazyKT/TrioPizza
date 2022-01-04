@@ -89,9 +89,9 @@ export async function completeOrder (orderId, token) {
 }
 
 
-export async function getOrdersByDriver (driverId, token, signal) {
+export async function getOrdersByDriver (driverId, token, signal, page=1) {
   try {
-    const { data } = await axios.get(`/api/orders/deliveries/${driverId}`, {
+    const { data } = await axios.get(`/api/orders/deliveries/${driverId}?page=${page}`, {
       headers: {
         'Content-Type' : 'application/json',
         Authorization : `Bearer ${token}`
