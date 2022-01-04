@@ -44,7 +44,7 @@ function getCellData (type) {
       case 'test':
         return ['name', 'code', 'population', 'size', 'density'];
       case 'user':
-        return ['id', 'name', 'username', 'mobile', 'type', 'isAdmin'];
+        return ['id', 'name', 'username', 'mobile', 'type'];
       case 'products':
         return ['_id', 'name', 'description', 'price', 'numReviews', 'rating'];
       case 'driver':

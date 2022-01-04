@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
+import { Pagination } from 'react-bootstrap';
 import Paper from '@mui/material/Paper';
 
 import Message from '../components/Message';
@@ -95,9 +96,13 @@ export default function ReservationListScreen ({history}) {
     return `${day}, ${date.toLocaleDateString()} ${formatAMPM(date)}`;
   }
 
-  const fetchUsersReservations = async (userId, token, signal) => {
+  const handlePagination = async (page) => {
+    await fetchUsersReservations(userInfo.id, userInfo.token, null, page);
+  }
+
+  const fetchUsersReservations = async (userId, token, signal, page=1) => {
     try {
-      const { error, data, message } = await getUsersReservations(userId, token, signal);
+      const { error, data, message } = await getUsersReservations(userId, token, signal, page);
 
       if (error) {
         setError(message);
@@ -105,6 +110,7 @@ export default function ReservationListScreen ({history}) {
       }
       else {
         setError(null);
+        console.log(data);
         setReservations(data);
       }
     }
@@ -147,7 +153,7 @@ export default function ReservationListScreen ({history}) {
       <h4>My Reservations</h4>
       { error && <Message variant='danger'>{error}</Message> }
       { loading && <Loader />}
-      { reservations.map ( (r) => (
+      { reservations?.reservations?.map ( (r) => (
         <Paper
           sx={styles.paper}
           key={r._id}
@@ -171,6 +177,19 @@ export default function ReservationListScreen ({history}) {
           </h6>
         </Paper>
       ))}
+      <Pagination
+        className='mx-2 my-4'
+      >
+        {[...Array(reservations.pages).keys()].map(p => (
+          <Pagination.Item
+            key={p}
+            active={p + 1 === reservations.page}
+            onClick={() => handlePagination(p + 1)}
+          >
+            { p + 1}
+          </Pagination.Item>
+        ))}
+      </Pagination>
     </>
   );
 }

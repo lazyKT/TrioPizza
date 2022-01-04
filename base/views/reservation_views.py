@@ -1,6 +1,7 @@
 import pytz
 from datetime import datetime
 from django.http import Http404
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
@@ -148,8 +149,24 @@ def get_users_reservation (request, pk):
     try:
         user = User.objects.get(id=pk)
         reservations = Reservation.objects.filter(user=user).order_by('-_id')
+
+        page = request.query_params.get('page')
+        if page is None:
+            page = 1
+
+        page = int(page)
+
+        paginator = Paginator(reservations, 10)
+
+        try:
+            reservations = paginator.page(page)
+        except PageNotAnInteger:
+            reservations = paginator.page(1)
+        except EmptyPage:
+            reservations = paginator.page(paginator.num_pages)
+
         serializer = ReservationSerializer(reservations, many=True)
-        return Response(serializer.data)
+        return Response({'reservations' : serializer.data, 'page' : page, 'pages' : paginator.num_pages })
     except User.DoesNotExist:
         return Response({'details' : 'User Not Found!'}, status=status.HTTP_400_BAD_REQUEST)
     except Exception as e:

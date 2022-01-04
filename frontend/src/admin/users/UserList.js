@@ -52,14 +52,7 @@ const columns = [
     minWidth: 100,
     align: 'right',
     format: (value) => value.toLocaleString('en-US'),
-  },
-  {
-    id: 'isAdmin',
-    label: 'Admin',
-    maxWidth: 170,
-    align: 'right',
-    format: (value) => value.toFixed(2),
-  },
+  }
 ];
 
 
