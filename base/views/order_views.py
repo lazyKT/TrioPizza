@@ -25,7 +25,7 @@ class OrderList (APIView):
         """
         # GET all orders
         """
-        orders = Order.objects.all().order_by('-_id')
+        orders = Order.objects.all().order_by('-status', '-_id')
         num_orders = len(orders)
 
         page = request.query_params.get('page')
@@ -214,7 +214,7 @@ def get_user_orders (request, pk):
     user = User.objects.get(id=pk)
     if user.profile.type != 'customer':
         return Response({'details' : 'Invalid Customer!'}, status=status.HTTP_400_BAD_REQUEST)
-    orders = Order.objects.filter(user=user).order_by('-_id')
+    orders = Order.objects.filter(user=user).order_by('-status', '-_id')
 
     page = request.query_params.get('page')
     if page is None:
@@ -246,7 +246,9 @@ def get_orders_by_driver (request, pk):
         driver = User.objects.get(id=pk)
         if driver.profile.type != 'driver':
             return Response({'details' : 'Invalid User!'}, status=status.HTTP_400_BAD_REQUEST)
-        orders = Order.objects.filter(deliveredBy=driver).order_by('-_id')
+        orders = Order.objects.filter(deliveredBy=driver).order_by('-status', '-_id')
+
+        total_orders = len(orders)
 
         page = request.query_params.get('page')
         if page is None:
@@ -264,7 +266,32 @@ def get_orders_by_driver (request, pk):
             orders = paginator.page(paginator.num_pages)
 
         serializer = OrderSerializer(orders, many=True)
-        return Response({'deliveries' : serializer.data, 'page' : page, 'pages' : paginator.num_pages})
+        return Response({'deliveries' : serializer.data, 'page' : page, 'pages' : paginator.num_pages, 'total' : total_orders})
+    except User.DoesNotExist:
+        return Response({'details' : 'Driver Not Found!'}, status=status.HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        error = 'Internal Server Error!' if str(e) == '' else str(e)
+        return Response({'details' : error}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['GET'])
+def get_driver_order_stats (request, pk):
+    try:
+        driver = User.objects.get(id=pk)
+        if driver.profile.type != 'driver':
+            return Response({'details' : 'Invalid Driver!'}, status=status.HTTP_400_BAD_REQUEST)
+        orders = Order.objects.filter(deliveredBy=driver)
+        active_orders = len([order for order in orders if order.status == 'progress'])
+        delivered_orders = len([order for order in orders if order.status == 'delivered'])
+        cancelled_orders = len(orders) - (active_orders + delivered_orders)
+
+        return Response({
+            'total' : len(orders),
+            'active' : active_orders,
+            'delivered' : delivered_orders,
+            'cancelled' : cancelled_orders
+        })
+
     except User.DoesNotExist:
         return Response({'details' : 'Driver Not Found!'}, status=status.HTTP_400_BAD_REQUEST)
     except Exception as e:

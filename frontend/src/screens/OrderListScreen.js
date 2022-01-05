@@ -77,7 +77,7 @@ function OrderListScreen({ history }) {
               ? (<Message variant='danger'>{error}</Message>)
               : (
                 <>
-                  {orders && orders.orders.map(order => (
+                  {orders?.orders && orders.orders.map(order => (
                     <Paper
                       elevation={2}
                       key={order._id}
