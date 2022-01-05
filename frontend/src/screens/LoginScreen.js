@@ -65,6 +65,7 @@ function LoginScreen({ location, history }) {
                         placeholder='Enter Email'
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
+                        required
                     >
                     </Form.Control>
                 </Form.Group>
@@ -77,6 +78,7 @@ function LoginScreen({ location, history }) {
                         placeholder='Enter Password'
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
+                        required
                     >
                     </Form.Control>
                 </Form.Group>
