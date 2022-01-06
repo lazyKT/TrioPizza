@@ -159,18 +159,23 @@ class OrderList (APIView):
         # get available driver to automatically assign to the order using Round Robin Mechanism
         """
         # Get the id of last assigned driver
-        assigned_drivers = DriverOrderStatus.objects.filter(status='occupied')
+        last_assigned_driver = DriverOrderStatus.objects.filter(last_assigned=True)
+        available_drivers = DriverOrderStatus.objects.filter(status='available')
+        if len(available_drivers) == 0:
+            return None
 
         # If none of the driver is assigned, the driver with least id will get the order
-        if len(assigned_drivers) > 0:
-            last_assigned_driver = assigned_drivers[len(assigned_drivers) - 1]
-            next_driver = DriverOrderStatus.objects.filter(_id=(last_assigned_driver._id + 1))
-            if len(next_driver) > 0:
-                return next_driver[0].driver
+        if len(last_assigned_driver) > 0:
+            last_assigned_driver = last_assigned_driver[0]
+            last_assigned_driver.last_assigned = False
+            last_assigned_driver.save()
+            next_drivers = DriverOrderStatus.objects.filter(_id__gt=last_assigned_driver._id).filter(status='available')
+            if len(next_drivers) > 0:
+                return next_drivers[0].driver
 
         # Otherwise, the driver with next id (id of last assigned driver + 1) will get the order
         # if the computed next id (id of last assigned driver + 1) is invalid, the driver with least id will get the order
-        return DriverOrderStatus.objects.first().driver
+        return available_drivers[0].driver
 
 
     def update_driver_order_status (self, driver, order):
@@ -182,6 +187,7 @@ class OrderList (APIView):
             current_status.current_order = order
             current_status.status = 'occupied'
             current_status.total_order = current_status.total_order + 1
+            current_status.last_assigned = True
             current_status.save()
         except DriverOrderStatus.DoesNotExist:
             raise Http404
@@ -204,6 +210,9 @@ class OrderList (APIView):
                 return Response({'details' : message}, status=status.HTTP_400_BAD_REQUEST)
             # Get Available Driver to Assign
             driver = self.get_driver()
+            if driver is None:
+                # if there are no aviable drivers
+                return Response({'details' : 'Our Drivers Are Busy. Please Try Again Later'}, status=status.HTTP_503_SERVICE_UNAVAILABLE)
             # Create Order
             order = self.create_order (data, user, driver)
             # Update Driver Status
