@@ -5,7 +5,6 @@ import Typography from '@mui/material/Typography';
 
 import CustomerDetails from './CustomerDetails';
 import SavedPlaces from './SavedPlaces';
-import DriverStats from './DriverStats';
 
 
 const styles = {
@@ -27,8 +26,6 @@ function switchContents (page) {
       return <CustomerDetails />;
     case 'SavedPlaces':
       return <SavedPlaces />;
-    case 'DriverStats':
-      return <DriverStats />;
     default:
       throw new Error('Invalid Page Choice!');
   }
@@ -58,13 +55,6 @@ export default function ProfileScreen({ history }) {
             variant='subtitle1' sx={styles.link}>
             Saved Places
           </Typography>)
-        }
-        { userInfo?.type === 'driver' &&
-          <Typography onClick={() => setPage('DriverStats')}
-            variant='subtitle1' sx={styles.link}
-          >
-            Stats
-          </Typography>
         }
       </Col>
       <Col>

@@ -22,7 +22,7 @@ function Header() {
   }
 
   useEffect(() => {
-    
+
     if (userInfo) {
       if (userInfo.type === 'admin')
         setShowHeader(false);
@@ -65,6 +65,12 @@ function Header() {
                       <LinkContainer to='/profile'>
                         <NavDropdown.Item>Profile</NavDropdown.Item>
                       </LinkContainer>
+
+                      {userInfo.type === 'driver' &&
+                        <LinkContainer to='/driver-stats'>
+                          <NavDropdown.Item>Stats</NavDropdown.Item>
+                        </LinkContainer>
+                      }
 
                       {userInfo.type === 'customer' &&
                       (

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
-import { Row, Col } from 'react-bootstrap';
+import { Row, Col, Container } from 'react-bootstrap';
 import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
 
@@ -69,12 +69,12 @@ export default function DriverStats () {
 
 
   return (
-    <>
+    <Container>
       <h4>Driver Stats</h4>
       {loading && <Loader />}
       {error && <Message variant="danger">{ error }</Message>}
       <Row className='my-2'>
-        <Col className="p-2">
+        <Col className="p-2 mr-2">
           <Paper
             sx={{ padding: '20px' }}
           >
@@ -91,7 +91,7 @@ export default function DriverStats () {
           </Paper>
         </Col>
 
-        <Col className="p-2">
+        <Col className="p-2 ml-2">
           <Paper
             sx={{ padding: '20px' }}
           >
@@ -109,7 +109,7 @@ export default function DriverStats () {
         </Col>
       </Row>
       <Row>
-        <Col className="p-2">
+        <Col className="p-2 mr-2">
           <Paper
             sx={{ padding: '20px' }}
           >
@@ -126,7 +126,7 @@ export default function DriverStats () {
           </Paper>
         </Col>
 
-        <Col className="p-2">
+        <Col className="p-2 ml-2">
           <Paper
             sx={{ padding: '20px' }}
           >
@@ -143,6 +143,6 @@ export default function DriverStats () {
           </Paper>
         </Col>
       </Row>
-    </>
+    </Container>
   );
 }

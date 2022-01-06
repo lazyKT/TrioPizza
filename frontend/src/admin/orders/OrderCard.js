@@ -89,7 +89,7 @@ export default function OrderCard ({order, goToOrderDetails}) {
           </Box>
           {order.status === 'progress' &&
           <h6 style={{marginTop: '10px'}}>
-            { order.driver ? "Assigned" : "Un-assigned"}
+            { order.driver && `Driver : ${order.driver.name}` }
           </h6>}
         </Col>
       </Row>
