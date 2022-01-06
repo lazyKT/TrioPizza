@@ -111,7 +111,7 @@ class DriverOrderStatus (models.Model):
     total_order = models.IntegerField(default=0)
 
     def __str__(self):
-        return 'driver name: %s, status: %s' % (self.driver.name, self.status)
+        return 'driver name: %s, status: %s' % (self.driver.profile.name, self.status)
 
 
 class Reservation (models.Model):
