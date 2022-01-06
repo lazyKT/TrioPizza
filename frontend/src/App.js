@@ -26,6 +26,7 @@ import ReservationScreen from './screens/ReservationScreen';
 
 import Admin from './admin/Admin';
 import DriverDashboard from './driver/Dashboard';
+import DriverStats from './screens/DriverStats';
 
 
 function App() {
@@ -70,6 +71,7 @@ function App() {
           <Route path='/admin/product/:id/edit' component={ProductEditScreen} />
 
           <Route path='/driver' component={DriverDashboard} />
+          <Route path='/driver-stats' component={DriverStats} />
         </Container>
         <Route path='/admin'
           render={ props =>
