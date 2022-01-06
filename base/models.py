@@ -108,6 +108,7 @@ class DriverOrderStatus (models.Model):
     driver = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
     current_order = models.ForeignKey(Order, on_delete=models.CASCADE, null=True, blank=True)
     status = models.CharField(max_length=10, default='available')
+    last_assigned = models.BooleanField(default=False)
     total_order = models.IntegerField(default=0)
 
     def __str__(self):
