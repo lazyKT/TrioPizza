@@ -61,7 +61,7 @@ export default function EditUser ({closeEditUser, editingID}) {
   useEffect(() => {
     console.log('userInfo', userDetails);
     if (userDetails) {
-      
+
       if (success)
         setMessage('User Updated Successfully!');
       else
@@ -71,6 +71,7 @@ export default function EditUser ({closeEditUser, editingID}) {
           mobile: userDetails.mobile,
           type: userDetails.type
         });
+        setMessage('');
     }
 
     return (() => {
@@ -85,9 +86,6 @@ export default function EditUser ({closeEditUser, editingID}) {
   useEffect(() => {
     if (successDelete) {
       closeEditUser();
-    }
-    else if (errorDelete) {
-      setMessage(errorDelete);
     }
 
     return(() => {
