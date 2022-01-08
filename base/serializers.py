@@ -94,6 +94,8 @@ class OrderSerializer (serializers.ModelSerializer):
 
     def get_user(self, obj):
         user = obj.user
+        if user is None:
+            return None
         serializer = UserSerializer(user, many=False)
         return serializer.data
 
@@ -115,11 +117,15 @@ class DriverOrderStatusSerializer (serializers.ModelSerializer):
 
     def get_driver (self, obj):
         driver = obj.driver
+        if driver is None:
+            return None
         serializer = UserSerializer(driver)
         return serializer.data
 
     def get_name (self, obj):
         driver = obj.driver
+        if driver is None:
+            return 'Deleted!'
         return driver.profile.name
 
 

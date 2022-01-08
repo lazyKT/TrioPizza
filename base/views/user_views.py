@@ -11,7 +11,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.hashers import make_password
 from rest_framework import status
 
-from base.models import Profile, ShippingAddress, DriverOrderStatus
+from base.models import Profile, ShippingAddress, DriverOrderStatus, Order
 from base.serializers import ProductSerializer, UserSerializer, UserSerializerWithToken, ShippingAddressSerializer, DriverOrderStatusSerializer
 
 
@@ -211,10 +211,26 @@ class UserDetails (APIView):
     def delete (self, request, pk, format=None):
         try:
             user = self.get_object(pk)
+            # Delete Driver
+            if user.profile.type == 'driver':
+                driver_status = DriverOrderStatus.objects.get(driver=user)
+                if driver_status.current_order is None:
+                    driver_status.delete()
+                else:
+                    return Response({'details' : 'Error! Cannot Delete the Active Driver!'}, status=status.HTTP_400_BAD_REQUEST)
+            # Delete Customer
+            elif user.profile.type == 'customer':
+                cust_orders = Order.objects.filter(user=user).filter(status='progress')
+                if len(cust_orders) > 0:
+                    return Response({'details' : 'Error! Cannot Delete the Active Customer!'}, status=status.HTTP_400_BAD_REQUEST)
+            # Delete Admin
+            elif user.profile.type == 'admin':
+                return Response({'details' : 'Error! Cannot Delete Admin User!'}, status=status.HTTP_400_BAD_REQUEST)
+
             user.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
         except Http404:
-            return Response({'details' : 'User Not Found!'}, status=status.HTTP_404_NOT_FOUND)
+            return Response({'details' : 'Not Found!'}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
             error = 'Internal Server Error' if repr(e) == '' else repr(e)
             return Response({'details' : error}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -413,13 +429,14 @@ def create_new_driver_record (request):
 
 @api_view(['GET'])
 def get_all_driver_status (request):
-    try:
-        statuses = DriverOrderStatus.objects.all()
-        serializer = DriverOrderStatusSerializer(statuses, many=True)
-        return Response(serializer.data)
-    except Exception as e:
-        error = 'Internal Server Error!' if str(e) == '' else str(e)
-        return Response({'details' : error}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    statuses = DriverOrderStatus.objects.all()
+    serializer = DriverOrderStatusSerializer(statuses, many=True)
+    return Response(serializer.data)
+    # try:
+    #
+    # except Exception as e:
+    #     error = 'Internal Server Error!' if str(e) == '' else str(e)
+    #     return Response({'details' : error}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 @api_view(['GET'])
