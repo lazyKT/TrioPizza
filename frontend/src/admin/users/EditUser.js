@@ -160,16 +160,14 @@ export default function EditUser ({closeEditUser, editingID}) {
             <Form.Group controlId='type'>
               <Form.Label>User Type</Form.Label>
               <Form.Control
-                as="select"
-                onChange={handleOnChange}
-                name="type"
+                required
+                type="text"
+                placeholder="Enter Mobile Number"
+                name='mobile'
                 value={user.type}
-              >
-                <option>Select User Type</option>
-                <option value="customer">Customer</option>
-                <option value="driver">Driver</option>
-                <option value="admin">Admin</option>
-              </Form.Control>
+                onChange={handleOnChange}
+                readOnly
+              />
             </Form.Group>
 
             <Box sx={{ display: 'flex', justifyContent: 'space-between'}}>
