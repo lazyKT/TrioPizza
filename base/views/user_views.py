@@ -209,9 +209,15 @@ class UserDetails (APIView):
 
 
     def delete (self, request, pk, format=None):
-        user = self.get_object(pk)
-        user.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        try:
+            user = self.get_object(pk)
+            user.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        except Http404:
+            return Response({'details' : 'User Not Found!'}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            error = 'Internal Server Error' if repr(e) == '' else repr(e)
+            return Response({'details' : error}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 
