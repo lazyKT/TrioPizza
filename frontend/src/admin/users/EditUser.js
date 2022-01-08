@@ -55,6 +55,12 @@ export default function EditUser ({closeEditUser, editingID}) {
   useEffect(() => {
     if (editingID && editingID > 0) {
       dispatch(getUserDetails(editingID));
+      dispatch({
+        type: USER_UPDATE_RESET,
+      });
+      dispatch({
+        type: USER_DELETE_RESET
+      });
     }
   }, [editingID]);
 
@@ -64,7 +70,7 @@ export default function EditUser ({closeEditUser, editingID}) {
 
       if (success)
         setMessage('User Updated Successfully!');
-      else
+      else {
         setUser({
           name: userDetails.name,
           username: userDetails.username,
@@ -72,6 +78,7 @@ export default function EditUser ({closeEditUser, editingID}) {
           type: userDetails.type
         });
         setMessage('');
+      }
     }
 
     return (() => {
