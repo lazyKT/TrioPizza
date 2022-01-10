@@ -451,6 +451,22 @@ def get_all_avaialble_drivers (request):
         return Response({'details' : error}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
+@api_view(['GET'])
+def get_driver_status_by_id (request, pk):
+    try:
+        user = User.objects.get(id=pk)
+        driver_status = DriverOrderStatus.objects.get(driver=user)
+        serializer = DriverOrderStatusSerializer(driver_status)
+        return Response(serializer.data)
+    except User.DoesNotExist:
+        return Response({'details' : 'User Not Found!'}, status=status.HTTP_400_BAD_REQUEST)
+    except DriverOrderStatus.DoesNotExist:
+        return Response({'details' : 'Driver Status Not Found!'}, status=status.HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        error = 'Internal Server Error!' if str(e) == '' else str(e)
+        return Response({'details' : error}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
 @api_view(['PUT'])
 def update_driver_status (request):
     try:
