@@ -52,7 +52,7 @@ class UserList (APIView):
             error = True
             message = 'User Type is required!'
             return error, message
-        if body['type'] != 'customer' and body['type'] != 'driver' and body['type'] != 'admin':
+        if body['type'] != 'customer' and body['type'] != 'driver' and body['type'] != 'admin' and body['type'] != 'restaurant owner':
             error = True
             message = 'Invalid User Type!'
             return error, message
@@ -87,35 +87,35 @@ class UserList (APIView):
         """
         # Create New Users
         """
-        # try:
-        data = request.data
-        error, message = self.validate_request_body(data)
-        if error:
-            return Response ({'details': message}, status=status.HTTP_400_BAD_REQUEST)
-        # Check user by username
-        user = self.get_user_by_username(data['username'])
-        if len(user) > 0:
-            error = 'User already exists with username, %s' % data['username']
-            return Response ({'details' : error}, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            data = request.data
+            error, message = self.validate_request_body(data)
+            if error:
+                return Response ({'details': message}, status=status.HTTP_400_BAD_REQUEST)
+            # Check user by username
+            user = self.get_user_by_username(data['username'])
+            if len(user) > 0:
+                error = 'User already exists with username, %s' % data['username']
+                return Response ({'details' : error}, status=status.HTTP_400_BAD_REQUEST)
 
-        user = User.objects.create(
-            username=data['username'],
-            password=make_password(data['password'])
-        )
+            user = User.objects.create(
+                username=data['username'],
+                password=make_password(data['password'])
+            )
 
-        profile = user.profile
-        profile.type = data['type']
-        profile.name = data['name']
-        profile.mobile = data['mobile']
-        profile.save()
-        if data['type'] == 'driver':
-            self.create_new_driver_record (user)
-        serializer = UserSerializer (user)
+            profile = user.profile
+            profile.type = data['type']
+            profile.name = data['name']
+            profile.mobile = data['mobile']
+            profile.save()
+            if data['type'] == 'driver':
+                self.create_new_driver_record (user)
+            serializer = UserSerializer (user)
 
-        return Response(serializer.data)
-        # except Exception as e:
-        #     error = repr(e)
-        #     return Response ({'details' : error}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response(serializer.data)
+        except Exception as e:
+            error = 'Internal Server Error!' if repr(e) == '' else repr(e)
+            return Response ({'details' : error}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 

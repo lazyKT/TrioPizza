@@ -2,7 +2,7 @@ from datetime import datetime
 from rest_framework import serializers
 from django.contrib.auth.models import User
 from rest_framework_simplejwt.tokens import RefreshToken
-from .models import Product, Order, OrderItem, ShippingAddress, Review, DriverOrderStatus, Reservation
+from .models import Product, Order, OrderItem, ShippingAddress, Review, DriverOrderStatus, Reservation, Restaurant, Location
 
 
 class UserSerializer (serializers.ModelSerializer):
@@ -145,3 +145,23 @@ class ReservationSerializer (serializers.ModelSerializer):
     def get_reservedDateTime (self, obj):
         reservedDateTime = obj.reservedDateTime
         return datetime.strftime(reservedDateTime, '%Y-%m-%d %I:%M %p')
+
+
+class LocationSerializer (serializers.ModelSerializer):
+
+    class Meta:
+        model = Location
+        fields = '__all__'
+
+
+class RestaurantSerializer (serializers.ModelSerializer):
+    locations = serializers.SerializerMethodField(read_only=True)
+
+    class Meta:
+        model = Restaurant
+        fields = ['_id', 'owner', 'name', 'description', 'locations', 'logo']
+
+    def get_locations (self, obj):
+        locations = obj.location_set.all()
+        serializer = LocationSerializer(locations, many=True)
+        return serializer.data
