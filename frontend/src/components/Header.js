@@ -2,14 +2,20 @@ import React, { useEffect, useState } from 'react'
 import Cookies from 'js-cookie';
 import { useHistory } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux'
-import { Navbar, Nav, Container, NavDropdown } from 'react-bootstrap'
-import { LinkContainer } from 'react-router-bootstrap'
-import SearchBox from './SearchBox'
-import { logout } from '../actions/userActions'
+import { Navbar, Nav, Container, NavDropdown, Alert, Button } from 'react-bootstrap';
+import CircleIcon from '@mui/icons-material/Circle';
+import { LinkContainer } from 'react-router-bootstrap';
+import SearchBox from './SearchBox';
+
+import { logout } from '../actions/userActions';
+import { getDriverWorkingStatus, updateWorkingStatus } from '../networking/driverRequests';
+
 
 function Header() {
 
   const [ showHeader, setShowHeader ] = useState(true);
+  const [ loading, setLoading ] = useState(true);
+  const [ isOnline, setIsOnline ] = useState(false);
 
   const { userInfo } = useSelector(state => state.userCookie);
 
@@ -21,18 +27,74 @@ function Header() {
     dispatch(logout());
   }
 
+  const changeWorkingStatus = async (e) => {
+    try {
+      setLoading(true);
+      e.preventDefault();
+      const status = isOnline ? 'offline' : 'available';
+
+      const { error, message, data } = await updateWorkingStatus(userInfo.id, status, userInfo.token);
+      if (error) {
+        setIsOnline(false);
+      }
+      else {
+        if (data.status === 'offline')
+          setIsOnline(false);
+        else
+          setIsOnline(true);
+      }
+    }
+    catch (error) {
+      setIsOnline(false);
+    }
+  }
+
+  const getDriverStatus = async (driverId, token, signal) => {
+    try {
+      const { error, message, data } = await getDriverWorkingStatus(driverId, token, signal);
+      if (error) {
+        setIsOnline(false);
+      }
+      else {
+        if (data.status === 'offline')
+          setIsOnline(false);
+        else
+          setIsOnline(true);
+      }
+    }
+    catch (error) {
+      setIsOnline(false);
+    }
+  }
+
   useEffect(() => {
+
+    const abortController = new AbortController();
 
     if (userInfo) {
       if (userInfo.type === 'admin')
         setShowHeader(false);
-      else
+      else {
         setShowHeader(true);
+        if (userInfo.type === 'driver') {
+          (async () => await getDriverStatus(userInfo.id, userInfo.token, abortController.signal))()
+        }
+      }
     }
     else {
       setShowHeader(true);
     }
+
+    return (() => {
+      if (abortController) abortController.abort();
+    })
   }, [userInfo]);
+
+
+  useEffect(() => {
+    setLoading(false);
+  }, [isOnline]);
+
 
   return (
     <>
@@ -87,11 +149,31 @@ function Header() {
                       <NavDropdown.Item onClick={logoutHandler}>Logout</NavDropdown.Item>
 
                     </NavDropdown>
+
+
                   ) : (
                     <LinkContainer to='/login'>
                       <Nav.Link><i className="fas fa-user"></i>Login</Nav.Link>
                     </LinkContainer>
                     )}
+
+                  {userInfo.type === 'driver' &&
+                  <>
+                    { loading
+                      ? (<Button className="px-2 py-1 m-1" variant='secondary'>
+                          <CircleIcon sx={{ fontSize: 10, marginBottom: '2px', marginRight: '5px' }}/>Loading
+                        </Button>)
+                      : <Button
+                          className="px-2 py-1 m-1"
+                          variant={isOnline ? 'success' : 'danger'}
+                          onClick={changeWorkingStatus}
+                        >
+                          <CircleIcon sx={{ fontSize: 10, marginBottom: '2px', marginRight: '5px' }}/>
+                          { isOnline ? 'Online' : 'Offline'}
+                        </Button>
+                    }
+                  </>
+                  }
 
                 </Nav>
               </Navbar.Collapse>
