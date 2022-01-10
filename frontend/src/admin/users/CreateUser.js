@@ -145,9 +145,10 @@ export default function CreateUser ({backToUserList}) {
                 required
               >
                 <option>Select User Type</option>
+                <option value="admin">Admin</option>
                 <option value="customer">Customer</option>
                 <option value="driver">Driver</option>
-                <option value="admin">Admin</option>
+                <option value="restaurant owner">Restaurant Owner</option>
               </Form.Control>
             </Form.Group>
 

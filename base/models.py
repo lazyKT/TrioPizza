@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from django.utils import timezone
 
 class Profile (models.Model):
     """
@@ -129,3 +130,55 @@ class PreOrder (models.Model):
     _id = models.AutoField(primary_key=True)
     product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True)
     reservation = models.ForeignKey(Reservation, on_delete=models.CASCADE)
+
+
+class Restaurant (models.Model):
+    """
+    # Restaurant Model
+    """
+    _id = models.AutoField(primary_key=True)
+    owner = models.ForeignKey(User, on_delete=models.CASCADE)
+    name = models.CharField(max_length=128, default='my_restaurant')
+    description = models.TextField(null=True, blank=True)
+    logo = models.ImageField(null=True, blank=True, default='/sample.jpg')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now_add=True)
+
+
+class Promos (models.Model):
+    """
+    # Restaurant Promos
+    """
+    _id = models.AutoField(primary_key=True)
+    restaurant = models.ForeignKey(Restaurant, on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    type = models.CharField(max_length=16, null=False, blank=False)
+    amount = models.DecimalField(max_digits=4, decimal_places=3, null=False, blank=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now_add=True)
+
+
+class Location (models.Model):
+    """
+    # Restaurant Addresses
+    """
+    _id = models.AutoField(primary_key=True)
+    restaurant = models.ForeignKey(Restaurant, on_delete=models.CASCADE)
+    address = models.TextField(null=False, blank=False)
+    district = models.CharField(max_length=32, null=False, blank=False)
+    postal_code = models.CharField(max_length=8, null=False, blank=False)
+    contact_number = models.CharField(max_length=16)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now_add=True)
+
+
+class RestaurantReview (models.Model):
+    """
+    # Restaurant Reviews
+    """
+    _id = models.AutoField(primary_key=True)
+    restaurant = models.ForeignKey(Restaurant, on_delete=models.CASCADE)
+    rating = models.DecimalField(max_digits=3, decimal_places=1)
+    comments = models.TextField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now_add=True)
