@@ -159,10 +159,11 @@ class OrderList (APIView):
         # get available driver to automatically assign to the order using Round Robin Mechanism
         """
         # Get the id of last assigned driver
-        last_assigned_driver = DriverOrderStatus.objects.filter(last_assigned=True)
         available_drivers = DriverOrderStatus.objects.filter(status='available')
         if len(available_drivers) == 0:
             return None
+
+        last_assigned_driver = DriverOrderStatus.objects.filter(last_assigned=True)
 
         # If none of the driver is assigned, the driver with least id will get the order
         if len(last_assigned_driver) > 0:
@@ -178,14 +179,17 @@ class OrderList (APIView):
         return available_drivers[0].driver
 
 
-    def update_driver_order_status (self, driver, order):
+    @staticmethod
+    def update_driver_order_status (driver, order):
         """
         # Update the driver orders & status upon assigning new orders
         """
         try:
             current_status = DriverOrderStatus.objects.get(driver=driver)
             current_status.current_order = order
-            current_status.status = 'occupied'
+            current_status.active_orders = current_status.active_orders + 1
+            if current_status.active_orders > 4:
+                current_status.status = 'full'
             current_status.total_order = current_status.total_order + 1
             current_status.last_assigned = True
             current_status.save()
@@ -216,7 +220,7 @@ class OrderList (APIView):
             # Create Order
             order = self.create_order (data, user, driver)
             # Update Driver Status
-            self.update_driver_order_status (driver, order)
+            OrderList.update_driver_order_status (driver, order)
             # Save Order Items Detail
             self.create_order_items(data['orderItems'], order)
 
@@ -349,58 +353,17 @@ def get_driver_order_stats (request, pk):
         return Response({'details' : error}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-def update_driver_order_status (driver, order):
+def update_driver_order_status (driver):
     """
     # Update the driver orders & status upon assigning new orders
     """
     try:
         current_status = DriverOrderStatus.objects.get(driver=driver)
-        current_status.current_order = order
-        current_status.status = 'occupied'
-        current_status.total_order = current_status.total_order + 1
-        current_status.save()
-    except DriverOrderStatus.DoesNotExist:
-        raise Http404
-
-
-def driver_complete_delivery (driver):
-    """
-    # Driver Finished Delivering Products and Update driver status to 'Available'
-    """
-    try:
-        current_status = DriverOrderStatus.objects.get(driver=driver)
         current_status.status = 'available'
-        current_status.current_order = None
+        current_status.total_order = current_status.total_order - 1
         current_status.save()
     except DriverOrderStatus.DoesNotExist:
         raise Http404
-
-
-# Assign Driver to Orders for delivery
-@api_view(['PUT'])
-def assign_driver_to_order (request):
-    try:
-        data = request.data
-        print(data)
-        if 'order' not in data or 'driver' not in data:
-            return Response({'detailss' : 'Missing Required Fields'}, status=status.HTTP_400_BAD_REQUEST)
-        order = Order.objects.get(_id=data['order'])
-        user = User.objects.get(id=data['driver'])
-        if user.profile.type != 'driver':
-            return Response({'details' : 'Invalid Driver!'}, status=status.HTTP_400_BAD_REQUEST)
-        order.deliveredBy = user
-        order.save()
-        update_driver_order_status(user, order)
-        serializer = OrderSerializer(order)
-        return Response(serializer.data)
-    except Order.DoesNotExist:
-        return Response({'details' : 'Order Not Found!'}, status=status.HTTP_400_BAD_REQUEST)
-    except User.DoesNotExist:
-        return Response({'details' : 'User Not Found!'}, status=status.HTTP_400_BAD_REQUEST)
-    except Exception as e:
-        error = 'Internal Server Error' if str(e) == '' else str(e)
-        return Response({'details' : error}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
 
 
 @api_view(['PUT'])
@@ -432,7 +395,7 @@ def updateOrderToDelivered(request, pk):
             order.isPaid = True
             order.paidAt = datetime.now()
         order.save()
-        driver_complete_delivery (order.deliveredBy)
+        update_driver_order_status (order.deliveredBy)
         serializer = OrderSerializer(order)
         return Response(serializer.data)
     except Order.DoesNotExist:
@@ -451,8 +414,7 @@ def cancel_order (request, pk):
         order.status = 'cancelled'
         order.save()
         serializer = OrderSerializer(order)
-        if order.deliveredBy is not None:
-            driver_complete_delivery (order.deliveredBy)
+        update_driver_order_status (order.deliveredBy)
         return Response(serializer.data)
     except Order.DoesNotExist:
         return Response({'details' : 'Order Not Found!'}, status=status.HTTP_400_BAD_REQUEST)
