@@ -23,6 +23,7 @@ import PreOrder from './screens/PreOrder';
 import ReserveConfirm from './screens/ReserveConfirm';
 import ReservationListScreen from './screens/ReservationListScreen';
 import ReservationScreen from './screens/ReservationScreen';
+import RestaurantScreen from './screens/RestaurantScreen';
 
 import Admin from './admin/Admin';
 import DriverDashboard from './driver/Dashboard';
@@ -57,6 +58,8 @@ function App() {
           <Route path='/payment' component={PaymentScreen} />
           <Route path='/product/:id' component={ProductScreen} />
           <Route path='/cart/:id?' component={CartScreen} />
+
+          <Route path='/restaurants/:id' component={RestaurantScreen} />
 
           <Route path='/reserve-table' component={CreateReservation} />
           <Route path='/reserve-add-ons' component={PreOrder} />

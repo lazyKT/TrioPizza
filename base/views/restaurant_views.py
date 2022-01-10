@@ -22,6 +22,9 @@ class RestaurantList (APIView):
         restaurants = Restaurant.objects.filter(name=name)
         return restaurants
 
+    def get_restaurnat_by_owner (self, owner):
+        return Restaurant.objects.filter(owner=owner)
+
 
     def get (self, request, format=None):
         try:
@@ -112,8 +115,11 @@ class RestaurantList (APIView):
             if owner.profile.type != 'restaurant owner':
                 return Response({'details' : 'Invalid User Type!'}, status=status.HTTP_400_BAD_REQUEST)
 
+            if (len(self.get_restaurnat_by_owner(owner))):
+                return Response({'details' : 'Error! Cannot add more than one restaurant'}, status=status.HTTP_400_BAD_REQUEST)
+
             if len(self.get_restaurant_by_name(data['name'])) > 0:
-                error = 'Restaurant with %s alreadt existed' % data['name']
+                error = 'Restaurant with %s already existed' % data['name']
                 return Response({'details' : error}, status=status.HTTP_400_BAD_REQUEST)
 
             description = '' if 'description' not in data else data['description']
@@ -186,11 +192,12 @@ class RestaurantDetails (APIView):
                 return Response({'details' : 'Invalid User Type!'}, status=status.HTTP_400_BAD_REQUEST)
 
             if len(self.get_restaurant_by_name(pk, data['name'])) > 0:
-                error = 'Restaurant with %s alreadt existed' % data['name']
+                error = 'Restaurant with %s already existed' % data['name']
                 return Response({'details' : error}, status=status.HTTP_400_BAD_REQUEST)
 
             restaurant.name = data['name']
             restaurant.owner = owner
+            restaurant.description = '' if 'description' not in data else data['description']
             restaurant.save()
             serializer = RestaurantSerializer(restaurant)
             return Response(serializer.data)
