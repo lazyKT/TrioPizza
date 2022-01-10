@@ -4,6 +4,7 @@ import TableBody from '@mui/material/TableBody';
 import TableRow from '@mui/material/TableRow';
 import Checkbox from '@mui/material/Checkbox';
 
+import DriverStatus from './drivers/DriverStatus';
 
 
 // This method is created for cross-browser compatibility, if you don't
@@ -48,7 +49,7 @@ function getCellData (type) {
       case 'products':
         return ['_id', 'name', 'description', 'price', 'numReviews', 'rating'];
       case 'driver':
-        return ['_id', 'name', 'status', 'current_order', 'total_order'];
+        return ['_id', 'name', 'active_orders', 'total_order', 'status'];
       default:
         throw new Error ("Invalid Data Type")
     }
@@ -104,7 +105,9 @@ export default function CustomTableBody (props) {
                 />
               </TableCell>}
               { cells.map( (cell, idx) =>
-                  <TableCell key={idx}>{row[cell]}</TableCell>
+                  <TableCell key={idx}>{
+                    dataType === 'driver' && cell === 'status' ? <DriverStatus status={row[cell]}/> : row[cell]
+                  }</TableCell>
               )}
             </TableRow>
           );
