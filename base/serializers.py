@@ -113,7 +113,7 @@ class DriverOrderStatusSerializer (serializers.ModelSerializer):
 
     class Meta:
         model = DriverOrderStatus
-        fields = ['_id', 'driver', 'name', 'total_order', 'current_order', 'status', 'last_assigned']
+        fields = ['_id', 'driver', 'name', 'active_orders', 'total_order', 'status', 'last_assigned']
 
     def get_driver (self, obj):
         driver = obj.driver

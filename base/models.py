@@ -106,10 +106,10 @@ class ShippingAddress(models.Model):
 class DriverOrderStatus (models.Model):
     _id = models.AutoField(primary_key=True)
     driver = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
-    current_order = models.ForeignKey(Order, on_delete=models.CASCADE, null=True, blank=True)
     status = models.CharField(max_length=10, default='available')
     last_assigned = models.BooleanField(default=False)
     total_order = models.IntegerField(default=0)
+    active_orders = models.IntegerField(default=0)
 
     def __str__(self):
         return 'driver name: %s, status: %s' % (self.driver.profile.name, self.status)

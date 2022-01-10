@@ -34,16 +34,10 @@ const columns = [
   { id: '_id', label: 'ID', maxWidth: 70 },
   { id: 'name', label: 'Name', minWidth: 170 },
   {
-    id: 'status',
-    label: 'Status',
-    maxWidth: 150,
-    align: 'right',
-  },
-  {
-    id: 'current_order',
-    label: 'Current Order',
-    minWidth: 100,
-    align: 'right',
+    id: 'active_orders',
+    label: 'Active Orders',
+    maxWidth: 100,
+    align: 'right'
   },
   {
     id: 'total_order',
@@ -51,6 +45,12 @@ const columns = [
     maxWidth: 170,
     align: 'right',
     format: (value) => value.toFixed(2),
+  },
+  {
+    id: 'status',
+    label: 'Status',
+    maxWidth: 150,
+    align: 'right',
   },
 ];
 

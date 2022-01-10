@@ -214,7 +214,7 @@ class UserDetails (APIView):
             # Delete Driver
             if user.profile.type == 'driver':
                 driver_status = DriverOrderStatus.objects.get(driver=user)
-                if driver_status.current_order is None:
+                if driver_status.status == "offline":
                     driver_status.delete()
                 else:
                     return Response({'details' : 'Error! Cannot Delete the Active Driver!'}, status=status.HTTP_400_BAD_REQUEST)
@@ -229,8 +229,10 @@ class UserDetails (APIView):
 
             user.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
-        except Http404:
-            return Response({'details' : 'Not Found!'}, status=status.HTTP_404_NOT_FOUND)
+        except DriverOrderStatus.DoesNotExist:
+            return Response({'details' : 'Driver Status Not Found!'}, status=status.HTTP_404_NOT_FOUND)
+        except User.DoesNotExist:
+            return Response({'details' : 'User Not Found'}, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             error = 'Internal Server Error' if repr(e) == '' else repr(e)
             return Response({'details' : error}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -429,14 +431,13 @@ def create_new_driver_record (request):
 
 @api_view(['GET'])
 def get_all_driver_status (request):
-    statuses = DriverOrderStatus.objects.all()
-    serializer = DriverOrderStatusSerializer(statuses, many=True)
-    return Response(serializer.data)
-    # try:
-    #
-    # except Exception as e:
-    #     error = 'Internal Server Error!' if str(e) == '' else str(e)
-    #     return Response({'details' : error}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    try:
+        statuses = DriverOrderStatus.objects.all()
+        serializer = DriverOrderStatusSerializer(statuses, many=True)
+        return Response(serializer.data)
+    except Exception as e:
+        error = 'Internal Server Error!' if str(e) == '' else str(e)
+        return Response({'details' : error}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 @api_view(['GET'])
@@ -445,6 +446,40 @@ def get_all_avaialble_drivers (request):
         drivers = DriverOrderStatus.objects.filter(status='available')
         serializer = DriverOrderStatusSerializer(drivers, many=True)
         return Response(serializer.data)
+    except Exception as e:
+        error = 'Internal Server Error!' if str(e) == '' else str(e)
+        return Response({'details' : error}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['PUT'])
+def update_driver_status (request):
+    try:
+        data = request.data
+        if 'driver' not in data:
+            return Response({'details' : 'Driver is required*'}, status=status.HTTP_400_BAD_REQUEST)
+        if 'status' not in data:
+            return Response({'details' : 'Status is required*'}, status=status.HTTP_400_BAD_REQUEST)
+
+        user = User.objects.get(id=data['driver'])
+        if user.profile.type != 'driver':
+            return Response({'details' : 'Invalid Driver!'}, status=status.HTTP_400_BAD_REQUEST)
+
+        driver_status = DriverOrderStatus.objects.get(driver=user)
+
+        if data['status'] != 'offline' and data['status'] != 'available':
+            return Response({'details' : 'Invalid Status!'}, status=status.HTTP_400_BAD_REQUEST)
+
+        driver_status.status = data['status']
+        driver_status.save()
+        serializer = DriverOrderStatusSerializer(driver_status)
+        return Response(serializer.data)
+
+    except User.DoesNotExist:
+        return Response({'details' : 'User Not Found!'}, status=status.HTTP_400_BAD_REQUEST)
+
+    except DriverOrderStatus.DoesNotExist:
+        return Response({'details' : 'Driver Status Not Found!'}, status=status.HTTP_400_BAD_REQUEST)
+
     except Exception as e:
         error = 'Internal Server Error!' if str(e) == '' else str(e)
         return Response({'details' : error}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
