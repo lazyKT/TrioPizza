@@ -157,7 +157,7 @@ function Header() {
                     </LinkContainer>
                     )}
 
-                  {userInfo.type === 'driver' &&
+                  {userInfo && userInfo.type === 'driver' &&
                   <>
                     { loading
                       ? (<Button className="px-2 py-1 m-1" variant='secondary'>

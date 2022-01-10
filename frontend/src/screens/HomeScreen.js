@@ -1,42 +1,75 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import Cookies from 'js-cookie';
 import { useHistory } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux'
+import { useSelector } from 'react-redux';
 import { Row, Col } from 'react-bootstrap'
-import Product from '../components/Product'
+import Restaurant from '../components/Restaurant'
 import Loader from '../components/Loader'
 import Message from '../components/Message'
 import Paginate from '../components/Paginate'
-import ProductCarousel from '../components/ProductCarousel'
+import RestaurantCarousel from '../components/RestaurantCarousel'
 import { listProducts } from '../actions/productActions'
-
+import { getAllRestaurants } from '../networking/restaurantRequests';
 
 
 function HomeScreen () {
-    const dispatch = useDispatch()
-    const { error, loading, products, page, pages } = useSelector(state => state.productList);
+
+    const [ restaurants, setRestaurants ] = useState([]);
+    const [ error, setError ] = useState(null);
+    const [ loading, setLoading ] = useState(true);
+    const [ page, setPage ] = useState(0);
+    const [ pages, setPages ] = useState(0);
+
     const { userInfo } = useSelector(state => state.userCookie);
 
     const history = useHistory();
-    let keyword = history.location.search
+    let keyword = history.location.search;
 
+
+    const fetchAllRestaurants = async (signal) => {
+      try {
+        const { error, data, message } = await getAllRestaurants(signal);
+
+        if (error) {
+          setError(message);
+        }
+        else {
+          setRestaurants(data.restaurants);
+          setPage(data.page);
+          setPages(data.pages);
+        }
+      }
+      catch (error) {
+        setError(error.message);
+      }
+    }
 
     useEffect(() => {
 
-        if (userInfo) {
-          if (userInfo.type === 'admin')
-            history.push('/admin');
-          else if (userInfo.type === 'driver')
-            history.push('/driver');
-        }
+      const abortController = new AbortController();
 
-        dispatch(listProducts(keyword))
+      (async () => await fetchAllRestaurants(abortController.signal))()
 
-    }, [dispatch, keyword, userInfo]);
+      if (userInfo) {
+        if (userInfo.type === 'admin')
+          history.push('/admin');
+        else if (userInfo.type === 'driver')
+          history.push('/driver');
+      }
+
+      return (() => {
+        if (abortController) abortController.abort();
+      })
+
+    }, [userInfo, keyword]);
+
+    useEffect(() => {
+      setLoading(false);
+    }, [error, restaurants])
 
     return (
         <div>
-            {!keyword && <ProductCarousel />}
+            {!keyword && <RestaurantCarousel restaurants={restaurants}/>}
 
             <h1>Latest Products</h1>
             {loading ? <Loader />
@@ -44,9 +77,9 @@ function HomeScreen () {
                     :
                     <div>
                         <Row>
-                            {products.map(product => (
-                                <Col key={product._id} sm={12} md={6} lg={4} xl={3}>
-                                    <Product product={product} />
+                            {restaurants.map(restaurant => (
+                                <Col key={restaurant._id} sm={12} md={6} lg={4} xl={3}>
+                                    <Restaurant restaurant={restaurant} />
                                 </Col>
                             ))}
                         </Row>
@@ -54,7 +87,7 @@ function HomeScreen () {
                     </div>
             }
         </div>
-    )
+    );
 }
 
 export default HomeScreen
