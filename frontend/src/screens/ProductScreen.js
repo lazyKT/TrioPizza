@@ -8,6 +8,7 @@ import Message from '../components/Message'
 import { listProductDetails, createProductReview } from '../actions/productActions'
 import { PRODUCT_CREATE_REVIEW_RESET } from '../constants/productConstants'
 
+
 function ProductScreen({ match, history }) {
     const [qty, setQty] = useState(1)
     const [rating, setRating] = useState(0)
@@ -26,18 +27,7 @@ function ProductScreen({ match, history }) {
         loading: loadingProductReview,
         error: errorProductReview,
         success: successProductReview,
-    } = productReviewCreate
-
-    useEffect(() => {
-        if (successProductReview) {
-            setRating(0)
-            setComment('')
-            dispatch({ type: PRODUCT_CREATE_REVIEW_RESET })
-        }
-
-        dispatch(listProductDetails(match.params.id))
-
-    }, [dispatch, match, successProductReview])
+    } = productReviewCreate;
 
     const addToCartHandler = () => {
         history.push(`/cart/${match.params.id}?qty=${qty}`)
@@ -53,9 +43,29 @@ function ProductScreen({ match, history }) {
         ))
     }
 
+    const backButtonClicked = (e) => {
+      history.goBack();
+    }
+
+    useEffect(() => {
+        if (successProductReview) {
+            setRating(0)
+            setComment('')
+            dispatch({ type: PRODUCT_CREATE_REVIEW_RESET })
+        }
+
+        dispatch(listProductDetails(match.params.id))
+
+    }, [dispatch, match, successProductReview])
+
     return (
         <div>
-            <Link to='/' className='btn btn-light my-3'>Go Back</Link>
+            <Button
+              className='btn btn-light my-3'
+              onClick={backButtonClicked}
+            >
+              Go Back
+            </Button>
             {loading ?
                 <Loader />
                 : error

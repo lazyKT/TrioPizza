@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
-import { Row, Col, ListGroup, Image } from 'react-bootstrap';
+import { Card, Row, Col, ListGroup, Image } from 'react-bootstrap';
 
 import Message from '../components/Message';
 import Loader from '../components/Loader';
+import RestaurantProducts from '../components/RestaurantProducts';
+import Rating from '../components/Rating';
 import { getRestaurantById } from '../networking/restaurantRequests';
 
 
@@ -30,7 +32,6 @@ export default function RestaurantScreen ({match, history}) {
       else {
         setError (null);
         setRestaurant(data);
-        console.log(data);
       }
     }
     catch (error) {
@@ -40,7 +41,6 @@ export default function RestaurantScreen ({match, history}) {
 
 
   useEffect(() => {
-    console.log('RestaurantScreen')
     const abortController = new AbortController();
 
     if (match) {
@@ -65,35 +65,52 @@ export default function RestaurantScreen ({match, history}) {
       {error && <Message variant='danger'>{error}</Message>}
       {restaurant &&
         <>
-          <Row>
+          <Card className="my-3">
+            <Card.Body>
+              <Row>
 
-            <Col md={6}>
-              <Image src={restaurant.logo} alt={restaurant.name} fluid />
-            </Col>
+                <Col md={3}>
+                  <Image
+                    style={{ height: '150px', width: '300px'}}
+                    src={restaurant.logo}
+                    alt={restaurant.name}
+                    fluid
+                  />
+                </Col>
 
-            <Col md={3}>
-              <ListGroup variant="flush">
-                  <ListGroup.Item>
-                      <h3>{restaurant.name}</h3>
-                  </ListGroup.Item>
+                <Col md={6}>
+                  <ListGroup variant="flush">
+                      <ListGroup.Item>
+                          <h3>{restaurant.name}</h3>
+                      </ListGroup.Item>
 
-                  <ListGroup.Item>
-                      Description: {restaurant.description}
-                  </ListGroup.Item>
-              </ListGroup>
-            </Col>
+                      <ListGroup.Item>
+                          Description: {restaurant.description}
+                      </ListGroup.Item>
 
-            <Col md={3}>
-              <ListGroup className="py-3" variant="flush">
-                  <ListGroup.Item>
-                      <h6>Address: {getFullAddress()}</h6>
-                  </ListGroup.Item>
-                  <ListGroup.Item>
-                      <h6>Contact: {restaurant.locations[0].contact_number}</h6>
-                  </ListGroup.Item>
-              </ListGroup>
-            </Col>
-          </Row>
+                      <ListGroup.Item>
+                        <Rating value={0} text={`0 reviews`} color={'#f8e825'} />
+                      </ListGroup.Item>
+                  </ListGroup>
+                </Col>
+
+                <Col md={3}>
+                  <ListGroup className="py-3" variant="flush">
+                    <ListGroup.Item>
+                        <h4>Contact</h4>
+                    </ListGroup.Item>
+                      <ListGroup.Item>
+                          <h6>Address: {getFullAddress()}</h6>
+                      </ListGroup.Item>
+                      <ListGroup.Item>
+                          <h6>Mobile: {restaurant.locations[0].contact_number}</h6>
+                      </ListGroup.Item>
+                  </ListGroup>
+                </Col>
+              </Row>
+            </Card.Body>
+          </Card>
+          <RestaurantProducts restaurantId={restaurant._id}/>
         </>
       }
     </div>

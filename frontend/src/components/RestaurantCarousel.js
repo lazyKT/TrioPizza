@@ -5,8 +5,6 @@ import { Link } from 'react-router-dom';
 
 export default function RestaurantCarousel ({restaurants}) {
 
-  React.useEffect(() => console.log(restaurants));
-
   return (
     <Carousel className="bg-primary">
       {restaurants.map(restaurant => (
