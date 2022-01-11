@@ -14,6 +14,9 @@ import {
 
 import { cartReducer } from './reducers/cartReducers';
 import { reservationReducer } from './reducers/reservationReducer';
+import {
+  restaurantReducer 
+} from './reducers/restaurantReducers';
 
 import {
     userCookieReducer,
@@ -49,6 +52,7 @@ const reducer = combineReducers({
 
     cart: cartReducer,
     reservation: reservationReducer,
+    restaurant: restaurantReducer,
 
     userCookie: userCookieReducer,
     userLogin: userLoginReducer,
@@ -91,6 +95,7 @@ const initialState = {
       info: {}
     },
     userCookie: { userInfo: userInfoFromStorage },
+    restaurant: {}
 }
 
 const middleware = [thunk]

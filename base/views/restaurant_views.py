@@ -28,7 +28,15 @@ class RestaurantList (APIView):
 
     def get (self, request, format=None):
         try:
-            restaurants = Restaurant.objects.all().order_by('name')
+            restaurants = None
+
+            keyword = request.query_params.get('owner')
+            if keyword is None:
+                restaurants = Restaurant.objects.all().order_by('name')
+            else:
+                owner = User.objects.get(id=keyword)
+                restaurants = Restaurant.objects.filter(owner=owner)
+
             num_restaurant = len(restaurants)
 
             page = request.query_params.get('page')
@@ -48,6 +56,8 @@ class RestaurantList (APIView):
 
             serializer = RestaurantSerializer(restaurants, many=True)
             return Response({'restaurants' : serializer.data, 'page' : page, 'pages' : paginator.num_pages, 'count' : num_restaurant})
+        except User.DoesNotExist:
+            return Response({'details' : 'User Not Found!'}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
             error = 'Internal Server Error!' if repr(e) == '' else repr(e)
             return Response ({'details' : error}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

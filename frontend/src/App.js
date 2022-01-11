@@ -29,6 +29,9 @@ import Admin from './admin/Admin';
 import DriverDashboard from './driver/Dashboard';
 import DriverStats from './screens/DriverStats';
 
+import RestaurantOwner from './restaurant_owner/RestaurantOwner';
+
+
 
 function App() {
 
@@ -75,12 +78,14 @@ function App() {
 
           <Route path='/driver' component={DriverDashboard} />
           <Route path='/driver-stats' component={DriverStats} />
+
         </Container>
         <Route path='/admin'
           render={ props =>
             <Admin hideHeader={hideHeader} />
           }
         />
+        <Route path='/restaurant-owner' component={RestaurantOwner} />
       </main>
       <Footer />
     </Router>

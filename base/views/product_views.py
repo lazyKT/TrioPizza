@@ -20,30 +20,43 @@ class ProductList (APIView):
     """
 
     def get (self, request, format=None):
-        query = request.query_params.get('keyword')
-        if query is None:
-            query = ''
-
-        products = Product.objects.filter(name__icontains=query).order_by('-createdAt')
-        num_products = len(products)
-
-        page = request.query_params.get('page')
-        if page is None:
-            page = 1
-
-        page = int(page)
-
-        paginator = Paginator(products, 10)
-
         try:
-            products = paginator.page(page)
-        except PageNotAnInteger:
-            products = paginator.page(1)
-        except EmptyPage:
-            products = paginator.page(paginator.num_pages)
+            query = request.query_params.get('keyword')
+            if query is None:
+                query = ''
 
-        serializer = ProductSerializer(products, many=True)
-        return Response({'products' : serializer.data, 'page' : page, 'pages': paginator.num_pages, 'count' : num_products})
+            products = None
+            restaurant_id = request.query_params.get('restaurant')
+            if restaurant_id is None:
+                products = Product.objects.filter(name__icontains=query).order_by('-createdAt')
+            else:
+                restaurant = Restaurant.objects.get(_id=restaurant_id)
+                products = Product.objects.filter(restaurant=restaurant).filter(name__icontains=query).order_by('name')
+
+            num_products = len(products)
+
+            page = request.query_params.get('page')
+            if page is None:
+                page = 1
+
+            page = int(page)
+
+            paginator = Paginator(products, 10)
+
+            try:
+                products = paginator.page(page)
+            except PageNotAnInteger:
+                products = paginator.page(1)
+            except EmptyPage:
+                products = paginator.page(paginator.num_pages)
+
+            serializer = ProductSerializer(products, many=True)
+            return Response({'products' : serializer.data, 'page' : page, 'pages': paginator.num_pages, 'count' : num_products})
+        except Restaurant.DoesNotExist:
+            return Response({'details' : 'Restaurant Not Found!'}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            error = 'Internal Server Error' if str(e) == '' else str(e)
+            return Response({'details' : error}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
     def validate_request (self, body):

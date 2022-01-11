@@ -46,12 +46,39 @@ export const listProducts = (keyword = '') => async (dispatch) => {
     } catch (error) {
         dispatch({
             type: PRODUCT_LIST_FAIL,
-            payload: error.response && error.response.data.detail
-                ? error.response.data.detail
+            payload: error.response && error.response.data.details
+                ? error.response.data.details
                 : error.message,
         })
     }
 }
+
+
+export const listRestaurantProducts = (restaurantId) => async (dispatch) => {
+  try {
+      dispatch({ type: PRODUCT_LIST_REQUEST });
+
+      const { data } = await axios.get(`/api/products?restaurant=${restaurantId}`, {
+        headers: {
+          'Content-Type' : 'application/json'
+        }
+      });
+
+      dispatch({
+          type: PRODUCT_LIST_SUCCESS,
+          payload: data
+      })
+
+  } catch (error) {
+      dispatch({
+          type: PRODUCT_LIST_FAIL,
+          payload: error.response && error.response.data.details
+              ? error.response.data.details
+              : error.message,
+      })
+  }
+}
+
 
 export const listTopProducts = () => async (dispatch) => {
     try {
