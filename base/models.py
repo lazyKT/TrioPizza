@@ -81,6 +81,15 @@ class Product(models.Model):
         return self.name
 
 
+class FeatureProduct (models.Model):
+    _id = models.AutoField(primary_key=True)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    restaurant = models.ForeignKey(Restaurant, on_delete=models.CASCADE)
+    priority = models.IntegerField(default=0)
+    create_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now_add=True)
+
+
 class Promos (models.Model):
     """
     # Restaurant Promos
@@ -88,6 +97,7 @@ class Promos (models.Model):
     _id = models.AutoField(primary_key=True)
     restaurant = models.ForeignKey(Restaurant, on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    code = models.CharField(max_length=16, null=False, blank=False)
     type = models.CharField(max_length=16, null=False, blank=False)
     amount = models.DecimalField(max_digits=4, decimal_places=3, null=False, blank=False)
     created_at = models.DateTimeField(auto_now_add=True)

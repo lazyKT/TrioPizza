@@ -2,7 +2,7 @@ from datetime import datetime
 from rest_framework import serializers
 from django.contrib.auth.models import User
 from rest_framework_simplejwt.tokens import RefreshToken
-from .models import Product, Order, OrderItem, ShippingAddress, Review, DriverOrderStatus, Reservation, Restaurant, Location
+from .models import Product, Order, OrderItem, ShippingAddress, Review, DriverOrderStatus, Reservation, Restaurant, Location, FeatureProduct
 
 
 class UserSerializer (serializers.ModelSerializer):
@@ -171,4 +171,23 @@ class RestaurantSerializer (serializers.ModelSerializer):
     def get_locations (self, obj):
         locations = obj.location_set.all()
         serializer = LocationSerializer(locations, many=True)
+        return serializer.data
+
+
+class FeatureProductSerializer (serializers.ModelSerializer):
+    product = serializers.SerializerMethodField(read_only=True)
+    restaurant = serializers.SerializerMethodField(read_only=True)
+
+    class Meta:
+        model = FeatureProduct
+        fields = '__all__'
+
+    def get_product (self, obj):
+        product = obj.product
+        serializer = ProductSerializer(product)
+        return serializer.data
+
+    def get_restaurant (self, obj):
+        restaurant = obj.restaurant
+        serializer = RestaurantSerializer(restaurant)
         return serializer.data

@@ -6,6 +6,7 @@ import { Card, Row, Col, ListGroup, Image } from 'react-bootstrap';
 import Message from '../components/Message';
 import Loader from '../components/Loader';
 import RestaurantProducts from '../components/RestaurantProducts';
+import Rating from '../components/Rating';
 import { getRestaurantById } from '../networking/restaurantRequests';
 
 
@@ -86,6 +87,10 @@ export default function RestaurantScreen ({match, history}) {
                       <ListGroup.Item>
                           Description: {restaurant.description}
                       </ListGroup.Item>
+
+                      <ListGroup.Item>
+                        <Rating value={0} text={`0 reviews`} color={'#f8e825'} />
+                      </ListGroup.Item>
                   </ListGroup>
                 </Col>
 
@@ -105,7 +110,6 @@ export default function RestaurantScreen ({match, history}) {
               </Row>
             </Card.Body>
           </Card>
-
           <RestaurantProducts restaurantId={restaurant._id}/>
         </>
       }

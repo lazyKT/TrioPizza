@@ -6,8 +6,8 @@ from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
-from base.models import Product, Review, Restaurant
-from base.serializers import ProductSerializer
+from base.models import Product, Review, Restaurant, FeatureProduct
+from base.serializers import ProductSerializer, FeatureProductSerializer
 
 from rest_framework import status
 
@@ -171,6 +171,9 @@ class ProductDetails (APIView):
                 product_review.delete()
             except Review.DoesNotExist:
                 pass
+            if len(FeatureProduct.objects.filter(product=product)) > 0:
+                return Response({'details' : 'Cannot delete Fature Product!'}, status=status.HTTP_400_BAD_REQUEST)
+
             product.delete()
             return Response('', status=status.HTTP_204_NO_CONTENT)
         except Http404:
@@ -279,3 +282,135 @@ def createProductReview(request, pk):
         product.save()
 
         return Response('Review Added')
+
+
+
+"""
+# Feature Products
+"""
+
+class FeatureProductList (APIView):
+    """
+    # GET All Feature Products
+    # Create New Feature Products
+    """
+
+    def get_feature_product_by_product_id (self, product):
+        return FeatureProduct.objects.filter(product=product)
+
+
+    def get_feature_products_by_restaurant (self, restaurant):
+        return FeatureProduct.objects.filter(restaurant=restaurant)
+
+
+    def get (self, request, format=None):
+        try:
+            query = request.query_params.get('restaurant')
+            products = None
+            if query is None:
+                products = FeatureProduct.objects.all()
+            else:
+                restaurant = Restaurant.objects.get(_id=query)
+                products = FeatureProduct.objects.filter(restaurant=restaurant)
+            serializer = FeatureProductSerializer(products, many=True)
+            return Response(serializer.data)
+        except Restaurant.DoesNotExist:
+            return Response({'details' : 'Restaurant Does Not Exist!'}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            error = 'Internal Server Error' if str(e) == '' else str(e)
+            return Response({'details' : error}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+    def validate_request (self, body):
+        error = True
+        message = ''
+        if 'product' not in body:
+            message = 'Product is Required*'
+            return error, message
+        elif 'restaurant' not in body:
+            message = 'Restaurant is Required*'
+            return error, message
+        elif 'priority' not in body:
+            message = 'Product Priority is Required*'
+            return error, message
+        elif type(body['priority']) != int:
+            message = 'Product Priority Must be a Number*'
+            return error, message
+        elif int(body['priority']) < 0 or int(body['priority']) > 4:
+            message = 'Product Priority Must be Between 0 and 4'
+            return error, message
+        else:
+            error = False
+            return error, ''
+
+
+    def post (self, request, *args, **kwargs):
+        try:
+            data = request.data
+            error, message = self.validate_request(data)
+            if error:
+                return Response({'details' : message}, status=status.HTTP_400_BAD_REQUEST)
+
+            product = Product.objects.get(_id=data['product'])
+            if len(self.get_feature_product_by_product_id(product)) > 0:
+                return Response({'details' : 'Given Product is already listed as Feature Product!'}, status=status.HTTP_400_BAD_REQUEST)
+
+            restaurant = Restaurant.objects.get(_id=data['restaurant'])
+
+            if restaurant._id != product.restaurant._id:
+                return Response({'details' : 'Invalid Restaurant!'}, status=status.HTTP_400_BAD_REQUEST)
+
+            if len(self.get_feature_products_by_restaurant(restaurant)) >= 5:
+                return Response({'details' : 'You can only list five feature products!'}, status=status.HTTP_400_BAD_REQUEST)
+
+            feature_product = FeatureProduct.objects.create(
+                restaurant=restaurant,
+                product=product,
+                priority=data['priority']
+            )
+            serializer = FeatureProductSerializer(feature_product)
+            return Response(serializer.data)
+        except Product.DoesNotExist:
+            return Response({'details' : 'Product Not Found!'}, status=status.HTTP_404_NOT_FOUND)
+        except Restaurant.DoesNotExist:
+            return Response({'details' : 'Restaurant Not Found!'}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            error = 'Internal Server Error' if str(e) == '' else str(e)
+            return Response({'details' : error}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class FeatureProductDetails (APIView):
+    """
+    # Get Feature Product Details
+    # Delete Feature Product by Id
+    """
+
+    def get_object (self, pk):
+        try:
+            return FeatureProduct.objects.get(_id=pk)
+        except FeatureProduct.DoesNotExist:
+            raise Http404
+
+
+    def get (self, request, pk, format=None):
+        try:
+            feature_product = self.get_object(pk)
+            serializer = FeatureProductSerializer(feature_product)
+            return Response(serializer.data)
+        except Http404:
+            return Response({'details' : 'Feature Product Not Found!'}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            error = 'Internal Server Error' if str(e) == '' else str(e)
+            return Response({'details' : error}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+    def delete (self, request, pk, format=None):
+        try:
+            feature_product = self.get_object(pk)
+            feature_product.delete()
+            return Response('', status=status.HTTP_204_NO_CONTENT)
+        except Http404:
+            return Response({'details' : 'Feature Product Not Found!'}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            error = 'Internal Server Error' if str(e) == '' else str(e)
+            return Response({'details' : error}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
