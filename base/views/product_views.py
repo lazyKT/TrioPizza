@@ -181,30 +181,33 @@ class ProductDetails (APIView):
 
 
 @api_view(['GET'])
-def getProducts(request):
-    query = request.query_params.get('keyword')
-    if query == None:
-        query = ''
-
-    products = Product.objects.filter(
-        name__icontains=query).order_by('-createdAt')
-
-    page = request.query_params.get('page')
-    paginator = Paginator(products, 8)
-
+def get_products_by_restaurant (request, restaurant_id):
     try:
-        products = paginator.page(page)
-    except PageNotAnInteger:
-        products = paginator.page(1)
-    except EmptyPage:
-        products = paginator.page(paginator.num_pages)
+        restaurant = Restaurant.objects.get(_id=restaurant_id)
+        products = Product.objects.filter(restaurant=restaurant)
+        num_products = len(products)
 
-    if page == None:
-        page = 1
+        page = request.query_params.get('page')
+        if page is None:
+            page = 1
+        page = int(page)
 
-    page = int(page)
-    serializer = ProductSerializer(products, many=True)
-    return Response({'products': serializer.data, 'page': page, 'pages': paginator.num_pages})
+        paginator = Paginator(products, 8)
+
+        try:
+            products = paginator.page(page)
+        except PageNotAnInteger:
+            products = paginator.page(1)
+        except EmptyPage:
+            products = paginator.page(paginator.num_pages)
+
+        serializer = ProductSerializer(products, many=True)
+        return Response({'products' : serializer.data, 'page' : page, 'pages': paginator.num_pages, 'count' : num_products})
+    except Restaurant.DoesNotExist:
+        return Response({'details' : 'Restaurant Not Found!'}, status=status.HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        error = 'Internal Server Error' if str(e) == '' else str(e)
+        return Response({'details' : error}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 @api_view(['GET'])
@@ -217,79 +220,6 @@ def getTopProducts(request):
         return Response(serializer.data)
     except Exception as e:
         return Response({'details' : repr(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-@api_view(['GET'])
-def getProduct(request, pk):
-    try:
-        product = Product.objects.get(_id=pk)
-        serializer = ProductSerializer(product, many=False)
-        return Response(serializer.data)
-    except Product.DoesNotExist:
-        return Response({'details' : 'Product Not Found'}, status=status.HTTP_400_BAD_REQUEST)
-    except Exception as e:
-        return Response({'details' : repr(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-
-@api_view(['POST'])
-# @permission_classes([IsAdminUser])
-def createProduct(request):
-    try:
-        data = request.data
-        print(data);
-
-        if 'name' not in data:
-            return Response({'deatils' : 'Name is required*'}, status=status.HTTP_400_BAD_REQUEST)
-        elif 'price' not in data:
-            return Response({'details' : 'Price is required*'}, status=status.HTTP_400_BAD_REQUEST)
-        elif 'description' not in data:
-            return Response({'details' : 'Description is required*'}, status=status.HTTP_400_BAD_REQUEST)
-
-        product = Product.objects.create(
-            name=data['name'],
-            price=data['price'],
-            description=data['description']
-        )
-
-        serializer = ProductSerializer(product, many=False)
-        return Response(serializer.data)
-    except Exception as e:
-        print(repr(e))
-        return Response({'details' : repr(e)}, status=status.HTTP_400_BAD_REQUEST)
-
-
-@api_view(['PUT'])
-# @permission_classes([IsAdminUser])
-def updateProduct(request, pk):
-    try:
-        data = request.data
-        product = Product.objects.get(_id=pk)
-
-        product.name = data['name']
-        product.price = data['price']
-        product.description = data['description']
-
-        product.save()
-
-        serializer = ProductSerializer(product, many=False)
-        return Response(serializer.data)
-    except Product.DoesNotExist:
-        return Response({'details' : 'Product Not Found!'}, status.HTTP_400_BAD_REQUEST)
-    except Exception as e:
-        return Response({'details' : repr(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-
-@api_view(['DELETE'])
-# @permission_classes([IsAdminUser])
-def deleteProduct(request, pk):
-    try:
-        product = Product.objects.get(_id=pk)
-        product.delete()
-        return Response('Producted Deleted')
-    except Product.DoesNotExist:
-        return Response({'details' : 'Product Not Found!'}, status.HTTP_400_BAD_REQUEST)
-    except Exception as e:
-        return Response({'details' : repr(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
 
 
 @api_view(['POST'])
