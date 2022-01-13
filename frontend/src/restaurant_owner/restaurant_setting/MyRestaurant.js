@@ -7,6 +7,7 @@ import { Card, Image, Button, Form, Stack } from 'react-bootstrap';
 import FormContainer from '../../components/FormContainer';
 import Loader from '../../components/Loader';
 import Message from '../../components/Message';
+import { updateRestaurantInfo } from '../../actions/restaurantActions';
 
 
 
@@ -29,6 +30,20 @@ export default function MyRestaurant () {
     })
   }
 
+
+  const handleOnSubmit = (e) => {
+    e.preventDefault();
+    console.log(userInfo.id, restaurant)
+    dispatch(updateRestaurantInfo(
+      restaurant._id,
+      {
+        owner: userInfo.id,
+        name: restaurant.name,
+        description: restaurant.description
+      },
+      userInfo.token
+    ))
+  }
 
   useEffect(() => {
     if (!userInfo) {
@@ -57,7 +72,7 @@ export default function MyRestaurant () {
           </div>
 
           <FormContainer>
-            <Form onSubmit={() => console.log('submit')}>
+            <Form onSubmit={handleOnSubmit}>
 
               <Form.Group controlId='name'>
                 <Form.Label>Restaurant Name</Form.Label>
@@ -68,10 +83,11 @@ export default function MyRestaurant () {
                   name='name'
                   value={restaurant.name}
                   onChange={handleOnChange}
+                  readOnly={!editing}
                 />
               </Form.Group>
 
-              <Form.Group controlId='description'>
+              <Form.Group className="mb-3" controlId='description'>
                 <Form.Label>Restaurant Description</Form.Label>
                 <Form.Control
                   as="textarea"
@@ -81,15 +97,38 @@ export default function MyRestaurant () {
                   name='description'
                   value={restaurant.description}
                   onChange={handleOnChange}
+                  readOnly={!editing}
                 />
               </Form.Group>
 
-              <Button
-                type="submit"
-                variant="contained"
-              >
-                Create Product
-              </Button>
+              { !editing && (
+                <Button
+                  variant="primary"
+                  className="mr-1"
+                  onClick={() => setEditing(true)}
+                >
+                  Edit
+                </Button>
+              )}
+
+              {editing && (
+                <div>
+                  <Button
+                    variant="success"
+                    className="mr-1 "
+                    type="submit"
+                  >
+                    Save
+                  </Button>
+                  <Button
+                    variant="light"
+                    className="mx-1"
+                    onClick={() => setEditing(false)}
+                  >
+                    Cancel
+                  </Button>
+                </div>
+              )}
 
             </Form>
           </FormContainer>

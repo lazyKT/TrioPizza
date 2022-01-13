@@ -112,14 +112,9 @@ function Header() {
                 <Nav className="ml-auto">
 
                   { userInfo && userInfo.type === 'customer' &&
-                    <>
-                    <LinkContainer to='/reserve-table'>
-                      <Nav.Link >Reservation</Nav.Link>
-                    </LinkContainer>
                     <LinkContainer to='/cart'>
                       <Nav.Link ><i className="fas fa-shopping-cart"></i>Cart</Nav.Link>
                     </LinkContainer>
-                    </>
                   }
 
                   {userInfo ? (
