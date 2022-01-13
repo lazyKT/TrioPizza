@@ -28,7 +28,15 @@ class RestaurantList (APIView):
 
     def get (self, request, format=None):
         try:
-            restaurants = Restaurant.objects.all().order_by('name')
+            restaurants = None
+
+            keyword = request.query_params.get('owner')
+            if keyword is None:
+                restaurants = Restaurant.objects.all().order_by('name')
+            else:
+                owner = User.objects.get(id=keyword)
+                restaurants = Restaurant.objects.filter(owner=owner)
+
             num_restaurant = len(restaurants)
 
             page = request.query_params.get('page')
@@ -48,6 +56,8 @@ class RestaurantList (APIView):
 
             serializer = RestaurantSerializer(restaurants, many=True)
             return Response({'restaurants' : serializer.data, 'page' : page, 'pages' : paginator.num_pages, 'count' : num_restaurant})
+        except User.DoesNotExist:
+            return Response({'details' : 'User Not Found!'}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
             error = 'Internal Server Error!' if repr(e) == '' else repr(e)
             return Response ({'details' : error}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -208,3 +218,31 @@ class RestaurantDetails (APIView):
         except Exception as e:
             error = 'Internal Server Error!' if repr(e) == '' else repr(e)
             return Response({'details' : error}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['PUT'])
+def edit_restaurant_location(request, pk):
+    try:
+        data = request.data
+        restaurant = Restaurant.objects.get(_id=pk)
+        if 'address' not in data:
+            return Response({'details' : 'Address is required*'}, status=status.HTTP_400_BAD_REQUEST)
+        elif 'district' not in data:
+            return Response({'details' : 'District is required*'}, status=status.HTTP_400_BAD_REQUEST)
+        elif 'postal_code' not in data:
+            return Response({'details' : 'Postal Code is required*'}, status=status.HTTP_400_BAD_REQUEST)
+        elif 'contact_number' not in data:
+            return Response({'details' : 'Contact Number is required*'}, status=status.HTTP_400_BAD_REQUEST)
+        location = Location.objects.get(restaurant=restaurant)
+        location.address = data['address']
+        location.district = data['district']
+        location.postal_code = data['postal_code']
+        location.contact_number = data['contact_number']
+        location.save()
+        serializer = RestaurantSerializer(restaurant)
+        return Response(serializer.data)
+    except Restaurant.DoesNotExist:
+        return Response({'details' : 'Restaurant Not Found!'}, status=status.HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        error = 'Internal Server Error!' if repr(e) == '' else repr(e)
+        return Response({'details' : error}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

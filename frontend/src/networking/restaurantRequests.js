@@ -8,7 +8,7 @@ export async function getAllRestaurants (signal) {
         'Content-Type' : 'application/json',
         'Accept' : 'application/json'
       },
-      signal
+      signal: signal
     });
 
     return { error: false, data }

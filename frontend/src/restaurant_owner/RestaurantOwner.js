@@ -1,20 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import { styled, useTheme } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import CssBaseline from '@mui/material/CssBaseline';
 
-import AdminAppbar from './AdminAppbar';
-import AdminDrawerMenu from './AdminDrawerMenu';
 import Dashboard from './Dashboard';
-import UserAdminDashboard from './users/UserAdminDashboard';
-import DriverDashboard from './drivers/DriverDashboard';
+import Appbar from './Appbar';
+import DrawerMenu from './DrawerMenu';
 import ProductDashboard from './products/ProductDashboard';
-import ReservationDashboard from './reservations/ReservationDashboard';
-import OrderDashboard from './orders/OrderDashboard';
-import Profile from './Profile';
-import Setting from './Setting';
+import MyRestaurant from './restaurant_setting/MyRestaurant';
 import { logout } from '../actions/userActions';
 
 
@@ -55,44 +50,40 @@ function switchContents (page) {
 		switch (page) {
 			case 'Dashboard':
 				return <Dashboard />;
-			case 'Users':
-				return <UserAdminDashboard />;
-      case 'Drivers Status':
-        return <DriverDashboard />;
-			case 'Restaurant Owners':
-				return <h5>Restaurant Owners</h5>;
+      case 'Products':
+        return <ProductDashboard />;
+      case 'Orders':
+        return <h5>Orders</h5>;
+      case 'Reservations':
+        return <h5>Reservations</h5>;
+      case 'Feature Products':
+        return <h5>Feature Products</h5>;
+      case 'Promo':
+        return <h5>Promotions</h5>;
+      case 'Restaurant Setting':
+        return <MyRestaurant />;
       case 'Profile':
-        return <Profile />
-      case 'Setting':
-        return <Setting />;
+        return <h5>Owner Profile</h5>;
 			default:
 				throw new Error ('Invalid Admin Page Content');
 		}
 }
 
 
-export default function Admin () {
+export default function OwnerDashboard () {
 
   const theme = useTheme();
-  const [ open, setOpen ] = useState(false);
-	const [ page, setPage ] = useState('Dashboard');
-	const [ pageTitle, setPageTitle ] = useState('Dashboard');
+  const [ open, setOpen ] = useState(true);
+  const [ page, setPage ] = useState('Dashboard');
+  const [ pageTitle, setPageTitle ] = useState('Dashboard');
 
   const dispatch = useDispatch();
   const history = useHistory();
 
-  const userCookie = useSelector(state => state.userCookie);
-  const { userInfo } = userCookie;
+  const { userInfo } = useSelector(state => state.userCookie);
 
-  const handleDrawerOpen = () => {
-    setOpen(true);
-  };
-
-  const handleDrawerClose = () => {
-    setOpen(false);
-  };
-
-	const onChangePage = (page) => {
+  const onChangePage = (page) => {
+    
 		if (page === 'Sign Out') {
       // sign out user
       dispatch(logout());
@@ -102,33 +93,37 @@ export default function Admin () {
     }
 	}
 
-	useEffect(() => {
+  useEffect(() => {
 		setPageTitle(page);
 
     if (!userInfo)
       history.push('/');
+    else {
+      if (userInfo.type !== 'restaurant owner')
+        history.push('/');
+    }
 
 	}, [open, page, dispatch, userInfo]);
 
   return (
-    <Box sx={{ display: 'flex' }}>
+    <Box sx={{display: 'flex'}}>
       <CssBaseline />
 
-			<AdminAppbar
-				title={pageTitle}
-				open={open}
-				handleDrawerOpen={handleDrawerOpen}
-			/>
+      <Appbar
+        title={pageTitle}
+        open={open}
+        handleDrawerOpen={() => setOpen(true)}
+      />
 
-      <AdminDrawerMenu
-				theme={theme}
-				open={open}
-				handleDrawerClose={handleDrawerClose}
-				openedMixin={openedMixin}
-				closedMixin={closedMixin}
-				onChangePage={onChangePage}
-				page={page}
-			/>
+      <DrawerMenu
+        theme={theme}
+        open={open}
+        handleDrawerClose={() => setOpen(false)}
+        openedMixin={openedMixin}
+        closedMixin={closedMixin}
+        onChangePage={onChangePage}
+        page={page}
+      />
 
       <Box component="main" sx={{ flexGrow: 1, p: 3, background: '#f9f9f9' }}>
         <DrawerHeader />

@@ -53,13 +53,15 @@ function HomeScreen () {
       if (userInfo) {
         if (userInfo.type === 'admin')
           history.push('/admin');
+        else if (userInfo.type === 'restaurant owner')
+          history.push('/restaurant-owner');
         else if (userInfo.type === 'driver')
           history.push('/driver');
       }
 
-      return (() => {
-        if (abortController) abortController.abort();
-      })
+      return () => {
+        abortController.abort();
+      };
 
     }, [userInfo, keyword]);
 
