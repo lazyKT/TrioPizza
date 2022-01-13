@@ -78,3 +78,37 @@ export const updateRestaurantInfo = (restaurantId, body, token) => async (dispat
     });
   }
 }
+
+
+export const updateRestaurantLocation = (restaurantId, body, token) => async (dispatch) => {
+  try {
+    dispatch({ type: RESTAURANT_EDIT_REQUEST });
+
+    const config = {
+        headers: {
+          'Content-type': 'application/json',
+          Authorization: `Bearer ${token}`
+        }
+    };
+
+    const { data } = await axios.put(`/api/restaurants/location/${restaurantId}/`, body, config);
+
+    dispatch({
+      type: RESTAURANT_EDIT,
+      payload: data
+    });
+
+    dispatch({
+      type: RESTAURANT_INFO,
+      payload: data
+    });
+  }
+  catch (error) {
+    dispatch({
+        type: RESTAURANT_EDIT_ERROR,
+        payload: error.response && error.response.data.details
+            ? error.response.data.details
+            : error.message,
+    });
+  }
+}
