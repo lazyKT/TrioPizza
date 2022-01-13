@@ -24,9 +24,8 @@ export default function EditProduct ({editingID, backToProductList}) {
 
   const dispatch = useDispatch();
   const { loading, product, error } = useSelector(state => state.productDetails );
-
+  const { restaurantInfo } = useSelector(state => state.restaurant);
   const { updateError, updatedProduct } = useSelector(state => state.productUpdate);
-
   const { errorDelete, successDelete } = useSelector(state => state.productDelete);
 
 
@@ -45,7 +44,10 @@ export default function EditProduct ({editingID, backToProductList}) {
       setMessage(errorMessage);
     }
     else {
-      dispatch(updateProduct(editingProduct, editingID));
+      dispatch(updateProduct(
+        { ...editingProduct, restaurant: restaurantInfo._id }, 
+        editingID
+      ));
     }
   }
 
@@ -76,6 +78,10 @@ export default function EditProduct ({editingID, backToProductList}) {
   }, [editingID, backToProductList]);
 
   useEffect(() => {
+
+    if (!restaurantInfo)
+      backToProductList();
+
     if (product) {
       setEditingProduct({
         name: product.name ? product.name : 'Failed to fetch',
@@ -86,7 +92,7 @@ export default function EditProduct ({editingID, backToProductList}) {
     else if (error) {
       setMessage(error);
     }
-  }, [product, error]);
+  }, [product, error, restaurantInfo]);
 
   useEffect(() => {
 

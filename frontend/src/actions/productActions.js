@@ -142,7 +142,7 @@ export const deleteProduct = (id) => async (dispatch, getState) => {
         }
 
         const { data } = await axios.delete(
-            `/api/products/delete/${id}/`,
+            `/api/products/${id}/`,
             config
         )
 
@@ -211,18 +211,18 @@ export const updateProduct = (product, id) => async (dispatch, getState) => {
         })
 
         const {
-            userLogin: { userInfo },
+            userCookie: { userInfo },
         } = getState()
 
         const config = {
             headers: {
                 'Content-type': 'application/json',
-                // Authorization: `Bearer ${userInfo.token}`
+                Authorization: `Bearer ${userInfo.token}`
             }
         }
 
         const { data } = await axios.put(
-            `/api/products/update/${id}/`,
+            `/api/products/${id}/`,
             product,
             config
         )
