@@ -11,11 +11,9 @@ import Divider from '@mui/material/Divider';
 import List from '@mui/material/List';
 
 import GroupIcon from '@mui/icons-material/Group';
+import RestaurantIcon from '@mui/icons-material/Restaurant';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import DeliveryDiningIcon from '@mui/icons-material/DeliveryDining';
-import TakeoutDiningIcon from '@mui/icons-material/TakeoutDining';
-import LocalPizzaIcon from '@mui/icons-material/LocalPizza';
-import BookOnlineIcon from '@mui/icons-material/BookOnline';
 import SettingsIcon from '@mui/icons-material/Settings';
 import AccountBoxIcon from '@mui/icons-material/AccountBox';
 import LogoutIcon from '@mui/icons-material/Logout';
@@ -90,17 +88,9 @@ function renderDrawerMenu (text, selected) {
       return (
         <DeliveryDiningIcon color={text === selected ? 'primary' : 'gray'} />
       );
-    case 'Orders':
+    case 'Restaurant Owners':
       return (
-        <TakeoutDiningIcon color={text === selected ? "primary" : "gray"} />
-      );
-    case 'Products':
-      return (
-        <LocalPizzaIcon color={text === selected ? "primary" : "gray"} />
-      );
-    case 'Reservations':
-      return (
-        <BookOnlineIcon color={text === selected ? "primary" : "gray"} />
+        <RestaurantIcon color={text === selected ? "primary" : "gray"} />
       );
     case 'Profile':
       return (
@@ -139,7 +129,7 @@ export default function AdminDrawerMenu (props) {
       </DrawerHeader>
       <Divider />
       <List>
-        {['Dashboard', 'Users', 'Drivers Status', 'Products', 'Orders', 'Reservations'].map((text, index) => (
+        {['Dashboard', 'Users', 'Drivers Status', 'Restaurant Owners'].map((text, index) => (
           <ListItem button key={text} onClick={() => onChangePage(text)}>
             <ListItemIcon>
               { renderDrawerMenu(text, page) }

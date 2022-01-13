@@ -59,12 +59,8 @@ function switchContents (page) {
 				return <UserAdminDashboard />;
       case 'Drivers Status':
         return <DriverDashboard />;
-			case 'Products':
-				return <ProductDashboard />;
-			case 'Orders':
-				return <OrderDashboard />;
-      case 'Reservations':
-        return <ReservationDashboard />;
+			case 'Restaurant Owners':
+				return <h5>Restaurant Owners</h5>;
       case 'Profile':
         return <Profile />
       case 'Setting':
@@ -97,7 +93,6 @@ export default function Admin () {
   };
 
 	const onChangePage = (page) => {
-    console.log(page);
 		if (page === 'Sign Out') {
       // sign out user
       dispatch(logout());
