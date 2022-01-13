@@ -6,12 +6,44 @@ import {
   RESTAURANT_INFO,
   RESTAURANT_EDIT_REQUEST,
   RESTAURANT_EDIT_ERROR,
-  RESTAURANT_EDIT
+  RESTAURANT_EDIT,
+  RESTAURANT_CREATE,
+  RESTAURANT_CREATE_ERROR,
+  RESTAURANT_CREATE_REQUEST
 } from '../constants/restaurantConstants';
 
 
 
-export const getRestaurantInfo = (ownerId, token) => async (dispatch) => {
+export const createRestaurant = (token, body) => async (dispatch) => {
+  try {
+    dispatch({ type: RESTAURANT_CREATE_REQUEST });
+
+    const config = {
+      headers: {
+        'Content-Type' : 'application/json',
+        Authorization : `Bearer ${token}`
+      }
+    };
+
+    const { data } = await axios.post('/api/restaurants/', body, config);
+
+    dispatch({
+      type: RESTAURANT_CREATE,
+      payload: data
+    });
+  }
+  catch (error) {
+    dispatch({
+        type: RESTAURANT_CREATE_ERROR,
+        payload: error.response && error.response.data.details
+            ? error.response.data.details
+            : error.message,
+    });
+  }
+}
+
+
+export const getRestaurantInfo = (ownerId, token, signal) => async (dispatch) => {
   try {
     dispatch({ type: RESTAURANT_INFO_REQUEST });
 
@@ -19,7 +51,8 @@ export const getRestaurantInfo = (ownerId, token) => async (dispatch) => {
         headers: {
           'Content-type': 'application/json',
           Authorization: `Bearer ${token}`
-        }
+        },
+        signal
     };
 
     const { data } = await axios.get(`/api/restaurants?owner=${ownerId}`, config);

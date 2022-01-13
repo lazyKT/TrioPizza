@@ -23,6 +23,7 @@ export default function CreateProduct ({backToProductList}) {
 
   const dispatch = useDispatch();
   const { loading, error, product } = useSelector(state => state.productCreate);
+  const { restaurantInfo } = useSelector(state => state.restaurant);
 
   const handleBackButtonClick = (e) => {
     e.preventDefault();
@@ -45,9 +46,12 @@ export default function CreateProduct ({backToProductList}) {
       setMessage(errorMessage);
     }
     else {
-      dispatch(
-        createProduct(newProduct)
-      );
+      dispatch(createProduct(
+        {
+          ...newProduct,
+          restaurant: restaurantInfo._id
+        }
+      ));
     }
   }
 
@@ -66,6 +70,11 @@ export default function CreateProduct ({backToProductList}) {
 
 
   useEffect(() => {
+
+    if (!restaurantInfo) {
+      backToProductList();
+    }
+
     if (product) {
       setMessage(`New Product Created, ${newProduct.name}`);
       setNewProduct({

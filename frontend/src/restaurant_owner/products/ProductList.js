@@ -11,6 +11,8 @@ import RefreshIcon from '@mui/icons-material/Refresh';
 
 import CustomTable from '../CustomTable';
 import EditProduct from './EditProduct';
+import Message from '../../components/Message';
+import Loader from '../../components/Loader';
 import { listRestaurantProducts } from '../../actions/productActions';
 
 
@@ -76,19 +78,15 @@ export default function ProductList ({addNewProduct}) {
 
   useEffect(() => {
     if (!openEditProduct) {
-      console.log(restaurantInfo);
-      if (restaurantInfo)
+      if (!empty && restaurantInfo)
         dispatch( listRestaurantProducts(restaurantInfo._id) )
     }
   }, [openEditProduct, empty, restaurantInfo]);
 
-  useEffect(() => {
-    console.log(products);
-  }, [products]);
 
   return (
     <>
-      {openEditProduct ?
+      { openEditProduct ?
         (<EditProduct
             editingID={editingID}
             backToProductList={closeOpenEditProduct}
@@ -125,8 +123,7 @@ export default function ProductList ({addNewProduct}) {
               edit={editProduct}
             />
           </>
-        )
-      }
+        )}
     </>
   );
 }

@@ -171,18 +171,18 @@ export const createProduct = (product) => async (dispatch, getState) => {
         })
 
         const {
-            userLogin: { userInfo },
+            userCookie: { userInfo },
         } = getState()
 
         const config = {
             headers: {
                 'Content-type': 'application/json',
-                // Authorization: `Bearer ${userInfo.token}`
+                Authorization: `Bearer ${userInfo.token}`
             }
         }
 
         const { data } = await axios.post(
-            `/api/products/create/`,
+            `/api/products/`,
             product,
             config
         )

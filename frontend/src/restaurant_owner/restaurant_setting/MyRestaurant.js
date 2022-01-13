@@ -7,6 +7,7 @@ import { Row, Col } from 'react-bootstrap';
 
 import RestaurantDetails from './RestaurantDetails';
 import LocationContact from './LocationContact';
+import NewRestaurant from './NewRestaurant';
 import FormContainer from '../../components/FormContainer';
 import Loader from '../../components/Loader';
 import Message from '../../components/Message';
@@ -33,41 +34,56 @@ function renderContent (content) {
   else if (content === 'location')
     return <LocationContact />;
   else
-    throw new Error('Invalid restaurant content!');
+    return <Message variant="info">Unexpected Error! Please refresh the page.</Message>;
 }
 
 
 export default function MyRestaurant () {
 
-  const [ content, setContent ] = useState('details');
+  const [ content, setContent ] = useState(null);
+
+  const { loading, error, empty, restaurantInfo } = useSelector(state => state.restaurant);
+
+  useEffect(() => {
+    if (empty) {
+      setContent(null)
+    }
+    else if (!empty && restaurantInfo) {
+      setContent('details');
+    }
+
+  }, [loading, error, empty, restaurantInfo])
 
   return (
     <Paper sx={{padding: '15px'}}>
-      <Row>
-        <Col sm="2">
-        <Typography onClick={() => setContent('details')}
-          variant='subtitle1'
-          sx={{
-            ...styles.link,
-            color: content === 'details' ? 'black' : 'gray'
-          }}
-        >
-          Restaurant Details
-        </Typography>
-        <Typography onClick={() => setContent('location')}
-          variant='subtitle1'
-          sx={{
-            ...styles.link,
-            color: content === 'location' ? 'black' : 'gray'
-          }}
-        >
-          Loacation & Contact
-        </Typography>
-        </Col>
-        <Col sm="10">
-          { renderContent(content) }
-        </Col>
-      </Row>
+      { (restaurantInfo && !empty)
+        ? (<Row>
+          <Col sm="2">
+          <Typography onClick={() => setContent('details')}
+            variant='subtitle1'
+            sx={{
+              ...styles.link,
+              color: content === 'details' ? 'black' : 'gray'
+            }}
+          >
+            Restaurant Details
+          </Typography>
+          <Typography onClick={() => setContent('location')}
+            variant='subtitle1'
+            sx={{
+              ...styles.link,
+              color: content === 'location' ? 'black' : 'gray'
+            }}
+          >
+            Loacation & Contact
+          </Typography>
+          </Col>
+          <Col sm="10">
+            { renderContent(content) }
+          </Col>
+        </Row>)
+        : <NewRestaurant />
+      }
     </Paper>
   );
 }

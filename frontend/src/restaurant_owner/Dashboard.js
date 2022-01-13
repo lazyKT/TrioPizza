@@ -16,15 +16,21 @@ export default function Dashboard () {
 
 
   useEffect(() => {
+    const abortController = new AbortController();
     if (userInfo) {
-      dispatch(getRestaurantInfo(userInfo.id, userInfo.token));
+      dispatch(getRestaurantInfo(userInfo.id, userInfo.token, abortController.signal));
     }
+
+    return(() => {
+      if (abortController) abortController.abort();
+    });
   }, [userInfo]);
 
 
   return (
     <>
       { error && <Message variant='danger'>{error}</Message> }
+      { empty && <Message variant='info'>Please Create Your Restaurant Profile in Restaurant Setting.</Message>}
       { loading && <Loader /> }
       { restaurantInfo && (
         <h5>{restaurantInfo.name}</h5>
