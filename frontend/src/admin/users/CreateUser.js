@@ -135,7 +135,7 @@ export default function CreateUser ({backToUserList}) {
               />
             </Form.Group>
 
-            <Form.Group controlId='type'>
+            <Form.Group className="mb-3" controlId='type'>
               <Form.Label>User Type</Form.Label>
               <Form.Control
                 as="select"

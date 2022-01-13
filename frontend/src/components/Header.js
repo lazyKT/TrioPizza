@@ -72,7 +72,7 @@ function Header() {
     const abortController = new AbortController();
 
     if (userInfo) {
-      if (userInfo.type === 'admin')
+      if (userInfo.type === 'admin' || userInfo.type === 'restaurant owner')
         setShowHeader(false);
       else {
         setShowHeader(true);
@@ -112,14 +112,9 @@ function Header() {
                 <Nav className="ml-auto">
 
                   { userInfo && userInfo.type === 'customer' &&
-                    <>
-                    <LinkContainer to='/reserve-table'>
-                      <Nav.Link >Reservation</Nav.Link>
-                    </LinkContainer>
                     <LinkContainer to='/cart'>
                       <Nav.Link ><i className="fas fa-shopping-cart"></i>Cart</Nav.Link>
                     </LinkContainer>
-                    </>
                   }
 
                   {userInfo ? (

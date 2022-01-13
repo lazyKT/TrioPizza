@@ -46,12 +46,39 @@ export const listProducts = (keyword = '') => async (dispatch) => {
     } catch (error) {
         dispatch({
             type: PRODUCT_LIST_FAIL,
-            payload: error.response && error.response.data.detail
-                ? error.response.data.detail
+            payload: error.response && error.response.data.details
+                ? error.response.data.details
                 : error.message,
         })
     }
 }
+
+
+export const listRestaurantProducts = (restaurantId) => async (dispatch) => {
+  try {
+      dispatch({ type: PRODUCT_LIST_REQUEST });
+
+      const { data } = await axios.get(`/api/products?restaurant=${restaurantId}`, {
+        headers: {
+          'Content-Type' : 'application/json'
+        }
+      });
+
+      dispatch({
+          type: PRODUCT_LIST_SUCCESS,
+          payload: data
+      })
+
+  } catch (error) {
+      dispatch({
+          type: PRODUCT_LIST_FAIL,
+          payload: error.response && error.response.data.details
+              ? error.response.data.details
+              : error.message,
+      })
+  }
+}
+
 
 export const listTopProducts = () => async (dispatch) => {
     try {
@@ -115,7 +142,7 @@ export const deleteProduct = (id) => async (dispatch, getState) => {
         }
 
         const { data } = await axios.delete(
-            `/api/products/delete/${id}/`,
+            `/api/products/${id}/`,
             config
         )
 
@@ -144,18 +171,18 @@ export const createProduct = (product) => async (dispatch, getState) => {
         })
 
         const {
-            userLogin: { userInfo },
+            userCookie: { userInfo },
         } = getState()
 
         const config = {
             headers: {
                 'Content-type': 'application/json',
-                // Authorization: `Bearer ${userInfo.token}`
+                Authorization: `Bearer ${userInfo.token}`
             }
         }
 
         const { data } = await axios.post(
-            `/api/products/create/`,
+            `/api/products/`,
             product,
             config
         )
@@ -184,18 +211,18 @@ export const updateProduct = (product, id) => async (dispatch, getState) => {
         })
 
         const {
-            userLogin: { userInfo },
+            userCookie: { userInfo },
         } = getState()
 
         const config = {
             headers: {
                 'Content-type': 'application/json',
-                // Authorization: `Bearer ${userInfo.token}`
+                Authorization: `Bearer ${userInfo.token}`
             }
         }
 
         const { data } = await axios.put(
-            `/api/products/update/${id}/`,
+            `/api/products/${id}/`,
             product,
             config
         )

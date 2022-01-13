@@ -10,11 +10,13 @@ import ListItemText from '@mui/material/ListItemText';
 import Divider from '@mui/material/Divider';
 import List from '@mui/material/List';
 
-import GroupIcon from '@mui/icons-material/Group';
-import RestaurantIcon from '@mui/icons-material/Restaurant';
+import StarIcon from '@mui/icons-material/Star';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import DeliveryDiningIcon from '@mui/icons-material/DeliveryDining';
-import SettingsIcon from '@mui/icons-material/Settings';
+import TakeoutDiningIcon from '@mui/icons-material/TakeoutDining';
+import LocalPizzaIcon from '@mui/icons-material/LocalPizza';
+import BookOnlineIcon from '@mui/icons-material/BookOnline';
+import StorefrontIcon from '@mui/icons-material/Storefront';
 import AccountBoxIcon from '@mui/icons-material/AccountBox';
 import LogoutIcon from '@mui/icons-material/Logout';
 
@@ -80,37 +82,45 @@ function renderDrawerMenu (text, selected) {
       return (
         <DashboardIcon color={text === selected ? "primary" : "gray"} />
       );
-    case 'Users':
+    case 'Feature Products':
       return (
-        <GroupIcon color={text === selected ? "primary" : "gray"}/>
+        <StarIcon color={text === selected ? "primary" : "gray"}/>
       );
-    case 'Drivers Status':
+    case 'Promo':
       return (
         <DeliveryDiningIcon color={text === selected ? 'primary' : 'gray'} />
       );
-    case 'Restaurant Owners':
+    case 'Orders':
       return (
-        <RestaurantIcon color={text === selected ? "primary" : "gray"} />
+        <TakeoutDiningIcon color={text === selected ? "primary" : "gray"} />
+      );
+    case 'Products':
+      return (
+        <LocalPizzaIcon color={text === selected ? "primary" : "gray"} />
+      );
+    case 'Reservations':
+      return (
+        <BookOnlineIcon color={text === selected ? "primary" : "gray"} />
       );
     case 'Profile':
       return (
         <AccountBoxIcon color={text === selected ? "primary" : "gray"} />
       );
-    case 'Setting':
+    case 'Restaurant Setting':
       return (
-        <SettingsIcon color={text === selected ? "primary" : "gray"} />
+        <StorefrontIcon color={text === selected ? "primary" : "gray"} />
       );
     case 'Sign Out':
       return (
         <LogoutIcon color={text === selected ? "primary" : "gray"} />
       );
     default:
-      throw new Error ('Invalid Menu Button!');
+      throw new Error (`Invalid Menu Button, ${text}`);
   }
 }
 
 
-export default function AdminDrawerMenu (props) {
+export default function DrawerMenu (props) {
 
   const {
     open,
@@ -129,7 +139,7 @@ export default function AdminDrawerMenu (props) {
       </DrawerHeader>
       <Divider />
       <List>
-        {['Dashboard', 'Users', 'Drivers Status', 'Restaurant Owners'].map((text, index) => (
+        {['Dashboard', 'Products', 'Feature Products', 'Promo', 'Orders', 'Reservations'].map((text, index) => (
           <ListItem button key={text} onClick={() => onChangePage(text)}>
             <ListItemIcon>
               { renderDrawerMenu(text, page) }
@@ -140,10 +150,10 @@ export default function AdminDrawerMenu (props) {
       </List>
       <Divider />
       <List>
-        {['Profile', 'Setting', 'Sign Out'].map((text, index) => (
+        {['Profile', 'Restaurant Setting', 'Sign Out'].map((text, index) => (
           <ListItem button key={text} onClick={() => onChangePage(text)}>
             <ListItemIcon>
-              { renderDrawerMenu(text) }
+              { renderDrawerMenu(text, page) }
             </ListItemIcon>
             <ListItemText primary={text} />
           </ListItem>

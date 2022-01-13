@@ -41,7 +41,6 @@ export function reservationReducer (
         }
 
     case RESERVATION_INFO:
-      console.log('reservation reducer', action.payload);
       return {
         ...state,
         info : action.payload
