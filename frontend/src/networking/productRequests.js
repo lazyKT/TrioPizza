@@ -62,3 +62,23 @@ export async function addToFeatureProducts (body, token) {
       return {error: true, message: error.message};
   }
 }
+
+
+export async function removeFromFeatureProducts (id, token) {
+  try {
+    const { data } = await axios.delete(`/api/products/featuring/${id}/`, {
+      headers: {
+        'Content-Type' : 'application/json',
+        Authorization : `Bearer ${token}`
+      }
+    });
+
+    return { error: false };
+  }
+  catch (error) {
+    if (error.response && error.response.data.details)
+      return {error: true, message: error.response.data.details};
+    else
+      return {error: true, message: error.message};
+  }
+}

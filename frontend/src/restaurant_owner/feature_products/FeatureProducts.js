@@ -1,17 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import Paper from '@mui/material/Paper';
-import { Row, Col, Card, Image } from 'react-bootstrap';
+import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
+import { Row, Col, Card, Image, Container, Button } from 'react-bootstrap';
 
 import Loader from '../../components/Loader';
 import Message from '../../components/Message';
 import Rating from '../../components/Rating';
-import { getFeatureProducts } from '../../networking/productRequests';
+import { getFeatureProducts, removeFromFeatureProducts } from '../../networking/productRequests';
 
 
-function FeatureProductCard({ product }) {
+function FeatureProductCard({ product, remove }) {
     return (
-        <Card className="my-3 p-3 rounded">
+        <Card className="p-2 rounded">
             <Image
               style={{ height: '230px'}}
               src={product.image} alt={product.name}
@@ -21,10 +22,15 @@ function FeatureProductCard({ product }) {
               <h6>{product.name}</h6>
               <h6>${product.price}</h6>
               <Card.Text as="div">
-                <div className="my-3">
+                <div>
                     <Rating value={product.rating} text={`${product.numReviews} reviews`} color={'#f8e825'} />
                 </div>
               </Card.Text>
+              <Button className="mt-1 py-1 w-100" variant='danger'
+                onClick={remove}
+              >
+                <DeleteForeverIcon/>
+              </Button>
             </Card.Body>
         </Card>
     )
@@ -43,7 +49,7 @@ export default function FeatureProducts () {
   const fetchFeatureProducts = async (restaurantId, token, signal) => {
     try {
       const { data, error, message } = await getFeatureProducts(restaurantId, token, signal);
-      console.log(data, error, message);
+
       if (error) {
         setFeatureProducts(null);
         setError(message);
@@ -58,6 +64,25 @@ export default function FeatureProducts () {
     }
   }
 
+
+  const removeOnClick = async (featureId) => {
+    try {
+      setLoading(true);
+
+      const { error, message } = await removeFromFeatureProducts(featureId, userInfo.token);
+
+      if (error) {
+        setFeatureProducts(null);
+        setError(`Remove Feature Product: ${message}`);
+      }
+      else {
+        await fetchFeatureProducts(restaurantInfo._id, userInfo.token);
+      }
+    }
+    catch (error) {
+      setError(`Remove Feature Product: ${error.message}`);
+    }
+  };
 
   useEffect(() => {
 
@@ -76,19 +101,21 @@ export default function FeatureProducts () {
   }, [error, featureProducts]);
 
   return (
-    <Paper sx={{ padding: '15px' }}>
+    <div>
       <h5 style={{ marginBottom: '30px' }}>Feature Products</h5>
       { loading && <Loader/> }
       { error && <Message variant="danger">{error}</Message>}
       { featureProducts && featureProducts.length === 0
         && <Message variant="info">You Don't Have Any Feature Products!</Message>}
-      <Row>
-        { featureProducts && featureProducts.map(fp => (
-          <Col key={fp._id}  sm={12} md={6} lg={4} xl={3}>
-            <FeatureProductCard product={fp.product} />
-          </Col>
-        ))}
-      </Row>
-    </Paper>
+      <Container>
+        <Row>
+          { featureProducts && featureProducts.map(fp => (
+            <Col key={fp._id}  xs={3}>
+              <FeatureProductCard product={fp.product} remove={() => removeOnClick(fp._id)}/>
+            </Col>
+          ))}
+        </Row>
+      </Container>
+    </div>
   );
 }

@@ -154,8 +154,8 @@ export const deleteProduct = (id) => async (dispatch, getState) => {
     } catch (error) {
         dispatch({
             type: PRODUCT_DELETE_FAIL,
-            payload: error.response && error.response.data.detail
-                ? error.response.data.detail
+            payload: error.response && error.response.data.details
+                ? error.response.data.details
                 : error.message,
         })
     }
