@@ -81,13 +81,13 @@ export default function CustomTableBody (props) {
         .map((row, index) => {
           const cells = getCellData(dataType);
 
-          const isItemSelected = isSelected(row[cells[0]]);
+          const isItemSelected = isSelected(index);
           const labelId = `enhanced-table-checkbox-${index}`;
 
           return (
             <TableRow
               hover
-              onClick={(event) => handleClick(event, row[cells[0]])}
+              onClick={(event) => handleClick(event, index)}
               role="checkbox"
               aria-checked={isItemSelected}
               tabIndex={-1}

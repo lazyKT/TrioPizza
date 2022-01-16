@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Form } from 'react-bootstrap';
+import React, { useState, useEffect, useRef } from 'react';
+import { Form, Image } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
 import Paper from '@mui/material/Paper';
 import Button from '@mui/material/Button';
@@ -14,7 +14,10 @@ import { PRODUCT_CREATE_RESET } from '../../constants/productConstants';
 
 export default function CreateProduct ({backToProductList}) {
 
+  const productImage = useRef(null);
   const [ message, setMessage ] = useState('');
+  const [ errorMsg, setErrorMsg ] = useState('');
+  const [ image, setImage ] = useState(null);
   const [ newProduct, setNewProduct ] = useState({
     description: '',
     name: '',
@@ -37,21 +40,51 @@ export default function CreateProduct ({backToProductList}) {
     });
   }
 
+  const fileInputOnChange = (e) => {
+    let img = e.target.files[0];
+    setImage(img);
+    let fr = new FileReader();
+    fr.addEventListener('load', e => {
+      productImage.current.style.display = 'block';
+      productImage.current.src = e.target.result;
+    });
+    fr.readAsDataURL(img);
+  }
+
   const handleFormSubmit = (e) => {
-    e.preventDefault();
-    console.log('new product', newProduct);
-    const { error, errorMessage } = validateNewProduct(newProduct);
-    console.log(error, errorMessage);
-    if (error) {
-      setMessage(errorMessage);
-    }
-    else {
-      dispatch(createProduct(
-        {
-          ...newProduct,
-          restaurant: restaurantInfo._id
+    try {
+      e.preventDefault();
+      console.log('new product', newProduct);
+      const { error, errorMessage } = validateNewProduct(newProduct);
+      console.log(error, errorMessage);
+      if (error) {
+        setErrorMsg(errorMessage);
+      }
+      else {
+        if (image) {
+          const formData = new FormData();
+          formData.append('image', image, image.name);
+          dispatch(createProduct(
+            {
+              ...newProduct,
+              restaurant: restaurantInfo._id,
+              image: formData
+            }
+          ));
+          setImage(null);
         }
-      ));
+        else {
+          dispatch(createProduct(
+            {
+              ...newProduct,
+              restaurant: restaurantInfo._id
+            }
+          ));
+        }
+      }
+    }
+    catch (error) {
+      console.error(error);
     }
   }
 
@@ -61,6 +94,9 @@ export default function CreateProduct ({backToProductList}) {
 
     if (newProduct.name && newProduct.name === '')
       return { error : true, errorMessage: '*Empty Name*' };
+
+    if (!(new RegExp(/^\d+(\.\d+)?$/)).test(newProduct.price))
+      return { error : true, errorMessage: 'Error: Invalid Price*'};
 
     if (newProduct.price && (newProduct.price === '' || parseInt(newProduct.price) <= 0) )
       return { error : true, errorMessage: '*Invalid Price*'};
@@ -76,6 +112,8 @@ export default function CreateProduct ({backToProductList}) {
     }
 
     if (product) {
+      setErrorMsg('');
+      console.log('Product Create!');
       setMessage(`New Product Created, ${newProduct.name}`);
       setNewProduct({
         description: '',
@@ -90,6 +128,7 @@ export default function CreateProduct ({backToProductList}) {
           type: PRODUCT_CREATE_RESET
         });
         setMessage('');
+        setErrorMsg('');
       }
     });
   }, [product]);
@@ -107,6 +146,7 @@ export default function CreateProduct ({backToProductList}) {
         <FormContainer>
           <h4>Create Product</h4>
           {message !== '' && <Message variant='info'>{message}</Message>}
+          {errorMsg !== '' && <Message variant='danger'>{errorMsg}</Message>}
           {loading && <Loader />}
           <Form onSubmit={handleFormSubmit}>
 
@@ -135,21 +175,23 @@ export default function CreateProduct ({backToProductList}) {
               />
             </Form.Group>
 
-            <Form.Group controlId='price'>
+            <Form.Group controlId='price' className="mb-3">
               <Form.Label>Product Price</Form.Label>
               <Form.Control
                 required
                 type="text"
-                placeholder="18.00"
+                placeholder="Enter Product Price"
                 name='price'
                 value={newProduct.price}
                 onChange={handleOnChange}
               />
             </Form.Group>
 
+            <Image className='mb-1' ref={productImage} style={{ display: 'none', height: '120px'}}/>
+
             <Form.Group controlId="formFile" className="mb-3">
               <Form.Label>Upload Product Image</Form.Label>
-              <Form.Control type="file" />
+              <Form.Control type="file" onChange={fileInputOnChange}/>
             </Form.Group>
 
             <Button

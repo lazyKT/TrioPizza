@@ -1,28 +1,60 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useHistory } from 'react-router-dom';
 import Button from '@mui/material/Button';
+import IconButton from '@mui/material/IconButton';
 import Paper from '@mui/material/Paper';
 import Box from '@mui/material/Box';
-import { Form } from 'react-bootstrap';
+import { Form, Row, Col, Image } from 'react-bootstrap';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import StarIcon from '@mui/icons-material/Star';
+import SaveIcon from '@mui/icons-material/Save';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 import FormContainer from '../../components/FormContainer';
 import Loader from '../../components/Loader';
 import Message from '../../components/Message';
 import { listProductDetails, updateProduct, deleteProduct } from '../../actions/productActions';
 import { PRODUCT_UPDATE_RESET, PRODUCT_DELETE_RESET } from '../../constants/productConstants';
+import { addToFeatureProducts, uploadNewProductImage } from '../../networking/productRequests';
+
+
+
+const styles = {
+  imgDiv: {
+    display: 'flex',
+    justifyContent: 'center',
+    marginBottom: '15px',
+    position: 'relative',
+    cursor: 'pointer',
+    opacity: '1'
+  },
+  img: {
+    height: '200px',
+    width: '200px',
+    border: '0.4px solid gainsboro',
+    borderRadius: '10px'
+  }
+}
 
 
 export default function EditProduct ({editingID, backToProductList}) {
 
+  const inputFile = useRef(null);
+  const imgRef = useRef(null);
   const [ message, setMessage ] = useState('');
+  const [ featureError, setFeatureError ] = useState(null);
+  const [ uploadError, setUploadError ] = useState(null);
+  const [ productImage, setProductImage ] = useState(null);
   const [ editingProduct, setEditingProduct ] = useState({
     name: '',
     description: '',
-    price: ''
+    price: '',
   });
 
   const dispatch = useDispatch();
+  const history = useHistory();
+  const { userInfo } = useSelector(state => state.userCookie);
   const { loading, product, error } = useSelector(state => state.productDetails );
   const { restaurantInfo } = useSelector(state => state.restaurant);
   const { updateError, updatedProduct } = useSelector(state => state.productUpdate);
@@ -33,19 +65,61 @@ export default function EditProduct ({editingID, backToProductList}) {
     setEditingProduct({
       ...editingProduct,
       [e.target.name] : e.target.value
-    })
+    });
   };
 
+  const openFile = () => {
+    inputFile.current.click();
+  };
 
-  const handleOnSubmit = (e) => {
+  const fileOnChange = (e) => {
+    let img = e.target.files[0];
+    setProductImage(img);
+    let reader = new FileReader();
+    reader.addEventListener('load', e => {
+      imgRef.current.src = e.target.result;
+    });
+    reader.readAsDataURL(img);
+  }
+
+
+  const uploadProductImage = async () => {
+    try {
+      console.log('uploading Logo');
+      const formData = new FormData();
+      formData.append('image', productImage, productImage.name);
+
+      const { error, message } = await uploadNewProductImage (editingID, formData, userInfo.token);
+
+      if (error) {
+        setUploadError(message);
+      }
+      else {
+        setUploadError(null);
+        setProductImage(null);
+      }
+    }
+    catch (error) {
+      console.error(error);
+      setUploadError(error.message);
+    }
+  }
+
+
+  const handleOnSubmit = async (e) => {
     e.preventDefault();
+
+    if (productImage) {
+      await uploadProductImage();
+    }
+
     const { error, errorMessage } = validateEditingProduct(editingProduct);
     if (error) {
-      setMessage(errorMessage);
+      setFeatureError(errorMessage);
     }
     else {
       dispatch(updateProduct(
-        { ...editingProduct, restaurant: restaurantInfo._id }, 
+        { ...editingProduct, restaurant: restaurantInfo._id },
         editingID
       ));
     }
@@ -57,6 +131,9 @@ export default function EditProduct ({editingID, backToProductList}) {
 
     if (editingProduct.name && editingProduct.name === '')
       return { error : true, errorMessage: 'Error: Empty Name*' };
+
+    if (!(new RegExp(/^\d+(\.\d+)?$/)).test(editingProduct.price))
+      return { error : true, errorMessage: 'Error: Invalid Price*'};
 
     if (editingProduct.price && (editingProduct.price === '' || parseInt(editingProduct.price) <= 0) )
       return { error : true, errorMessage: 'Error: Invalid Price*'};
@@ -72,12 +149,43 @@ export default function EditProduct ({editingID, backToProductList}) {
   }
 
 
+  const addToFeatureProductsList = async (e) => {
+    try {
+      const { data, error, message } = await addToFeatureProducts(
+        {
+          product: editingID,
+          restaurant: restaurantInfo._id
+        },
+        userInfo.token
+      );
+
+      if (error) {
+        setFeatureError(message);
+        setMessage('');
+      }
+      else {
+        setMessage('Added to feature product list!');
+        setFeatureError(null);
+      }
+    }
+    catch (error) {
+      console.error(error.message);
+      setFeatureError(error.message);
+      setMessage('');
+    }
+  }
+
+
   useEffect(() => {
     // Fetch Product Details
     dispatch(listProductDetails(editingID));
   }, [editingID, backToProductList]);
 
+
   useEffect(() => {
+
+    if (!userInfo)
+      history.push('/');
 
     if (!restaurantInfo)
       backToProductList();
@@ -92,7 +200,7 @@ export default function EditProduct ({editingID, backToProductList}) {
     else if (error) {
       setMessage(error);
     }
-  }, [product, error, restaurantInfo]);
+  }, [product, error, restaurantInfo, userInfo]);
 
   useEffect(() => {
 
@@ -103,6 +211,8 @@ export default function EditProduct ({editingID, backToProductList}) {
         price: product.price
       });
       setMessage('Product Updated Successfully');
+      setUploadError(null);
+      setFeatureError(null);
     }
 
     return(() => {
@@ -146,6 +256,18 @@ export default function EditProduct ({editingID, backToProductList}) {
           <h4>Edit Product</h4>
           {message !== '' && <Message variant='info'>{message}</Message>}
           {error && <Message variant='danger'>{error}</Message>}
+          {featureError && <Message variant='danger'>{featureError}</Message>}
+          {uploadError && <Message variant='danger'>{uploadError}</Message>}
+          <div style={styles.imgDiv}>
+            <Image
+              style={styles.img}
+              src={product.image}
+              alt={product.name}
+              ref={imgRef}
+              onClick={openFile}
+            />
+            <input type='file' onChange={fileOnChange} ref={inputFile} style={{display: 'none'}}/>
+          </div>
           <Form onSubmit={handleOnSubmit}>
 
             <Form.Group controlId='name'>
@@ -163,6 +285,7 @@ export default function EditProduct ({editingID, backToProductList}) {
             <Form.Group controlId='description'>
               <Form.Label>Product Description</Form.Label>
               <Form.Control
+                as='textarea'
                 required
                 type="text"
                 placeholder="Enter Product Description"
@@ -172,7 +295,7 @@ export default function EditProduct ({editingID, backToProductList}) {
               />
             </Form.Group>
 
-            <Form.Group controlId='price'>
+            <Form.Group className="mb-3" controlId='price'>
               <Form.Label>Product Price</Form.Label>
               <Form.Control
                 required
@@ -184,7 +307,7 @@ export default function EditProduct ({editingID, backToProductList}) {
               />
             </Form.Group>
 
-            <Box sx={{ display: 'flex', justifyContent: 'space-between'}}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap'}}>
               <Button
                 variant="contained"
                 type="submit"
@@ -192,13 +315,23 @@ export default function EditProduct ({editingID, backToProductList}) {
                 Save Changes
               </Button>
 
-              <Button
-                variant="contained"
-                color="error"
-                onClick={onDeleteProduct}
-              >
-                Delete Product
-              </Button>
+              <div>
+                <IconButton
+                  aria-label='star'
+                  color='secondary'
+                  onClick={addToFeatureProductsList}
+                >
+                  <StarIcon/>
+                </IconButton>
+                <IconButton
+                  color='error'
+                  aria-label='delete'
+                  onClick={onDeleteProduct}
+                >
+                  <DeleteIcon/>
+                </IconButton>
+              </div>
+
             </Box>
 
           </Form>

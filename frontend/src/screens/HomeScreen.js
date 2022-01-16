@@ -73,7 +73,7 @@ function HomeScreen () {
         <div>
             {!keyword && <RestaurantCarousel restaurants={restaurants}/>}
 
-            <h1>Latest Products</h1>
+            <h1>Restaurants</h1>
             {loading ? <Loader />
                 : error ? <Message variant='danger'>{error}</Message>
                     :

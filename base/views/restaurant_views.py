@@ -220,6 +220,26 @@ class RestaurantDetails (APIView):
             return Response({'details' : error}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
+
+@api_view(['POST'])
+def upalod_logo (request, pk):
+    try:
+        restaurant = Restaurant.objects.get(_id=pk)
+        print('UPLOADING NEW LOGO ...')
+        print(request.FILES)
+        if 'logo' not in request.FILES:
+            return Response({'details' : 'Empty or Invalid Payload!'}, status=status.HTTP_400_BAD_REQUEST)
+        restaurant.logo = request.FILES['logo']
+        restaurant.save()
+        return Response('Logo Uploaded Successfully!')
+    except Restaurant.DoesNotExist:
+        return Response({'details' : 'Restaurant Not Found!'}, status=status.HTTP_404_NOT_FOUND)
+    except Exception as e:
+        error = 'Internal Server Error!' if repr(e) == '' else repr(e)
+        return Response({'details' : error}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+
 @api_view(['PUT'])
 def edit_restaurant_location(request, pk):
     try:
