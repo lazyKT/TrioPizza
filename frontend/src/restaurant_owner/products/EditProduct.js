@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import Button from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton';
 import Paper from '@mui/material/Paper';
 import Box from '@mui/material/Box';
-import { Form, Row, Col } from 'react-bootstrap';
+import { Form, Row, Col, Image } from 'react-bootstrap';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import StarIcon from '@mui/icons-material/Star';
 import SaveIcon from '@mui/icons-material/Save';
@@ -16,17 +16,40 @@ import Loader from '../../components/Loader';
 import Message from '../../components/Message';
 import { listProductDetails, updateProduct, deleteProduct } from '../../actions/productActions';
 import { PRODUCT_UPDATE_RESET, PRODUCT_DELETE_RESET } from '../../constants/productConstants';
-import { addToFeatureProducts } from '../../networking/productRequests';
+import { addToFeatureProducts, uploadNewProductImage } from '../../networking/productRequests';
+
+
+
+const styles = {
+  imgDiv: {
+    display: 'flex',
+    justifyContent: 'center',
+    marginBottom: '15px',
+    position: 'relative',
+    cursor: 'pointer',
+    opacity: '1'
+  },
+  img: {
+    height: '200px',
+    width: '200px',
+    border: '0.4px solid gainsboro',
+    borderRadius: '10px'
+  }
+}
 
 
 export default function EditProduct ({editingID, backToProductList}) {
 
+  const inputFile = useRef(null);
+  const imgRef = useRef(null);
   const [ message, setMessage ] = useState('');
   const [ featureError, setFeatureError ] = useState(null);
+  const [ uploadError, setUploadError ] = useState(null);
+  const [ productImage, setProductImage ] = useState(null);
   const [ editingProduct, setEditingProduct ] = useState({
     name: '',
     description: '',
-    price: ''
+    price: '',
   });
 
   const dispatch = useDispatch();
@@ -45,9 +68,51 @@ export default function EditProduct ({editingID, backToProductList}) {
     });
   };
 
+  const openFile = () => {
+    inputFile.current.click();
+  };
 
-  const handleOnSubmit = (e) => {
+  const fileOnChange = (e) => {
+    let img = e.target.files[0];
+    setProductImage(img);
+    let reader = new FileReader();
+    reader.addEventListener('load', e => {
+      imgRef.current.src = e.target.result;
+    });
+    reader.readAsDataURL(img);
+  }
+
+
+  const uploadProductImage = async () => {
+    try {
+      console.log('uploading Logo');
+      const formData = new FormData();
+      formData.append('image', productImage, productImage.name);
+
+      const { error, message } = await uploadNewProductImage (editingID, formData, userInfo.token);
+
+      if (error) {
+        setUploadError(message);
+      }
+      else {
+        setUploadError(null);
+        setProductImage(null);
+      }
+    }
+    catch (error) {
+      console.error(error);
+      setUploadError(error.message);
+    }
+  }
+
+
+  const handleOnSubmit = async (e) => {
     e.preventDefault();
+
+    if (productImage) {
+      await uploadProductImage();
+    }
+
     const { error, errorMessage } = validateEditingProduct(editingProduct);
     if (error) {
       setFeatureError(errorMessage);
@@ -146,6 +211,7 @@ export default function EditProduct ({editingID, backToProductList}) {
         price: product.price
       });
       setMessage('Product Updated Successfully');
+      setUploadError(null);
       setFeatureError(null);
     }
 
@@ -191,6 +257,17 @@ export default function EditProduct ({editingID, backToProductList}) {
           {message !== '' && <Message variant='info'>{message}</Message>}
           {error && <Message variant='danger'>{error}</Message>}
           {featureError && <Message variant='danger'>{featureError}</Message>}
+          {uploadError && <Message variant='danger'>{uploadError}</Message>}
+          <div style={styles.imgDiv}>
+            <Image
+              style={styles.img}
+              src={product.image}
+              alt={product.name}
+              ref={imgRef}
+              onClick={openFile}
+            />
+            <input type='file' onChange={fileOnChange} ref={inputFile} style={{display: 'none'}}/>
+          </div>
           <Form onSubmit={handleOnSubmit}>
 
             <Form.Group controlId='name'>

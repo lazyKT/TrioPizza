@@ -168,7 +168,7 @@ export const createProduct = (product) => async (dispatch, getState) => {
     try {
         dispatch({
             type: PRODUCT_CREATE_REQUEST
-        })
+        });
 
         const {
             userCookie: { userInfo },
@@ -185,11 +185,24 @@ export const createProduct = (product) => async (dispatch, getState) => {
             `/api/products/`,
             product,
             config
-        )
+        );
+
+        if (product.image) {
+          console.log('uploading new product image!');
+          const { imageResult: data } = await axios.post(`/api/products/upload/${data._id}/`, product.image,
+            {
+              headers: {
+                'Content-Type' : 'multipart/form-data',
+                Authorization : `Bearer ${userInfo.token}`
+              }
+            }
+          );
+        }
+
         dispatch({
             type: PRODUCT_CREATE_SUCCESS,
             payload: data,
-        })
+        });
 
 
     } catch (error) {

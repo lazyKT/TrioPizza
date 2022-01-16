@@ -82,3 +82,24 @@ export async function removeFromFeatureProducts (id, token) {
       return {error: true, message: error.message};
   }
 }
+
+
+export async function uploadNewProductImage (productId, body, token) {
+  try {
+    console.log('uploading new logo request ...');
+    const { data } = await axios.post(`/api/products/upload/${productId}/`, body, {
+      headers: {
+        'Content-Type' : 'multipart/form-data',
+        Authorization: `Bearer ${token}`
+      }
+    });
+
+    return { error: false, data };
+  }
+  catch (error) {
+    if (error.response && error.response.data.details)
+      return { error: true, message: error.response.data.details };
+    else
+      return { error: true, message: error.message };
+  }
+}

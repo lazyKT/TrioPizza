@@ -225,6 +225,7 @@ class RestaurantDetails (APIView):
 def upalod_logo (request, pk):
     try:
         restaurant = Restaurant.objects.get(_id=pk)
+        print('UPLOADING NEW LOGO ...')
         print(request.FILES)
         if 'logo' not in request.FILES:
             return Response({'details' : 'Empty or Invalid Payload!'}, status=status.HTTP_400_BAD_REQUEST)
