@@ -239,12 +239,11 @@ def getTopProducts(request):
 
 
 @api_view(['POST'])
-def uploadImage(request):
+def uploadImage(request, pk):
     try:
         data = request.data
-        id = data['product_id']
-        product = Product.objects.get(_id=id)
-
+        product = Product.objects.get(_id=pk)
+        print(request.FILES)
         product.image = request.FILES.get('image')
         product.save()
 

@@ -42,7 +42,7 @@ export default function EditProduct ({editingID, backToProductList}) {
     setEditingProduct({
       ...editingProduct,
       [e.target.name] : e.target.value
-    })
+    });
   };
 
 
@@ -50,7 +50,7 @@ export default function EditProduct ({editingID, backToProductList}) {
     e.preventDefault();
     const { error, errorMessage } = validateEditingProduct(editingProduct);
     if (error) {
-      setMessage(errorMessage);
+      setFeatureError(errorMessage);
     }
     else {
       dispatch(updateProduct(
@@ -66,6 +66,9 @@ export default function EditProduct ({editingID, backToProductList}) {
 
     if (editingProduct.name && editingProduct.name === '')
       return { error : true, errorMessage: 'Error: Empty Name*' };
+
+    if (!(new RegExp(/^\d+(\.\d+)?$/)).test(editingProduct.price))
+      return { error : true, errorMessage: 'Error: Invalid Price*'};
 
     if (editingProduct.price && (editingProduct.price === '' || parseInt(editingProduct.price) <= 0) )
       return { error : true, errorMessage: 'Error: Invalid Price*'};
@@ -205,6 +208,7 @@ export default function EditProduct ({editingID, backToProductList}) {
             <Form.Group controlId='description'>
               <Form.Label>Product Description</Form.Label>
               <Form.Control
+                as='textarea'
                 required
                 type="text"
                 placeholder="Enter Product Description"

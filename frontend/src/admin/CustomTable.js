@@ -22,42 +22,26 @@ import CustomTableBody from './CustomTableBody';
 
 const EnhancedTableToolbar = (props) => {
 
-  const { selected, openEditPannel, deleteUser, numSelected, type } = props;
-
-  const handleDeleteClick = (e) => {
-    e.preventDefault();
-    deleteUser(selected[0]);
-  }
+  const { selected, openEditPannel } = props;
 
   return (
     <Toolbar
       sx={{
         pl: { sm: 2 },
         pr: { xs: 1, sm: 1 },
-        ...(numSelected > 0 && {
+        ...(selected && {
           bgcolor: (theme) =>
             alpha(theme.palette.primary.main, theme.palette.action.activatedOpacity),
         }),
       }}
     >
-      {numSelected > 0 ? (
-        <Typography
-          sx={{ flex: '1 1 100%' }}
-          color="inherit"
-          variant="subtitle1"
-          component="div"
-        >
-          {numSelected} selected
-        </Typography>
-      ) : (
-        <h6>{type}</h6>
-      )}
 
-      {numSelected > 0 && (
+
+      {selected && (
         <Tooltip title="Edit">
           <IconButton
             color="primary"
-            onClick={() => openEditPannel(selected[0])}
+            onClick={() => openEditPannel(selected.id)}
           >
             <EditIcon />
           </IconButton>
@@ -67,9 +51,9 @@ const EnhancedTableToolbar = (props) => {
   );
 };
 
-EnhancedTableToolbar.propTypes = {
-  numSelected: PropTypes.number.isRequired,
-};
+// EnhancedTableToolbar.propTypes = {
+//   numSelected: PropTypes.number.isRequired,
+// };
 
 export default function CustomTable (props) {
 
@@ -77,7 +61,7 @@ export default function CustomTable (props) {
 
   const [ order, setOrder ] = useState('asc');
   const [ orderBy, setOrderBy ] = useState('calories');
-  const [ selected, setSelected ] = useState([]);
+  const [ selected, setSelected ] = useState(null);
   const [ page, setPage ] = useState(0);
   const [ dense, setDense ] = useState(false);
   const [ rowsPerPage, setRowsPerPage ] = useState(5);
@@ -97,32 +81,35 @@ export default function CustomTable (props) {
           else
             return n._id;
         });
-        setSelected(newSelecteds);
+        // setSelected(newSelecteds);
         return;
       }
-      setSelected([]);
+      // setSelected([]);
     }
   };
 
-  const handleClick = (event, name) => {
+  const handleClick = (event, selectedIndex) => {
     if (type !== 'driver') {
-      const selectedIndex = selected.indexOf(name);
-      let newSelected = [];
-
-      if (selectedIndex === -1) {
-        newSelected = newSelected.concat(selected, name);
-      } else if (selectedIndex === 0) {
-        newSelected = newSelected.concat(selected.slice(1));
-      } else if (selectedIndex === selected.length - 1) {
-        newSelected = newSelected.concat(selected.slice(0, -1));
-      } else if (selectedIndex > 0) {
-        newSelected = newSelected.concat(
-          selected.slice(0, selectedIndex),
-          selected.slice(selectedIndex + 1),
-        );
-      }
-
-      setSelected(newSelected);
+      // const selectedIndex = selected.indexOf(name);
+      // let newSelected = [];
+      //
+      // if (selectedIndex === -1) {
+      //   newSelected = newSelected.concat(selected, name);
+      // } else if (selectedIndex === 0) {
+      //   newSelected = newSelected.concat(selected.slice(1));
+      // } else if (selectedIndex === selected.length - 1) {
+      //   newSelected = newSelected.concat(selected.slice(0, -1));
+      // } else if (selectedIndex > 0) {
+      //   newSelected = newSelected.concat(
+      //     selected.slice(0, selectedIndex),
+      //     selected.slice(selectedIndex + 1),
+      //   );
+      // }
+      console.log(selected, selectedIndex);
+      if (selectedIndex === selected)
+        setSelected(null);
+      else
+        setSelected(selectedIndex);
     }
   };
 
@@ -139,7 +126,7 @@ export default function CustomTable (props) {
     setDense(event.target.checked);
   };
 
-  const isSelected = (name) => selected.indexOf(name) !== -1;
+  const isSelected = (idx) => selected === idx;
 
   // Avoid a layout jump when reaching the last page with empty rows.
   const emptyRows =
@@ -153,10 +140,8 @@ export default function CustomTable (props) {
             <Paper sx={{ width: '100%', mb: 2 }}>
 
               <EnhancedTableToolbar
-                numSelected={selected.length}
-                selected={selected}
+                selected={rows[selected]}
                 openEditPannel={(id) => edit(id)}
-                type={type.toUpperCase()}
               />
 
               <TableContainer>
@@ -167,7 +152,6 @@ export default function CustomTable (props) {
                 >
                   <CustomTableHead
                     headCells={columns}
-                    numSelected={selected.length}
                     order={order}
                     orderBy={orderBy}
                     onSelectAllClick={handleSelectAllClick}

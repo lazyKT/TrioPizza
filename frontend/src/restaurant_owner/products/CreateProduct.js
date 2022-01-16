@@ -15,6 +15,7 @@ import { PRODUCT_CREATE_RESET } from '../../constants/productConstants';
 export default function CreateProduct ({backToProductList}) {
 
   const [ message, setMessage ] = useState('');
+  const [ errorMsg, setErrorMsg ] = useState('');
   const [ newProduct, setNewProduct ] = useState({
     description: '',
     name: '',
@@ -43,7 +44,7 @@ export default function CreateProduct ({backToProductList}) {
     const { error, errorMessage } = validateNewProduct(newProduct);
     console.log(error, errorMessage);
     if (error) {
-      setMessage(errorMessage);
+      setErrorMsg(errorMessage);
     }
     else {
       dispatch(createProduct(
@@ -62,6 +63,9 @@ export default function CreateProduct ({backToProductList}) {
     if (newProduct.name && newProduct.name === '')
       return { error : true, errorMessage: '*Empty Name*' };
 
+    if (!(new RegExp(/^\d+(\.\d+)?$/)).test(newProduct.price))
+      return { error : true, errorMessage: 'Error: Invalid Price*'};
+
     if (newProduct.price && (newProduct.price === '' || parseInt(newProduct.price) <= 0) )
       return { error : true, errorMessage: '*Invalid Price*'};
 
@@ -76,6 +80,7 @@ export default function CreateProduct ({backToProductList}) {
     }
 
     if (product) {
+      setErrorMsg('');
       setMessage(`New Product Created, ${newProduct.name}`);
       setNewProduct({
         description: '',
@@ -90,6 +95,7 @@ export default function CreateProduct ({backToProductList}) {
           type: PRODUCT_CREATE_RESET
         });
         setMessage('');
+        setErrorMsg('');
       }
     });
   }, [product]);
@@ -107,6 +113,7 @@ export default function CreateProduct ({backToProductList}) {
         <FormContainer>
           <h4>Create Product</h4>
           {message !== '' && <Message variant='info'>{message}</Message>}
+          {errorMsg !== '' && <Message variant='danger'>{errorMsg}</Message>}
           {loading && <Loader />}
           <Form onSubmit={handleFormSubmit}>
 
@@ -140,7 +147,7 @@ export default function CreateProduct ({backToProductList}) {
               <Form.Control
                 required
                 type="text"
-                placeholder="18.00"
+                placeholder="Enter Product Price"
                 name='price'
                 value={newProduct.price}
                 onChange={handleOnChange}
