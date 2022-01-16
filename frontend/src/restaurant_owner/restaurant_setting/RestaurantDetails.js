@@ -1,26 +1,73 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import Paper from '@mui/material/Paper';
+import InsertPhotoIcon from '@mui/icons-material/InsertPhoto';
 import { Card, Image, Button, Form, Stack } from 'react-bootstrap';
 
 import FormContainer from '../../components/FormContainer';
 import Loader from '../../components/Loader';
 import Message from '../../components/Message';
-import { updateRestaurantInfo } from '../../actions/restaurantActions';
+import { updateRestaurantInfo, getRestaurantInfo } from '../../actions/restaurantActions';
+import { uploadNewLogo } from '../../networking/restaurantRequests';
 
+
+
+const styles = {
+  logoImgDiv: {
+    display: 'flex',
+    justifyContent: 'center',
+    marginBottom: '15px',
+    position: 'relative'
+  },
+  logoImg: {
+    height: '200px',
+    width: '300px',
+    border: '0.4px solid gainsboro',
+    borderRadius: '10px'
+  },
+  uploadLogo: {
+    position: 'absolute',
+    fontSize: 75,
+    top: '55px'
+  }
+}
 
 
 export default function RestaurantDetails () {
 
   const [ restaurant, setRestaurant ] = useState(null);
   const [ editing, setEditing ] = useState(false);
+  const [ logo, setLogo ] = useState(null);
+  const [ uploadError, setUploadError ] = useState(null);
+  const inputFile = useRef(null);
+  const logoImg = useRef(null);
 
   const dispatch = useDispatch();
   const history = useHistory();
 
   const { userInfo } = useSelector(state => state.userCookie);
   const { error, empty, loading, restaurantInfo } = useSelector(state => state.restaurant);
+
+
+  const openFile = () => {
+    if (editing) {
+      inputFile.current.click();
+    }
+  };
+
+
+  // logo image onChange event
+  const fileOnChange = (e) => {
+    console.log(e.target.files);
+    let img = e.target.files[0];
+    setLogo(img);
+    let reader = new FileReader();
+    reader.addEventListener('load', e => {
+      logoImg.current.src = e.target.result;
+    });
+    reader.readAsDataURL(img);
+  }
 
 
   const handleOnChange = (e) => {
@@ -31,9 +78,38 @@ export default function RestaurantDetails () {
   }
 
 
-  const handleOnSubmit = (e) => {
+  const uploadLogo = async () => {
+    try {
+      console.log('uploading Logo');
+      const formData = new FormData();
+      formData.append('logo', logo, logo.name);
+
+      const { error, message } = await uploadNewLogo (restaurant._id, formData, userInfo.token);
+
+      if (error) {
+        setUploadError(message);
+      }
+      else {
+        setUploadError(null);
+        setLogo(null);
+      }
+    }
+    catch (error) {
+      console.error(error);
+      setUploadError(error.message);
+    }
+  }
+
+
+  const handleOnSubmit = async (e) => {
     e.preventDefault();
-    console.log(userInfo.id, restaurant)
+    console.log(userInfo.id, restaurant, logo);
+
+    if (logo) {
+      // upload new logo
+      await uploadLogo();
+    }
+
     dispatch(updateRestaurantInfo(
       restaurant._id,
       {
@@ -42,7 +118,7 @@ export default function RestaurantDetails () {
         description: restaurant.description
       },
       userInfo.token
-    ))
+    ));
   }
 
   useEffect(() => {
@@ -54,22 +130,44 @@ export default function RestaurantDetails () {
       setRestaurant(restaurantInfo);
   }, [userInfo, error, empty, loading, restaurantInfo]);
 
+  useEffect(() => {
+
+    if (!editing && restaurantInfo) {
+      console.log('editing false!');
+      setRestaurant(restaurantInfo);
+      setLogo(null);
+      if (logoImg && logoImg.current)
+        logoImg.current.src = restaurantInfo.logo;
+    }
+  }, [editing]);
+
   return (
     <>
       {loading && <Loader/>}
       {error && <Message variant='danger'>{error}</Message>}
+      {uploadError && <Message variant='danger'>{uploadError}</Message>}
       {empty && <Message variant='info'>You have not set up your restaurant yet!</Message>}
       {restaurant && (
         <Card>
           <Card.Body>
-            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '15px'}}>
+            <div
+              style={styles.logoImgDiv}
+
+            >
               <Image
-                style={{ height: '200px', width: '300px', border: '0.4px solid gainsboro', borderRadius: '10px'}}
+                style={{
+                  ...styles.logoImg,
+                  opacity: editing ? 0.7 : 1,
+                  cursor: editing ? 'pointer' : 'default'
+                }}
                 src={restaurant.logo}
                 alt={restaurant.name}
-                onClick={() => console.log('Onclick Image')}
+                ref={logoImg}
+                onClick={openFile}
                 fluid
               />
+              <input type='file' onChange={fileOnChange} ref={inputFile} style={{display: 'none'}}/>
+              {editing && <InsertPhotoIcon sx={styles.uploadLogo} onClick={openFile}/>}
             </div>
 
             <FormContainer>

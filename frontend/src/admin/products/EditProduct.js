@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import Button from '@mui/material/Button';
 import Paper from '@mui/material/Paper';
 import Box from '@mui/material/Box';
-import { Form } from 'react-bootstrap';
+import { Form, Image } from 'react-bootstrap';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
 import FormContainer from '../../components/FormContainer';
@@ -13,8 +13,34 @@ import { listProductDetails, updateProduct, deleteProduct } from '../../actions/
 import { PRODUCT_UPDATE_RESET, PRODUCT_DELETE_RESET } from '../../constants/productConstants';
 
 
+
+const styles = {
+  imgDiv: {
+    display: 'flex',
+    background: 'coral',
+    justifyContent: 'center',
+    marginBottom: '15px',
+    position: 'relative',
+    cursor: 'pointer',
+    opacity: '1'
+  },
+  img: {
+    height: '200px',
+    width: '300px',
+    border: '0.4px solid gainsboro',
+    borderRadius: '10px'
+  },
+  uploadIcon: {
+    position: 'absolute',
+    fontSize: 75,
+    top: '55px'
+  }
+}
+
+
 export default function EditProduct ({editingID, backToProductList}) {
 
+  const imageRef = useRef(null);
   const [ message, setMessage ] = useState('');
   const [ editingProduct, setEditingProduct ] = useState({
     name: '',
@@ -72,15 +98,18 @@ export default function EditProduct ({editingID, backToProductList}) {
 
   useEffect(() => {
     // Fetch Product Details
+    console.log('use effect!');
     dispatch(listProductDetails(editingID));
   }, [editingID, backToProductList]);
 
   useEffect(() => {
     if (product) {
+      console.log(product);
       setEditingProduct({
         name: product.name ? product.name : 'Failed to fetch',
         description: product.description ? product.description : 'Failed to fetch',
-        price: product.price ? product.price : ''
+        price: product.price ? product.price : '',
+        image: product.image
       });
     }
     else if (error) {
@@ -140,6 +169,14 @@ export default function EditProduct ({editingID, backToProductList}) {
           <h4>Edit Product</h4>
           {message !== '' && <Message variant='info'>{message}</Message>}
           {error && <Message variant='danger'>{error}</Message>}
+          <div style={styles.imgDiv}>
+            <Image
+              style={styles.logoImg}
+              src={editingProduct.image}
+              alt={editingProduct.name}
+              ref={imageRef}
+            />
+          </div>
           <Form onSubmit={handleOnSubmit}>
 
             <Form.Group controlId='name'>

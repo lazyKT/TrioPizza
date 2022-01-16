@@ -10,6 +10,7 @@ import Appbar from './Appbar';
 import DrawerMenu from './DrawerMenu';
 import ProductDashboard from './products/ProductDashboard';
 import MyRestaurant from './restaurant_setting/MyRestaurant';
+import FeatureProducts from './feature_products/FeatureProducts';
 import { logout } from '../actions/userActions';
 
 
@@ -57,7 +58,7 @@ function switchContents (page) {
       case 'Reservations':
         return <h5>Reservations</h5>;
       case 'Feature Products':
-        return <h5>Feature Products</h5>;
+        return <FeatureProducts />;
       case 'Promo':
         return <h5>Promotions</h5>;
       case 'Restaurant Setting':
@@ -83,7 +84,7 @@ export default function OwnerDashboard () {
   const { userInfo } = useSelector(state => state.userCookie);
 
   const onChangePage = (page) => {
-    
+
 		if (page === 'Sign Out') {
       // sign out user
       dispatch(logout());

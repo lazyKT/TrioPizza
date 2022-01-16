@@ -239,12 +239,11 @@ def getTopProducts(request):
 
 
 @api_view(['POST'])
-def uploadImage(request):
+def uploadImage(request, pk):
     try:
         data = request.data
-        id = data['product_id']
-        product = Product.objects.get(_id=id)
-
+        product = Product.objects.get(_id=pk)
+        print(request.FILES)
         product.image = request.FILES.get('image')
         product.save()
 
@@ -343,15 +342,6 @@ class FeatureProductList (APIView):
         elif 'restaurant' not in body:
             message = 'Restaurant is Required*'
             return error, message
-        elif 'priority' not in body:
-            message = 'Product Priority is Required*'
-            return error, message
-        elif type(body['priority']) != int:
-            message = 'Product Priority Must be a Number*'
-            return error, message
-        elif int(body['priority']) < 0 or int(body['priority']) > 4:
-            message = 'Product Priority Must be Between 0 and 4'
-            return error, message
         else:
             error = False
             return error, ''
@@ -378,8 +368,7 @@ class FeatureProductList (APIView):
 
             feature_product = FeatureProduct.objects.create(
                 restaurant=restaurant,
-                product=product,
-                priority=data['priority']
+                product=product
             )
             serializer = FeatureProductSerializer(feature_product)
             return Response(serializer.data)

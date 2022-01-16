@@ -51,6 +51,7 @@ class Location (models.Model):
     updated_at = models.DateTimeField(auto_now_add=True)
 
 
+
 class RestaurantReview (models.Model):
     """
     # Restaurant Reviews
@@ -81,13 +82,14 @@ class Product(models.Model):
         return self.name
 
 
+
 class FeatureProduct (models.Model):
     _id = models.AutoField(primary_key=True)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     restaurant = models.ForeignKey(Restaurant, on_delete=models.CASCADE)
-    priority = models.IntegerField(default=0)
     create_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now_add=True)
+
 
 
 class Promos (models.Model):
