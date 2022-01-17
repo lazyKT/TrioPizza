@@ -10,7 +10,6 @@ import { visuallyHidden } from '@mui/utils';
 
 
 CustomTableHead.propTypes = {
-  numSelected: PropTypes.number.isRequired,
   onRequestSort: PropTypes.func.isRequired,
   onSelectAllClick: PropTypes.func.isRequired,
   order: PropTypes.oneOf(['asc', 'desc']).isRequired,
@@ -25,7 +24,6 @@ export default function CustomTableHead (props) {
     onSelectAllClick,
     order,
     orderBy,
-    numSelected,
     rowCount,
     onRequestSort,
     headCells,
@@ -41,15 +39,6 @@ export default function CustomTableHead (props) {
       <TableRow>
         {type !== 'driver' &&
         <TableCell padding="checkbox">
-          <Checkbox
-            color="primary"
-            indeterminate={numSelected > 0 && numSelected < rowCount}
-            checked={rowCount > 0 && numSelected === rowCount}
-            onChange={onSelectAllClick}
-            inputProps={{
-              'aria-label': 'select all desserts',
-            }}
-          />
         </TableCell>}
         {headCells.map((headCell) => (
           <TableCell

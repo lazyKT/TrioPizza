@@ -98,10 +98,11 @@ class Promos (models.Model):
     """
     _id = models.AutoField(primary_key=True)
     restaurant = models.ForeignKey(Restaurant, on_delete=models.CASCADE)
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
-    code = models.CharField(max_length=16, null=False, blank=False)
+    product = models.ForeignKey(Product, null=True, blank=True, on_delete=models.CASCADE)
+    description = models.TextField()
     type = models.CharField(max_length=16, null=False, blank=False)
     amount = models.DecimalField(max_digits=4, decimal_places=3, null=False, blank=False)
+    expiry_date = models.DateTimeField()
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now_add=True)
 

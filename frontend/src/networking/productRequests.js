@@ -86,7 +86,7 @@ export async function removeFromFeatureProducts (id, token) {
 
 export async function uploadNewProductImage (productId, body, token) {
   try {
-    console.log('uploading new logo request ...');
+    // console.log('uploading new logo request ...');
     const { data } = await axios.post(`/api/products/upload/${productId}/`, body, {
       headers: {
         'Content-Type' : 'multipart/form-data',

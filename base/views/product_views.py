@@ -87,13 +87,23 @@ class ProductList (APIView):
                 return Response({'details' : message}, status=status.HTTP_400_BAD_REQUEST)
 
             restaurant = Restaurant.objects.get(_id=data['restaurant'])
-
-            product = Product.objects.create(
-                name=data['name'],
-                price=data['price'],
-                description=data['description'],
-                restaurant=restaurant
-            )
+            image = request.FILES.get('image')
+            print(image)
+            if image is None:
+                product = Product.objects.create(
+                    name=data['name'],
+                    price=data['price'],
+                    description=data['description'],
+                    restaurant=restaurant
+                )
+            else:
+                product = Product.objects.create(
+                    name=data['name'],
+                    price=data['price'],
+                    description=data['description'],
+                    restaurant=restaurant,
+                    image=image
+                )
 
             serializer = ProductSerializer(product)
             return Response(serializer.data)
@@ -203,6 +213,11 @@ def get_products_by_restaurant (request, restaurant_id):
         products = Product.objects.filter(restaurant=restaurant)
         num_products = len(products)
 
+        limit = request.query_params.get('limit')
+        if limit == 'all':
+            serializer = ProductSerializer(products, many=True)
+            return Response(serializer.data)
+
         page = request.query_params.get('page')
         if page is None:
             page = 1
@@ -243,7 +258,7 @@ def uploadImage(request, pk):
     try:
         data = request.data
         product = Product.objects.get(_id=pk)
-        print(request.FILES)
+        print(request.FILES.get('image'), pk)
         product.image = request.FILES.get('image')
         product.save()
 

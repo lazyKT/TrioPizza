@@ -169,7 +169,6 @@ export default function EditProduct ({editingID, backToProductList}) {
       }
     }
     catch (error) {
-      console.error(error.message);
       setFeatureError(error.message);
       setMessage('');
     }

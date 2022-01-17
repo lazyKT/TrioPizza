@@ -58,7 +58,7 @@ export const listRestaurantProducts = (restaurantId) => async (dispatch) => {
   try {
       dispatch({ type: PRODUCT_LIST_REQUEST });
 
-      const { data } = await axios.get(`/api/products?restaurant=${restaurantId}`, {
+      const { data } = await axios.get(`/api/products/restaurants/${restaurantId}?limit=all`, {
         headers: {
           'Content-Type' : 'application/json'
         }
@@ -107,7 +107,7 @@ export const listProductDetails = (id) => async (dispatch) => {
         dispatch({ type: PRODUCT_DETAILS_REQUEST })
 
         const { data } = await axios.get(`/api/products/${id}`)
-
+        
         dispatch({
             type: PRODUCT_DETAILS_SUCCESS,
             payload: data
@@ -164,7 +164,7 @@ export const deleteProduct = (id) => async (dispatch, getState) => {
 
 
 
-export const createProduct = (product) => async (dispatch, getState) => {
+export const createProduct = (product, image) => async (dispatch, getState) => {
     try {
         dispatch({
             type: PRODUCT_CREATE_REQUEST
@@ -187,16 +187,13 @@ export const createProduct = (product) => async (dispatch, getState) => {
             config
         );
 
-        if (product.image) {
-          console.log('uploading new product image!');
-          const { imageResult: data } = await axios.post(`/api/products/upload/${data._id}/`, product.image,
-            {
-              headers: {
-                'Content-Type' : 'multipart/form-data',
-                Authorization : `Bearer ${userInfo.token}`
-              }
+        if (image) {
+          const response = await axios.post(`/api/products/upload/${data._id}/`, image, {
+            headers: {
+              'Content-Type' : 'multipart/form-data',
+              Authorization: `Bearer ${userInfo.token}`
             }
-          );
+          });
         }
 
         dispatch({

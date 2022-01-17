@@ -51,12 +51,12 @@ export default function CreateProduct ({backToProductList}) {
     fr.readAsDataURL(img);
   }
 
+
   const handleFormSubmit = (e) => {
     try {
       e.preventDefault();
-      console.log('new product', newProduct);
       const { error, errorMessage } = validateNewProduct(newProduct);
-      console.log(error, errorMessage);
+
       if (error) {
         setErrorMsg(errorMessage);
       }
@@ -68,8 +68,8 @@ export default function CreateProduct ({backToProductList}) {
             {
               ...newProduct,
               restaurant: restaurantInfo._id,
-              image: formData
-            }
+            },
+            formData
           ));
           setImage(null);
         }
@@ -114,6 +114,7 @@ export default function CreateProduct ({backToProductList}) {
     if (product) {
       setErrorMsg('');
       console.log('Product Create!');
+      productImage.current.style.display = 'none';
       setMessage(`New Product Created, ${newProduct.name}`);
       setNewProduct({
         description: '',
