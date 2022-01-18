@@ -1,13 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import CircleIcon from '@mui/icons-material/Circle';
 import { Alert } from 'react-bootstrap';
 
 
 export default function DriverStatus ({status}) {
-
-  useEffect(() => {
-    console.log('Driver Status', status);
-  }, [status]);
 
   return (
     <>

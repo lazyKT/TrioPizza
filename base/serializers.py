@@ -176,15 +176,22 @@ class LocationSerializer (serializers.ModelSerializer):
 
 class RestaurantSerializer (serializers.ModelSerializer):
     locations = serializers.SerializerMethodField(read_only=True)
+    owner_name = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = Restaurant
-        fields = ['_id', 'owner', 'name', 'description', 'locations', 'logo']
+        fields = ['_id', 'owner', 'name', 'owner_name', 'description', 'locations', 'logo', 'created_at']
 
     def get_locations (self, obj):
         locations = obj.location_set.all()
         serializer = LocationSerializer(locations, many=True)
         return serializer.data
+
+    def get_owner_name (self, obj):
+        owner = obj.owner
+        if owner is None:
+            return ""
+        return owner.profile.name
 
 
 class FeatureProductSerializer (serializers.ModelSerializer):
@@ -214,18 +221,6 @@ class PromosSerializer (serializers.ModelSerializer):
     class Meta:
         model = Promos
         fields = '__all__'
-
-    # def get_product (self, obj):
-    #     if obj.product is None:
-    #         return []
-    #     product = obj.product
-    #     serializer = ProductSerializer(product)
-    #     return serializer.data
-
-    # def get_restaurant (self, obj):
-    #     restaurant = obj.restaurant
-    #     serializer = RestaurantSerializer(restaurant)
-    #     return serializer.data
 
     def get_status (self, obj):
         expiry_dt = obj.expiry_date

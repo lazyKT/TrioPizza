@@ -40,9 +40,6 @@ export default function OrderList () {
     }
   }, [userInfo, showOrderDetails]);
 
-
-  useEffect(() => console.log(orders), [orders]);
-
   return (
     <>
       { showOrderDetails && selected !== -1

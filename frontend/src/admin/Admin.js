@@ -10,9 +10,7 @@ import AdminDrawerMenu from './AdminDrawerMenu';
 import Dashboard from './Dashboard';
 import UserAdminDashboard from './users/UserAdminDashboard';
 import DriverDashboard from './drivers/DriverDashboard';
-import ProductDashboard from './products/ProductDashboard';
-import ReservationDashboard from './reservations/ReservationDashboard';
-import OrderDashboard from './orders/OrderDashboard';
+import RestaurantDashboard from './restaurants/RestaurantDashboard';
 import Profile from './Profile';
 import Setting from './Setting';
 import { logout } from '../actions/userActions';
@@ -59,8 +57,8 @@ function switchContents (page) {
 				return <UserAdminDashboard />;
       case 'Drivers Status':
         return <DriverDashboard />;
-			case 'Restaurant Owners':
-				return <h5>Restaurant Owners</h5>;
+			case 'Restaurants':
+				return <RestaurantDashboard />;
       case 'Profile':
         return <Profile />
       case 'Setting':

@@ -2,9 +2,9 @@ import axios from 'axios';
 
 
 
-export async function getRestaurantProducts (restaurantId, signal) {
+export async function getRestaurantProducts (restaurantId, signal, page=1) {
   try {
-    const { data } = await axios.get(`/api/products/restaurants/${restaurantId}`, {
+    const { data } = await axios.get(`/api/products/restaurants/${restaurantId}?page=${page}`, {
       headers: {
         'Content-Type' : 'application/json',
         'Accept' : 'application/json'

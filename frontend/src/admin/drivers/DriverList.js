@@ -16,20 +16,6 @@ import CustomTable from '../CustomTable';
 
 import { getAllDriverStatus } from '../../networking/driverRequests';
 
-
-const styles = {
-  topContainer: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: '25px',
-    padding: '10px'
-  },
-  searchInput: {
-    maxWidth: '200px'
-  }
-}
-
 const columns = [
   { id: '_id', label: 'ID', maxWidth: 70 },
   { id: 'name', label: 'Name', minWidth: 170 },
@@ -41,7 +27,7 @@ const columns = [
   },
   {
     id: 'total_order',
-    label: 'Num Deliveries',
+    label: 'Total Order',
     maxWidth: 170,
     align: 'right',
     format: (value) => value.toFixed(2),

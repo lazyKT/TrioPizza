@@ -24,6 +24,7 @@ export default function CreatePromotion ({backToPromoList}) {
   const [ error, setError ] = useState(null);
   const [ success, setSuccess ] = useState(null);
   const [ loading, setLoading ] = useState(false);
+  const [ minDate, setMinDate ] = useState(null);
 
   const { restaurantInfo } = useSelector(state => state.restaurant);
   const { userInfo } = useSelector(state => state.userCookie);
@@ -66,11 +67,30 @@ export default function CreatePromotion ({backToPromoList}) {
     }
   };
 
+
+  const setMinimumDate = () => {
+    const date = new Date();
+    const yyyy = date.getFullYear();
+
+    let mm = date.getMonth() + 1;
+    if (mm < 10)
+      mm = '0' + mm;
+
+    let dd = date.getDate() + 1;
+    if (dd < 10)
+      dd = '0' + dd;
+    console.log(`${yyyy}-${mm}-${dd}`);
+    setMinDate(`${yyyy}-${mm}-${dd}`)
+  }
+
   useEffect(() => {
     if (!userInfo)
       history.push('/');
+
     if (!restaurantInfo)
       setError('Unexpected Error Encountered! Please refresh the page!');
+
+    setMinimumDate();
   }, [restaurantInfo, userInfo]);
 
   useEffect(() => {
@@ -162,6 +182,7 @@ export default function CreatePromotion ({backToPromoList}) {
               <Form.Control
                 required
                 type="date"
+                min={minDate}
                 placeholder="Enter Promotion Expiry Date"
                 name='expiry_date'
                 value={promotion.expiry_date}

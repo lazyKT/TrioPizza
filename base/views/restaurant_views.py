@@ -41,13 +41,23 @@ class RestaurantList (APIView):
 
             num_restaurant = len(restaurants)
 
+            limit = request.query_params.get('limit')
+            if limit is None:
+                limit = 8
+
+            # Get all restaurants without pagination
+            if limit == 'all':
+                serializer = RestaurantSerializer(restaurants, many=True)
+                return Response(serializer.data)
+
             page = request.query_params.get('page')
             if page is None:
                 page = 1
 
             page = int(page)
+            limit = int(limit)
 
-            paginator = Paginator(restaurants, 8)
+            paginator = Paginator(restaurants, limit)
 
             try:
                 restaurants = paginator.page(page)
@@ -357,6 +367,7 @@ class PromoList (APIView):
         except Exception as e:
             error = 'Internal Server Error!' if repr(e) == '' else repr(e)
             return Response({'details' : error}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 
 
 class PromoDetails (APIView):

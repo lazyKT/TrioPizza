@@ -379,7 +379,7 @@ def update_driver_order_status (driver):
     try:
         current_status = DriverOrderStatus.objects.get(driver=driver)
         current_status.status = 'available'
-        current_status.total_order = current_status.total_order - 1
+        current_status.active_orders = current_status.active_orders - 1
         current_status.save()
     except DriverOrderStatus.DoesNotExist:
         raise Http404

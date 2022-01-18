@@ -32,16 +32,21 @@ function ProductScreen({ match, history }) {
     } = productReviewCreate;
 
     const addToCartHandler = () => {
-        if (restaurant && product?.restaurant?._id !== restaurant) {
-          setShowModal(true);
-          console.log('product from different restaurants');
+        if (userInfo) {
+          if (restaurant && product?.restaurant?._id !== restaurant) {
+            setShowModal(true);
+            console.log('product from different restaurants');
+          }
+          else {
+            dispatch({
+              type: RESTAURANT_CART,
+              payload: product?.restaurant?._id
+            });
+            history.push(`/cart/${match.params.id}?qty=${qty}`);
+          }
         }
         else {
-          dispatch({
-            type: RESTAURANT_CART,
-            payload: product?.restaurant?._id
-          });
-          history.push(`/cart/${match.params.id}?qty=${qty}`);
+          history.push('/login');
         }
     };
 
