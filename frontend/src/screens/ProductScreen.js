@@ -7,20 +7,23 @@ import Rating from '../components/Rating';
 import Loader from '../components/Loader';
 import Message from '../components/Message';
 import { listProductDetails, createProductReview } from '../actions/productActions';
+import { getProductPromotion } from '../networking/productRequests';
 import { PRODUCT_CREATE_REVIEW_RESET } from '../constants/productConstants';
 import { RESTAURANT_CART, CART_CLEAR_ITEMS } from '../constants/cartConstants';
 
 
 function ProductScreen({ match, history }) {
-    const [qty, setQty] = useState(1);
-    const [rating, setRating] = useState(0);
-    const [comment, setComment] = useState('');
+    const [ qty, setQty ] = useState(1);
+    const [ rating, setRating ] = useState(0);
+    const [ comment, setComment ] = useState('');
     const [ showModal, setShowModal ] = useState(false);
+    const [ promo, setPromo ] = useState(null);
+    const [ promoError, setPromoError ] = useState(null);
 
     const dispatch = useDispatch()
 
     const { loading, error, product } = useSelector(state => state.productDetails);
-    const { userInfo } = useSelector(state => state.userLogin);
+    const { userInfo } = useSelector(state => state.userCookie);
     const productReviewCreate = useSelector(state => state.productReviewCreate);
     const { restaurant } = useSelector(state => state.cart);
 
@@ -74,20 +77,53 @@ function ProductScreen({ match, history }) {
 
     const backButtonClicked = (e) => {
       history.goBack();
+    };
+
+    const discountedPrice = (price) => {
+      let percentage = Number(promo.amount)/100;
+      return (price - (price * percentage)).toFixed(2);
     }
 
-    useEffect(() => {
-        if (successProductReview) {
-            setRating(0)
-            setComment('')
-            dispatch({ type: PRODUCT_CREATE_REVIEW_RESET })
+    const getProductPromotionDetails = async (productId, signal) => {
+      try {
+        const { data, error, message } = await getProductPromotion(productId, signal);
+
+        if (error) {
+          setPromoError(message);
+          setPromo(null);
         }
+        else {
+          setPromoError(null);
+          setPromo(data);
+        }
+      }
+      catch (error) {
+        setPromoError(error.message);
+      }
+    };
 
-        dispatch(listProductDetails(match.params.id));
 
-        console.log('restaurant in cart', restaurant);
+    useEffect(() => {
+      if (successProductReview) {
+        setRating(0)
+        setComment('')
+        dispatch({ type: PRODUCT_CREATE_REVIEW_RESET });
+      }
 
-    }, [dispatch, match, successProductReview, restaurant])
+      dispatch(listProductDetails(match.params.id));
+
+    }, [dispatch, match, successProductReview, restaurant]);
+
+    useEffect(() => {
+      const abortController = new AbortController();
+
+      if (product?._id) {
+
+        (async () => await getProductPromotionDetails(product._id, abortController.signal))();
+      }
+
+      return () => abortController.abort();
+    }, [loading, error, product]);
 
     return (
         <div>
@@ -110,6 +146,7 @@ function ProductScreen({ match, history }) {
 
 
                                 <Col md={3}>
+                                    { promoError && <Message variant='danger'>{promoError}</Message>}
                                     <ListGroup variant="flush">
                                         <ListGroup.Item>
                                             <h3>{product.name}</h3>
@@ -120,12 +157,29 @@ function ProductScreen({ match, history }) {
                                         </ListGroup.Item>
 
                                         <ListGroup.Item>
-                                            Price: ${product.price}
+                                            Price:&nbsp;
+                                            <span
+                                              style={{
+                                                textDecoration: promo?.status === 'active' ? 'line-through' : 'auto',
+                                                color: promo?.status === 'active' ? 'red' : 'dark-gray'
+                                              }}
+                                            >
+                                             ${product.price}
+                                            </span>
+                                            {promo?.status === 'active' &&
+                                            <span>&nbsp;${discountedPrice(product.price)}</span>
+                                            }
                                         </ListGroup.Item>
 
                                         <ListGroup.Item>
                                             Description: {product.description}
                                         </ListGroup.Item>
+
+                                        {promo && (
+                                          <ListGroup.Item className='text-danger'>
+                                              <h5>*{promo.description}</h5>
+                                          </ListGroup.Item>
+                                        )}
                                     </ListGroup>
                                 </Col>
 
@@ -137,7 +191,11 @@ function ProductScreen({ match, history }) {
                                                 <Row>
                                                     <Col>Price:</Col>
                                                     <Col>
-                                                        <strong>${product.price}</strong>
+                                                      {
+                                                        promo?.status === 'active'
+                                                        ? <strong>${discountedPrice(product.price)}</strong>
+                                                        : <strong>${product.price}</strong>
+                                                      }
                                                     </Col>
                                                 </Row>
                                             </ListGroup.Item>

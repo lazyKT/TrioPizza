@@ -57,7 +57,12 @@ function CartScreen({ match, location, history }) {
                           <ListGroup.Item key={item.product}>
                               <Row>
                                   <Col md={2}>
-                                      <Image src={item.image} alt={item.name} fluid rounded />
+                                      <Image
+                                        style={{height: '75px', width: '80px'}}
+                                        src={item.image}
+                                        alt={item.name}
+                                        fluid rounded
+                                      />
                                   </Col>
                                   <Col md={3}>
                                       <Link to={`/product/${item.product}`}>{item.name}</Link>
@@ -92,6 +97,16 @@ function CartScreen({ match, location, history }) {
                                     </Button>
                                   </Col>
                               </Row>
+                              {item.promo &&
+                                <Row>
+                                  <Col md={2}>
+
+                                  </Col>
+                                  <Col md={3}>
+                                      <span style={{color: 'red'}}>*Promotion Applied</span>
+                                  </Col>
+                                </Row>
+                              }
                           </ListGroup.Item>
                       ))}
                   </ListGroup>

@@ -8,8 +8,19 @@ import {
 } from '../constants/cartConstants'
 
 
+function discountedPrice (price, amount) {
+  let percentage = Number(amount)/100;
+  return (price - (price * percentage)).toFixed(2);
+}
+
+
 export const addToCart = (id, qty) => async (dispatch, getState) => {
-    const { data } = await axios.get(`/api/products/${id}`)
+    const { data } = await axios.get(`/api/products/${id}`);
+    const { data: promoData } = await axios.get(`/api/restaurants/promos?product=${id}`);
+
+    const productPrice = promoData && promoData[0]?.status === 'active'
+                          ? discountedPrice(parseFloat(data.price), promoData[0]?.amount)
+                          : parseFloat(data.price);
 
     dispatch({
         type: CART_ADD_ITEM,
@@ -17,9 +28,10 @@ export const addToCart = (id, qty) => async (dispatch, getState) => {
             product: data._id,
             name: data.name,
             image: data.image,
-            price: parseFloat(data.price),
+            price: productPrice,
             countInStock: data.countInStock,
-            totalPrice: parseFloat(parseInt(qty) * parseFloat(data.price)),
+            totalPrice: parseFloat(parseInt(qty) * productPrice),
+            promo: promoData && promoData[0]?.status === 'active',
             qty
         }
     })

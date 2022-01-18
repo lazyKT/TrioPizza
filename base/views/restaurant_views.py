@@ -296,11 +296,19 @@ class PromoList (APIView):
                 restaurant = Restaurant.objects.get(_id=restaurant_id)
                 promos = Promos.objects.filter(restaurant=restaurant).order_by('-created_at')
 
+            # get promotion by product id
+            product_id = request.query_params.get('product')
+            if product_id is not None:
+                product = Product.objects.get(_id=product_id)
+                promos = Promos.objects.filter(product=product).order_by('-created_at')
+
             serializer = PromosSerializer(promos, many=True)
             return Response(serializer.data)
 
         except Restaurant.DoesNotExist:
             return Response({'details' : 'Restaurant Not Found!'}, status=status.HTTP_404_NOT_FOUND)
+        except Product.DoesNotExist:
+            return Response({'details' : 'Product Not Found!'}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
             error = 'Internal Server Error!' if repr(e) == '' else repr(e)
             return Response({'details' : error}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
