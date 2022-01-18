@@ -1,3 +1,5 @@
+import pytz
+from datetime import datetime
 from django.http import Http404
 from django.db.models import Q
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
@@ -8,8 +10,8 @@ from rest_framework.response import Response
 from django.contrib.auth.models import User
 
 
-from base.models import Restaurant, Promos, Location, RestaurantReview
-from base.serializers import RestaurantSerializer, LocationSerializer
+from base.models import Restaurant, Promos, Location, RestaurantReview, Product
+from base.serializers import RestaurantSerializer, LocationSerializer, PromosSerializer
 
 
 
@@ -266,3 +268,129 @@ def edit_restaurant_location(request, pk):
     except Exception as e:
         error = 'Internal Server Error!' if repr(e) == '' else repr(e)
         return Response({'details' : error}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+
+class PromoList (APIView):
+    """
+    # Get all promotions, Creae new promotion
+    """
+
+    def get (self, request, format=None):
+        try:
+            restaurant_id = request.query_params.get('restaurant')
+            promos = None
+            if restaurant_id is None:
+                promos = Promos.objects.all().order_by('-created_at')
+            else:
+                restaurant = Restaurant.objects.get(_id=restaurant_id)
+                promos = Promos.objects.filter(restaurant=restaurant).order_by('-created_at')
+
+            serializer = PromosSerializer(promos, many=True)
+            return Response(serializer.data)
+
+        except Restaurant.DoesNotExist:
+            return Response({'details' : 'Restaurant Not Found!'}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            error = 'Internal Server Error!' if repr(e) == '' else repr(e)
+            return Response({'details' : error}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+    def get_promos_by_product (self, product):
+        return Promos.objects.filter(product=product).filter(expiry_date__gt=datetime.now())
+
+
+    def validate_request (self, data):
+        error = True
+        if 'restaurant' not in data:
+            message = 'Restaurant is Required*'
+            return error, message
+        elif 'product' not in data:
+            message = 'Promoted Product is required'
+            return error, message
+        elif 'description' not in data:
+            message = 'Description is Required'
+            return error, message
+        elif 'type' not in data:
+            message = 'Promotion Type is required'
+            return error, message
+        elif 'expiry_date' not in data:
+            message = 'Promotion Expiry Date is required'
+            return error, message
+        elif 'amount' not in data:
+            message = 'Promotion amount is required'
+            return error, message
+        else:
+            error = False
+            return error, ''
+
+
+    def post (self, request, *args, **kwargs):
+        try:
+            data = request.data
+            error, message = self.validate_request(data)
+            if error:
+                return Response({'details' : message}, status=status.HTTP_400_BAD_REQUEST)
+            restaurant = Restaurant.objects.get(_id=data['restaurant'])
+            product = Product.objects.get(_id=data['product'])
+            if len(self.get_promos_by_product(product)) > 0:
+                return Response({'details' : 'Promotion existed with the same product!'}, status=status.HTTP_400_BAD_REQUEST)
+            if restaurant._id != product.restaurant._id:
+                return Response({'details' : 'Invalid Product!'}, status=status.HTTP_400_BAD_REQUEST)
+            print(data['amount'], type(data['amount']))
+            print(float(data['amount']))
+            promo = Promos.objects.create(
+                restaurant=restaurant,
+                product=product,
+                type=data['type'],
+                description=data['description'],
+                amount=float(data['amount']),
+                expiry_date=pytz.utc.localize(datetime.strptime(data['expiry_date'], '%Y-%m-%d'))
+            )
+            serializer = PromosSerializer(promo)
+            return Response(serializer.data)
+
+        except Product.DoesNotExist:
+            return Response({'details' : 'Product Not Found!'}, status=status.HTTP_404_NOT_FOUND)
+        except Restaurant.DoesNotExist:
+            return Response({'details' : 'Restaurant Not Found!'}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            error = 'Internal Server Error!' if repr(e) == '' else repr(e)
+            return Response({'details' : error}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class PromoDetails (APIView):
+    """
+    # Get Promotion Details By Id
+    # Delete Promotions by Id
+    """
+
+    def get_object (self, pk):
+        try:
+            return Promos.objects.get(_id=pk)
+        except Promos.DoesNotExist:
+            raise Http404
+
+
+    def get (self, request, pk, format=None):
+        try:
+            promo = self.get_object(pk)
+            serializer = PromosSerializer(promo)
+            return Response(serializer.data)
+        except Http404:
+            return Response({'details' : 'Promotion Not Found!'}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            error = 'Internal Server Error!' if repr(e) == '' else repr(e)
+            return Response({'details' : error}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+    def delete (self, request, pk, format=None):
+        try:
+            promo = self.get_object(pk)
+            promo.delete()
+            return Response("", status=status.HTTP_204_NO_CONTENT)
+        except Http404:
+            return Response({'details' : 'Promotion Not Found!'}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            error = 'Internal Server Error!' if repr(e) == '' else repr(e)
+            return Response({'details' : error}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

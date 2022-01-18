@@ -40,10 +40,10 @@ function getComparator(order, orderBy) {
 
 function getCellData (type) {
     switch (type) {
-      case 'test':
-        return ['name', 'code', 'population', 'size', 'density'];
       case 'products':
         return ['_id', 'name', 'description', 'price', 'numReviews', 'rating'];
+      case 'promos':
+        return ['_id', 'description', 'status', 'type', 'amount', 'expiry_date'];
       default:
         throw new Error ("Invalid Data Type")
     }
@@ -75,28 +75,30 @@ export default function CustomTableBody (props) {
         .map((row, index) => {
           const cells = getCellData(dataType);
 
-          const isItemSelected = isSelected(row[cells[0]]);
+          const isItemSelected = isSelected(index);
           const labelId = `enhanced-table-checkbox-${index}`;
 
           return (
             <TableRow
               hover
-              onClick={(event) => handleClick(event, row[cells[0]])}
+              onClick={(event) => handleClick(event, index)}
               role="checkbox"
               aria-checked={isItemSelected}
               tabIndex={-1}
               key={row[cells[0]]}
               selected={isItemSelected}
             >
-              <TableCell padding="checkbox">
-                <Checkbox
-                  color="primary"
-                  checked={isItemSelected}
-                  inputProps={{
-                    'aria-labelledby': labelId,
-                  }}
-                />
-              </TableCell>
+              {dataType !== 'promos' &&
+                <TableCell padding="checkbox">
+                  <Checkbox
+                    color="primary"
+                    checked={isItemSelected}
+                    inputProps={{
+                      'aria-labelledby': labelId,
+                    }}
+                  />
+                </TableCell>
+              }
 
               { cells.map( (cell, idx) =>
                   <TableCell key={idx}>
