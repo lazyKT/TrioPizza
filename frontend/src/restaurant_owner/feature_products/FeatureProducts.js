@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import Paper from '@mui/material/Paper';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
+import AddBoxIcon from '@mui/icons-material/AddBox';
 import { Row, Col, Card, Image, Container, Button } from 'react-bootstrap';
 
 import Loader from '../../components/Loader';
@@ -33,7 +34,18 @@ function FeatureProductCard({ product, remove }) {
               </Button>
             </Card.Body>
         </Card>
-    )
+    );
+}
+
+
+function EmptyCard () {
+  return (
+      <Card className="p-2 rounded">
+          <AddBoxIcon
+            sx={{ fontSize: 50, color: 'gainsboro' }}
+          />
+      </Card>
+  )
 }
 
 
@@ -107,11 +119,22 @@ export default function FeatureProducts () {
       { error && <Message variant="danger">{error}</Message>}
       { featureProducts && featureProducts.length === 0
         && <Message variant="info">You Don't Have Any Feature Products!</Message>}
+
       <Container>
         <Row>
-          { featureProducts && featureProducts.map(fp => (
-            <Col key={fp._id}  xs={3}>
-              <FeatureProductCard product={fp.product} remove={() => removeOnClick(fp._id)}/>
+          { [0, 1, 2, 3, 4].map(a => (
+            <Col key={a} xs={3} className='mb-3'>
+              {
+                (featureProducts && featureProducts[a])
+                ? (
+                  <FeatureProductCard
+                    product={featureProducts[a].product}
+                    remove={() => removeOnClick(featureProducts[a]._id)}
+                  />
+                ) : (
+                  <EmptyCard />
+                )
+              }
             </Col>
           ))}
         </Row>

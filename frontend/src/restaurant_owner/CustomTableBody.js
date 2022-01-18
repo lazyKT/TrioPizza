@@ -42,6 +42,8 @@ function getCellData (type) {
     switch (type) {
       case 'products':
         return ['_id', 'name', 'description', 'price', 'numReviews', 'rating'];
+      case 'promos':
+        return ['_id', 'description', 'status', 'type', 'amount', 'expiry_date'];
       default:
         throw new Error ("Invalid Data Type")
     }
@@ -86,15 +88,17 @@ export default function CustomTableBody (props) {
               key={row[cells[0]]}
               selected={isItemSelected}
             >
-              <TableCell padding="checkbox">
-                <Checkbox
-                  color="primary"
-                  checked={isItemSelected}
-                  inputProps={{
-                    'aria-labelledby': labelId,
-                  }}
-                />
-              </TableCell>
+              {dataType !== 'promos' &&
+                <TableCell padding="checkbox">
+                  <Checkbox
+                    color="primary"
+                    checked={isItemSelected}
+                    inputProps={{
+                      'aria-labelledby': labelId,
+                    }}
+                  />
+                </TableCell>
+              }
 
               { cells.map( (cell, idx) =>
                   <TableCell key={idx}>

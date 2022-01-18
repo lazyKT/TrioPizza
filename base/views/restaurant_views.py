@@ -283,27 +283,11 @@ class PromoList (APIView):
             if restaurant_id is None:
                 promos = Promos.objects.all().order_by('-created_at')
             else:
-                restaurant = Restaurant.objects.get(restaurant=restaurant_id)
+                restaurant = Restaurant.objects.get(_id=restaurant_id)
                 promos = Promos.objects.filter(restaurant=restaurant).order_by('-created_at')
 
-            num_promos = len(promos)
-
-            page = request.query_params.get('page')
-            if page is None:
-                page = 1
-            page = int(page)
-
-            paginator = Paginator(promos, 10)
-
-            try:
-                promos = paginator.page(page)
-            except PageNotAnInteger:
-                promos = paginator.page(1)
-            except EmptyPage:
-                promos = paginator.page(paginator.num_pages)
-
             serializer = PromosSerializer(promos, many=True)
-            return Response({'promos': serializer.data, 'page' : page, 'pages' : paginator.num_pages, 'count' : num_promos})
+            return Response(serializer.data)
 
         except Restaurant.DoesNotExist:
             return Response({'details' : 'Restaurant Not Found!'}, status=status.HTTP_404_NOT_FOUND)
@@ -353,12 +337,14 @@ class PromoList (APIView):
                 return Response({'details' : 'Promotion existed with the same product!'}, status=status.HTTP_400_BAD_REQUEST)
             if restaurant._id != product.restaurant._id:
                 return Response({'details' : 'Invalid Product!'}, status=status.HTTP_400_BAD_REQUEST)
+            print(data['amount'], type(data['amount']))
+            print(float(data['amount']))
             promo = Promos.objects.create(
                 restaurant=restaurant,
                 product=product,
                 type=data['type'],
                 description=data['description'],
-                amount=data['amount'],
+                amount=float(data['amount']),
                 expiry_date=pytz.utc.localize(datetime.strptime(data['expiry_date'], '%Y-%m-%d'))
             )
             serializer = PromosSerializer(promo)

@@ -11,7 +11,6 @@ import { visuallyHidden } from '@mui/utils';
 
 CustomTableHead.propTypes = {
   onRequestSort: PropTypes.func.isRequired,
-  onSelectAllClick: PropTypes.func.isRequired,
   order: PropTypes.oneOf(['asc', 'desc']).isRequired,
   orderBy: PropTypes.string.isRequired,
   rowCount: PropTypes.number.isRequired,
@@ -37,7 +36,7 @@ export default function CustomTableHead (props) {
   return (
     <TableHead>
       <TableRow>
-        {type !== 'driver' &&
+        {type !== 'promos' &&
         <TableCell padding="checkbox">
         </TableCell>}
         {headCells.map((headCell) => (
