@@ -50,6 +50,8 @@ function getCellData (type) {
         return ['_id', 'name', 'description', 'price', 'numReviews', 'rating'];
       case 'driver':
         return ['_id', 'name', 'active_orders', 'total_order', 'status'];
+      case 'restaurants':
+        return ['_id', 'name', 'description', 'owner_name', 'address', 'created_at'];
       default:
         throw new Error ("Invalid Data Type")
     }
@@ -94,7 +96,7 @@ export default function CustomTableBody (props) {
               key={row[cells[0]]}
               selected={isItemSelected}
             >
-              {dataType !== 'driver' &&
+              {dataType === 'user' &&
               <TableCell padding="checkbox">
                 <Checkbox
                   color="primary"

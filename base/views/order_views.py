@@ -6,7 +6,7 @@ from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
-from base.models import Product, Order, OrderItem, ShippingAddress, User, DriverOrderStatus
+from base.models import Product, Order, OrderItem, ShippingAddress, User, DriverOrderStatus, Restaurant
 from base.serializers import ProductSerializer, OrderSerializer
 
 from rest_framework import status
@@ -25,32 +25,47 @@ class OrderList (APIView):
         """
         # GET all orders
         """
-        orders = Order.objects.all().order_by('-status', '-_id')
-        num_orders = len(orders)
-
-        page = request.query_params.get('page')
-        if page is None:
-            page = 1
-
-        page = int(page)
-
-        paginator = Paginator(orders, 5)
-
         try:
-            orders = paginator.page(page)
-        except PageNotAnInteger:
-            orders = paginator.page(1)
-        except EmptyPage:
-            orders = paginator.page(paginator.num_pages)
+            orders = None
+            restaurant_id = request.query_params.get('restaurant')
+            if restaurant_id is None:
+                orders = Order.objects.all().order_by('-status', '-_id')
+            else:
+                restaurant = Restaurant.objects.get(_id=restaurant_id)
+                orders = Order.objects.filter(restaurant=restaurant).order_by('-status', '-_id')
 
-        serializer = OrderSerializer(orders, many=True)
-        return Response ({'orders' : serializer.data, 'page': page, 'pages' : paginator.num_pages, 'count' : num_orders });
+            num_orders = len(orders)
+
+            page = request.query_params.get('page')
+            if page is None:
+                page = 1
+
+            page = int(page)
+
+            paginator = Paginator(orders, 5)
+
+            try:
+                orders = paginator.page(page)
+            except PageNotAnInteger:
+                orders = paginator.page(1)
+            except EmptyPage:
+                orders = paginator.page(paginator.num_pages)
+
+            serializer = OrderSerializer(orders, many=True)
+            return Response ({'orders' : serializer.data, 'page': page, 'pages' : paginator.num_pages, 'count' : num_orders });
+        except Restaurant.DoesNotExist:
+            return Response({'details' : 'Restaurant Not Found!'}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            error = 'Internal Sever Error!' if str(e) == '' else str(e)
+            return Response({'details' : error}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
     def validate_cretae_order_request (self, request_body):
         error = True
         if 'user' not in request_body:
             return error, 'Mising Required Field! User'
+        if 'restaurant' not in request_body:
+            return error, 'Missing Required Field! Restaurant'
         elif 'orderItems' not in request_body:
             return error, 'Field, orderItems, is required!'
         elif len(request_body['orderItems']) == 0:
@@ -119,9 +134,10 @@ class OrderList (APIView):
         return len(product)
 
 
-    def create_order (self, data, customer, driver):
+    def create_order (self, data, customer, driver, restaurant):
         return Order.objects.create(
             user=customer,
+            restaurant=restaurant,
             paymentMethod=data['paymentMethod'],
             taxPrice=data['taxPrice'],
             shippingPrice=data['shippingPrice'],
@@ -217,8 +233,9 @@ class OrderList (APIView):
             if driver is None:
                 # if there are no aviable drivers
                 return Response({'details' : 'Our Drivers Are Busy. Please Try Again Later'}, status=status.HTTP_503_SERVICE_UNAVAILABLE)
+            restaurant = Restaurant.objects.get(_id=data['restaurant'])
             # Create Order
-            order = self.create_order (data, user, driver)
+            order = self.create_order (data, user, driver, restaurant)
             # Update Driver Status
             OrderList.update_driver_order_status (driver, order)
             # Save Order Items Detail
@@ -228,6 +245,8 @@ class OrderList (APIView):
             return Response(serializer.data)
         except Http404:
             return Response({'details' : 'User Not Found!'}, status=status.HTTP_400_BAD_REQUEST)
+        except Restaurant.DoesNotExist:
+            return Response({'details' : 'Restaurant Not Found!'}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
             error = 'Internal Sever Error!' if str(e) == '' else str(e)
             return Response({'details' : error}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -360,7 +379,7 @@ def update_driver_order_status (driver):
     try:
         current_status = DriverOrderStatus.objects.get(driver=driver)
         current_status.status = 'available'
-        current_status.total_order = current_status.total_order - 1
+        current_status.active_orders = current_status.active_orders - 1
         current_status.save()
     except DriverOrderStatus.DoesNotExist:
         raise Http404

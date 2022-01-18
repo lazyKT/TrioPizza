@@ -10,7 +10,7 @@ import Rating from '../components/Rating';
 import { getRestaurantById } from '../networking/restaurantRequests';
 
 
-export default function RestaurantScreen ({match, history}) {
+export default function RestaurantScreen ({match, location, history}) {
 
   const [ restaurant, setRestaurant ] = useState(null);
   const [ loading, setLoading ] = useState(true);
@@ -110,7 +110,7 @@ export default function RestaurantScreen ({match, history}) {
               </Row>
             </Card.Body>
           </Card>
-          <RestaurantProducts restaurantId={restaurant._id}/>
+          <RestaurantProducts restaurantId={restaurant._id} location={location}/>
         </>
       }
     </div>

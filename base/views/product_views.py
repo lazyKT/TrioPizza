@@ -210,7 +210,7 @@ class ProductDetails (APIView):
 def get_products_by_restaurant (request, restaurant_id):
     try:
         restaurant = Restaurant.objects.get(_id=restaurant_id)
-        products = Product.objects.filter(restaurant=restaurant)
+        products = Product.objects.filter(restaurant=restaurant).order_by('name')
         num_products = len(products)
 
         limit = request.query_params.get('limit')

@@ -9,7 +9,7 @@ import { getRestaurantProducts } from '../networking/productRequests';
 
 
 
-export default function RestaurantProducts ({restaurantId}) {
+export default function RestaurantProducts ({restaurantId, location}) {
 
   const [ product, setProduct ] = useState(null);
   const [ loading, setLoading ] = useState(true);
@@ -18,7 +18,9 @@ export default function RestaurantProducts ({restaurantId}) {
 
   const fetchProductsByRestaurantId = async (restaurantId, signal) => {
     try {
-      const { data, error, message } = await getRestaurantProducts(restaurantId, signal);
+
+      const page = location.search ? Number(location.search.split('=')[2]) : 1;
+      const { data, error, message } = await getRestaurantProducts(restaurantId, signal, page);
 
       if (error) {
         setError(message);
@@ -40,9 +42,9 @@ export default function RestaurantProducts ({restaurantId}) {
 
     return (() => {
       if (abortController) abortController.abort();
-    })
+    });
 
-  }, [restaurantId]);
+  }, [restaurantId, location]);
 
 
   useEffect(() => {

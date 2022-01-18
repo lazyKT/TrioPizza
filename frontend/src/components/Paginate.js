@@ -13,7 +13,7 @@ function Paginate({ pages, page, keyword = '', isAdmin = false }) {
                 <LinkContainer
                     key={x + 1}
                     to={!isAdmin ?
-                        `/?keyword=${keyword}&page=${x + 1}`
+                        `?keyword=${keyword}&page=${x + 1}`
                         : `/admin/productlist/?keyword=${keyword}&page=${x + 1}`
                     }
                 >

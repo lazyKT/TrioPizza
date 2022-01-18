@@ -35,9 +35,9 @@ export default function CustomTableHead (props) {
   return (
     <TableHead>
       <TableRow>
-        {type !== 'driver' &&
-        <TableCell padding="checkbox">
 
+        {type === 'user' &&
+        <TableCell padding="checkbox">
         </TableCell>}
         {headCells.map((headCell) => (
           <TableCell
