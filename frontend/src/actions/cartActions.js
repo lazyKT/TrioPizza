@@ -28,7 +28,7 @@ export const addToCart = (id, qty) => async (dispatch, getState) => {
             product: data._id,
             name: data.name,
             image: data.image,
-            price: productPrice,
+            price: parseFloat(productPrice),
             countInStock: data.countInStock,
             totalPrice: parseFloat(parseInt(qty) * productPrice),
             promo: promoData && promoData[0]?.status === 'active',
