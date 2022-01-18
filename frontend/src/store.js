@@ -15,7 +15,7 @@ import {
 import { cartReducer } from './reducers/cartReducers';
 import { reservationReducer } from './reducers/reservationReducer';
 import {
-  restaurantReducer 
+  restaurantReducer
 } from './reducers/restaurantReducers';
 
 import {
@@ -88,6 +88,7 @@ const initialState = {
     cart: {
       cartItems: cartItemsFromStorage,
       shippingAddress: shippingAddressFromStorage,
+      restaurant: null
     },
     reservation: {
       preOrder: false,

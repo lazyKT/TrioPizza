@@ -1,28 +1,30 @@
-import React, { useState, useEffect } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import { Link } from 'react-router-dom'
-import { Row, Col, Image, ListGroup, Button, Card, Form } from 'react-bootstrap'
-import Rating from '../components/Rating'
-import Loader from '../components/Loader'
-import Message from '../components/Message'
-import { listProductDetails, createProductReview } from '../actions/productActions'
-import { PRODUCT_CREATE_REVIEW_RESET } from '../constants/productConstants'
+import React, { useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { Link } from 'react-router-dom';
+import { Row, Col, Image, ListGroup, Button, Card, Form, Modal } from 'react-bootstrap';
+
+import Rating from '../components/Rating';
+import Loader from '../components/Loader';
+import Message from '../components/Message';
+import { listProductDetails, createProductReview } from '../actions/productActions';
+import { PRODUCT_CREATE_REVIEW_RESET } from '../constants/productConstants';
+import { RESTAURANT_CART, CART_CLEAR_ITEMS } from '../constants/cartConstants';
 
 
 function ProductScreen({ match, history }) {
-    const [qty, setQty] = useState(1)
-    const [rating, setRating] = useState(0)
-    const [comment, setComment] = useState('')
+    const [qty, setQty] = useState(1);
+    const [rating, setRating] = useState(0);
+    const [comment, setComment] = useState('');
+    const [ showModal, setShowModal ] = useState(false);
 
     const dispatch = useDispatch()
 
-    const productDetails = useSelector(state => state.productDetails)
-    const { loading, error, product } = productDetails
+    const { loading, error, product } = useSelector(state => state.productDetails);
+    const { userInfo } = useSelector(state => state.userLogin);
+    const productReviewCreate = useSelector(state => state.productReviewCreate);
+    const { restaurant } = useSelector(state => state.cart);
 
-    const userLogin = useSelector(state => state.userLogin)
-    const { userInfo } = userLogin
 
-    const productReviewCreate = useSelector(state => state.productReviewCreate)
     const {
         loading: loadingProductReview,
         error: errorProductReview,
@@ -30,18 +32,40 @@ function ProductScreen({ match, history }) {
     } = productReviewCreate;
 
     const addToCartHandler = () => {
-        history.push(`/cart/${match.params.id}?qty=${qty}`)
-    }
+        if (restaurant && product?.restaurant?._id !== restaurant) {
+          setShowModal(true);
+          console.log('product from different restaurants');
+        }
+        else {
+          dispatch({
+            type: RESTAURANT_CART,
+            payload: product?.restaurant?._id
+          });
+          history.push(`/cart/${match.params.id}?qty=${qty}`);
+        }
+    };
+
+    const createNewCart = (e) => {
+      e.preventDefault();
+      console.log('createNewCart');
+      dispatch({ type: CART_CLEAR_ITEMS });
+      dispatch({
+        type: RESTAURANT_CART,
+        payload: product?.restaurant?._id
+      });
+      history.push(`/cart/${match.params.id}?qty=${qty}`);
+    };
 
     const submitHandler = (e) => {
-        e.preventDefault()
-        dispatch(createProductReview(
-            match.params.id, {
+      e.preventDefault()
+      dispatch(createProductReview(
+          match.params.id,
+          {
             rating,
             comment
-        }
-        ))
-    }
+          }
+      ));
+    };
 
     const backButtonClicked = (e) => {
       history.goBack();
@@ -54,9 +78,11 @@ function ProductScreen({ match, history }) {
             dispatch({ type: PRODUCT_CREATE_REVIEW_RESET })
         }
 
-        dispatch(listProductDetails(match.params.id))
+        dispatch(listProductDetails(match.params.id));
 
-    }, [dispatch, match, successProductReview])
+        console.log('restaurant in cart', restaurant);
+
+    }, [dispatch, match, successProductReview, restaurant])
 
     return (
         <div>
@@ -222,7 +248,25 @@ function ProductScreen({ match, history }) {
 
             }
 
-
+            <Modal show={showModal}>
+              <Modal.Body>
+                You already have item(s) in the cart from different store.
+                Proceeding to Add to Cart will remove the item(s) and replace with current item.
+              </Modal.Body>
+              <Modal.Footer>
+                <Button
+                  variant="secondary"
+                  onClick={() => setShowModal(false)}
+                >
+                  Close
+                </Button>
+                <Button variant="success"
+                  onClick={createNewCart}
+                >
+                  Add to Cart
+                </Button>
+              </Modal.Footer>
+            </Modal>
         </div >
     )
 }

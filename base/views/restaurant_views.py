@@ -37,7 +37,7 @@ class RestaurantList (APIView):
                 restaurants = Restaurant.objects.all().order_by('name')
             else:
                 owner = User.objects.get(id=keyword)
-                restaurants = Restaurant.objects.filter(owner=owner)
+                restaurants = Restaurant.objects.filter(owner=owner).order_by('name')
 
             num_restaurant = len(restaurants)
 
