@@ -1,10 +1,10 @@
 import axios from 'axios';
 
 
-
-export async function getRestaurantProducts (restaurantId, signal) {
+// get products from restaurant
+export async function getRestaurantProducts (restaurantId, signal, page=1) {
   try {
-    const { data } = await axios.get(`/api/products/restaurants/${restaurantId}`, {
+    const { data } = await axios.get(`/api/products/restaurants/${restaurantId}?page=${page}`, {
       headers: {
         'Content-Type' : 'application/json',
         'Accept' : 'application/json'
@@ -23,6 +23,7 @@ export async function getRestaurantProducts (restaurantId, signal) {
 }
 
 
+// get feature product list
 export async function getFeatureProducts (restaurantId, token, signal) {
   try {
     const { data } = await axios.get(`/api/products/featuring?restaurant=${restaurantId}`, {
@@ -44,6 +45,7 @@ export async function getFeatureProducts (restaurantId, token, signal) {
 }
 
 
+// add product to feature product list
 export async function addToFeatureProducts (body, token) {
   try {
     const { data } = await axios.post(`/api/products/featuring/`, body, {
@@ -64,6 +66,7 @@ export async function addToFeatureProducts (body, token) {
 }
 
 
+// remove product from feature product list
 export async function removeFromFeatureProducts (id, token) {
   try {
     const { data } = await axios.delete(`/api/products/featuring/${id}/`, {
@@ -84,9 +87,9 @@ export async function removeFromFeatureProducts (id, token) {
 }
 
 
+// upload product new image
 export async function uploadNewProductImage (productId, body, token) {
   try {
-    // console.log('uploading new logo request ...');
     const { data } = await axios.post(`/api/products/upload/${productId}/`, body, {
       headers: {
         'Content-Type' : 'multipart/form-data',
@@ -95,6 +98,27 @@ export async function uploadNewProductImage (productId, body, token) {
     });
 
     return { error: false, data };
+  }
+  catch (error) {
+    if (error.response && error.response.data.details)
+      return { error: true, message: error.response.data.details };
+    else
+      return { error: true, message: error.message };
+  }
+}
+
+
+// get product promotion details
+export async function getProductPromotion (productId, signal) {
+  try {
+    const { data } = await axios.get(`/api/restaurants/promos?product=${productId}`, {
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      signal
+    });
+
+    return { error: false, data: data[0] };
   }
   catch (error) {
     if (error.response && error.response.data.details)

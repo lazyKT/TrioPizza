@@ -1,9 +1,9 @@
 import axios from 'axios';
 
 
-export async function getAllRestaurants (signal) {
+export async function getAllRestaurants (signal, limit=8) {
   try {
-    const { data } = await axios.get(`/api/restaurants`, {
+    const { data } = await axios.get(`/api/restaurants?limit=${limit}`, {
       headers: {
         'Content-Type' : 'application/json',
         'Accept' : 'application/json'

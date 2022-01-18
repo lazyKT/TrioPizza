@@ -12,12 +12,9 @@ function PaymentScreen({ history }) {
 
     const dispatch = useDispatch()
 
-    const [paymentMethod, setPaymentMethod] = useState('Visa');
+    const [ paymentMethod, setPaymentMethod ] = useState('Visa');
     const [ showLogin, setShowLogin ] = useState(true);
 
-    if (!shippingAddress.address) {
-        history.push('/shipping')
-    }
 
     const handleOnChange = e => {
       console.log(e.target.value);
@@ -36,6 +33,12 @@ function PaymentScreen({ history }) {
       else
         setShowLogin (true);
     }, [userInfo]);
+
+    useEffect(() => {
+      if (!shippingAddress.address) {
+          history.push('/shipping')
+      }
+    }, [shippingAddress]);
 
     return (
         <FormContainer>

@@ -24,11 +24,6 @@ function PlaceOrderScreen({ history }) {
 
     cart.totalPrice = (Number(cart.itemsPrice) + Number(cart.shippingPrice) + Number(cart.taxPrice)).toFixed(2)
 
-
-    if (!cart.paymentMethod) {
-        history.push('/payment')
-    }
-
     const placeOrder = (e) => {
         e.preventDefault();
         const { address, city, postalCode, country } = cart.shippingAddress;
@@ -42,7 +37,8 @@ function PlaceOrderScreen({ history }) {
             shippingPrice: parseFloat(cart.shippingPrice),
             taxPrice: parseFloat(cart.taxPrice),
             totalPrice: parseFloat(cart.totalPrice),
-            isPaid: cart.paymentMethod === 'Cash' ? false : true
+            isPaid: cart.paymentMethod === 'Cash' ? false : true,
+            restaurant: cart.restaurant
         }));
     }
 
@@ -65,6 +61,10 @@ function PlaceOrderScreen({ history }) {
     useEffect(() => {
       if (cart.cartItems.length === 0) {
         history.push('/');
+      }
+      
+      if (!cart.paymentMethod) {
+          history.push('/payment')
       }
     }, [cart]);
 

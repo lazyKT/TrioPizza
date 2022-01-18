@@ -101,8 +101,9 @@ function OrderListScreen({ history }) {
                     </Paper>
                   ))}
                   <Pagination>
-                    {[...Array(orders.pages).keys()].map(p => (
+                    {[...Array(orders.pages).keys()].map((p, idx) => (
                       <Pagination.Item
+                        key={idx}
                         active={p + 1 === orders.page}
                         onClick={() => handlePagination(p + 1)}
                       >

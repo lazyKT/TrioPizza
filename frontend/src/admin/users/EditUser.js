@@ -65,7 +65,6 @@ export default function EditUser ({closeEditUser, editingID}) {
   }, [editingID]);
 
   useEffect(() => {
-    console.log('userInfo', userDetails);
     if (userDetails) {
 
       if (success)
@@ -157,7 +156,7 @@ export default function EditUser ({closeEditUser, editingID}) {
               />
             </Form.Group>
 
-            <Form.Group controlId='type'>
+            <Form.Group controlId='type' className="mb-3">
               <Form.Label>User Type</Form.Label>
               <Form.Control
                 required
