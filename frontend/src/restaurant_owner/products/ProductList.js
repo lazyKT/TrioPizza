@@ -83,7 +83,6 @@ export default function ProductList ({addNewProduct}) {
     }
   }, [openEditProduct, empty, restaurantInfo]);
 
-
   return (
     <>
       { openEditProduct ?

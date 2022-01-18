@@ -1,8 +1,21 @@
+import pytz
 from datetime import datetime
 from rest_framework import serializers
 from django.contrib.auth.models import User
 from rest_framework_simplejwt.tokens import RefreshToken
-from .models import Product, Order, OrderItem, ShippingAddress, Review, DriverOrderStatus, Reservation, Restaurant, Location, FeatureProduct
+from .models import (
+    Product,
+    Order,
+    OrderItem,
+    ShippingAddress,
+    Review,
+    Promos,
+    DriverOrderStatus,
+    Reservation,
+    Restaurant,
+    Location,
+    FeatureProduct
+)
 
 
 class UserSerializer (serializers.ModelSerializer):
@@ -191,3 +204,29 @@ class FeatureProductSerializer (serializers.ModelSerializer):
         restaurant = obj.restaurant
         serializer = RestaurantSerializer(restaurant)
         return serializer.data
+
+
+class PromosSerializer (serializers.ModelSerializer):
+    # product = serializers.SerializerMethodField(read_only=True)
+    # restaurant = serializers.SerializerMethodField(read_only=True)
+    status = serializers.SerializerMethodField(read_only=True)
+
+    class Meta:
+        model = Promos
+        fields = '__all__'
+
+    # def get_product (self, obj):
+    #     if obj.product is None:
+    #         return []
+    #     product = obj.product
+    #     serializer = ProductSerializer(product)
+    #     return serializer.data
+
+    # def get_restaurant (self, obj):
+    #     restaurant = obj.restaurant
+    #     serializer = RestaurantSerializer(restaurant)
+    #     return serializer.data
+
+    def get_status (self, obj):
+        expiry_dt = obj.expiry_date
+        return 'active' if expiry_dt > pytz.utc.localize(datetime.now()) else 'expired'

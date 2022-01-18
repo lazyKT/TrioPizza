@@ -11,6 +11,7 @@ import DrawerMenu from './DrawerMenu';
 import ProductDashboard from './products/ProductDashboard';
 import MyRestaurant from './restaurant_setting/MyRestaurant';
 import FeatureProducts from './feature_products/FeatureProducts';
+import Promotions from './promotions/Promotions';
 import { logout } from '../actions/userActions';
 
 
@@ -60,7 +61,7 @@ function switchContents (page) {
       case 'Feature Products':
         return <FeatureProducts />;
       case 'Promo':
-        return <h5>Promotions</h5>;
+        return <Promotions />;
       case 'Restaurant Setting':
         return <MyRestaurant />;
       case 'Profile':
