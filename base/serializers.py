@@ -13,6 +13,7 @@ from .models import (
     DriverOrderStatus,
     Reservation,
     Restaurant,
+    RestaurantReview,
     Location,
     FeatureProduct
 )
@@ -225,3 +226,17 @@ class PromosSerializer (serializers.ModelSerializer):
     def get_status (self, obj):
         expiry_dt = obj.expiry_date
         return 'active' if expiry_dt > pytz.utc.localize(datetime.now()) else 'expired'
+
+
+class RestaurantReviewSerializer (serializers.ModelSerializer):
+    user = serializers.SerializerMethodField(read_only=True)
+
+    class Meta:
+        model = RestaurantReview
+        fields = '__all__'
+
+    def get_user (self, obj):
+        user = obj.user
+        if user is None:
+            return ""
+        return user.profile.name
