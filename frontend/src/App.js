@@ -24,6 +24,7 @@ import ReserveConfirm from './screens/ReserveConfirm';
 import ReservationListScreen from './screens/ReservationListScreen';
 import ReservationScreen from './screens/ReservationScreen';
 import RestaurantScreen from './screens/RestaurantScreen';
+import RestaurantReviewScreen from './screens/RestaurantReviewScreen';
 
 import Admin from './admin/Admin';
 import DriverDashboard from './driver/Dashboard';
@@ -63,6 +64,7 @@ function App() {
           <Route path='/cart/:id?' component={CartScreen} />
 
           <Route path='/restaurants/:id' component={RestaurantScreen} />
+          <Route path='/restaurant-review/:id?' component={RestaurantReviewScreen} />
 
           <Route path='/reserve-table' component={CreateReservation} />
           <Route path='/reserve-add-ons' component={PreOrder} />

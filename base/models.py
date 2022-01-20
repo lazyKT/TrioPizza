@@ -58,8 +58,9 @@ class RestaurantReview (models.Model):
     """
     _id = models.AutoField(primary_key=True)
     restaurant = models.ForeignKey(Restaurant, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     rating = models.DecimalField(max_digits=3, decimal_places=1)
-    comments = models.TextField(null=True, blank=True)
+    comment = models.TextField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now_add=True)
 

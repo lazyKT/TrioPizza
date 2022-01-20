@@ -11,7 +11,7 @@ from django.contrib.auth.models import User
 
 
 from base.models import Restaurant, Promos, Location, RestaurantReview, Product
-from base.serializers import RestaurantSerializer, LocationSerializer, PromosSerializer
+from base.serializers import RestaurantSerializer, LocationSerializer, PromosSerializer, RestaurantReviewSerializer
 
 
 
@@ -410,6 +410,105 @@ class PromoDetails (APIView):
             return Response("", status=status.HTTP_204_NO_CONTENT)
         except Http404:
             return Response({'details' : 'Promotion Not Found!'}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            error = 'Internal Server Error!' if repr(e) == '' else repr(e)
+            return Response({'details' : error}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+
+class RestaurantReviewList (APIView):
+    """
+    # Get Restaurant Reviews
+    # Create Restaurant Reviews
+    """
+
+    def get (self, request, format=None):
+        try:
+            restaurant_id = request.query_params.get('restaurant')
+            reviews = None
+            if restaurant_id is None:
+                reviews = RestaurantReview.objects.all().order_by('-created_at')
+            else:
+                restaurant = Restaurant.objects.get(_id=restaurant_id)
+                reviews = RestaurantReview.objects.filter(restaurant=restaurant).order_by('-created_at')
+
+            num_reviews = len(reviews)
+
+            page = request.query_params.get('page')
+            if page is None:
+                page = 1
+            print(page)
+            page = int(page)
+
+            paginator = Paginator(reviews, 5);
+
+            try:
+                reviews = paginator.page(page)
+            except PageNotAnInteger:
+                reviews = paginator.page(1)
+            except EmptyPage:
+                reviews = paginator.page(paginator.num_pages)
+
+            serializer = RestaurantReviewSerializer(reviews, many=True)
+            return Response({
+                'reviews' : serializer.data,
+                'page' : page,
+                'pages' : paginator.num_pages,
+                'count' : num_reviews,
+                'restaurant' : restaurant.name if restaurant is not None else None
+            })
+
+        except Restaurant.DoesNotExist:
+            return Response({'details' : 'Restaurant Not Found!'}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            error = 'Internal Server Error!' if repr(e) == '' else repr(e)
+            return Response({'details' : error}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+    def validate_request (self, request):
+        error = True
+        if 'restaurant' not in request:
+            message = 'Restaurant is required*'
+            return error, message
+        elif 'user' not in request:
+            message = 'User is required*'
+            return error, message
+        elif 'rating' not in request:
+            message = 'Rating is required*'
+            return error, message
+        elif type(request['rating']) != float and type(request['rating']) != int:
+            message = 'Rating must be an integer or decimal number*'
+            return error, message
+        elif request['rating'] > 5 or request['rating'] < 0:
+            message = 'Rating must be within 0 to 5.*'
+            return error, message
+        else:
+            error = False
+            return error, ''
+
+
+    def post (self, request, *args, **kwargs):
+        try:
+            data = request.data
+            error, message = self.validate_request(data)
+            if error:
+                return Response({'details' : message}, status=status.HTTP_400_BAD_REQUEST)
+            restaurant = Restaurant.objects.get(_id=data['restaurant'])
+            user = User.objects.get(id=data['user'])
+            if user.profile.type != 'customer':
+                return Response({'details' : 'Invalid User!'}, status=status.HTTP_400_BAD_REQUEST)
+            review = RestaurantReview.objects.create(
+                restaurant=restaurant,
+                user=user,
+                rating=data['rating'],
+                comment=data['comment'] if 'comment' in data else None
+            )
+            serializer = RestaurantReviewSerializer(review)
+            return Response(serializer.data)
+        except Restaurant.DoesNotExist:
+            return Response({'details' : 'Restaurant Not Found!'}, status=status.HTTP_404_NOT_FOUND)
+        except User.DoesNotExist:
+            return Response({'details' : 'User Not Found!'}, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             error = 'Internal Server Error!' if repr(e) == '' else repr(e)
             return Response({'details' : error}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
