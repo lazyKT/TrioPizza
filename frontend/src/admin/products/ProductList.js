@@ -39,21 +39,7 @@ const columns = [
     label: 'Price',
     maxWidth: 100,
     align: 'right',
-  },
-  {
-    id: 'numReviews',
-    label: 'Number of Reviews',
-    maxWidth: 120,
-    align: 'right',
-    format: (value) => value.toLocaleString('en-US'),
-  },
-  {
-    id: 'rating',
-    label: 'Rating',
-    maxWidth: 150,
-    align: 'right',
-    format: (value) => value.toFixed(2),
-  },
+  }
 ];
 
 

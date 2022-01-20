@@ -1,10 +1,13 @@
-import React from 'react'
-import { Card } from 'react-bootstrap'
-import Rating from './Rating'
-import { Link } from 'react-router-dom'
+import React from 'react';
+import { Card } from 'react-bootstrap';
+import { Link } from 'react-router-dom';
+import StarIcon from '@mui/icons-material/Star';
 
 
 const styles = {
+  container: {
+    minHeight: '380px'
+  },
   img: {
     height: '230px'
   }
@@ -12,7 +15,7 @@ const styles = {
 
 function Product({ product }) {
     return (
-        <Card className="my-3 p-3 rounded">
+        <Card className="my-3 p-3 rounded" style={styles.container}>
             <Link to={`/product/${product._id}`}>
                 <Card.Img
                   style={styles.img}
@@ -21,22 +24,23 @@ function Product({ product }) {
             </Link>
 
             <Card.Body>
+
+              <Card.Title className="text-primary">
                 <Link to={`/product/${product._id}`}>
-                    <Card.Title as="div">
-                        <strong>{product.name}</strong>
-                    </Card.Title>
+                  <strong>{product.name}</strong>
                 </Link>
+                <br/>
+                {
+                  product.feature &&
+                  <span style={{ color: 'gold'}}>
+                    <StarIcon fontSize="small"/> <small>featured</small>
+                  </span>
+                }
+              </Card.Title>
 
-                <Card.Text as="div">
-                    <div className="my-3">
-                        <Rating value={product.rating} text={`${product.numReviews} reviews`} color={'#f8e825'} />
-                    </div>
-                </Card.Text>
-
-
-                <Card.Text as="h3">
-                    ${product.price}
-                </Card.Text>
+              <Card.Text className="text-dark">
+                  ${product.price}
+              </Card.Text>
             </Card.Body>
         </Card>
     )

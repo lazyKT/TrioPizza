@@ -29,33 +29,18 @@ const styles = {
 
 const columns = [
   { id: '_id', label: 'ID', maxWidth: 70 },
-  { id: 'name', label: 'Name', minWidth: 170 },
+  { id: 'name', label: 'Name', minWidth: 200 },
   {
     id: 'description',
     label: 'Description',
-    minWidth: 170,
-    align: 'right'
+    maxWidth: 180,
   },
   {
     id: 'price',
     label: 'Price',
     maxWidth: 100,
     align: 'right',
-  },
-  {
-    id: 'numReviews',
-    label: 'Number of Reviews',
-    maxWidth: 120,
-    align: 'right',
-    format: (value) => value.toLocaleString('en-US'),
-  },
-  {
-    id: 'rating',
-    label: 'Rating',
-    maxWidth: 150,
-    align: 'right',
-    format: (value) => value.toFixed(2),
-  },
+  }
 ];
 
 

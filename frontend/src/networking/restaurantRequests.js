@@ -104,3 +104,42 @@ export async function fetchPromotionsByRestaurant (restaurantId, token, signal) 
       return { error: true, message: error.message };
   }
 }
+
+
+
+export async function createRestaurantReview (body, token) {
+  try {
+    const { data } = await axios.post(`/api/restaurants/reviews/`, body, {
+      headers: {
+        'Content-Type' : 'application/json',
+        Authorization :  `Bearer ${token}`
+      }
+    });
+
+    return { error : false, data };
+  }
+  catch (error) {
+    if (error.response && error.response.data.details)
+      return { error: true, message: error.response.data.details };
+    else
+      return { error: true, message: error.message };
+  }
+}
+
+
+export async function fetchRestaurantReviews (restaurantId, signal, page=1) {
+  try {
+    const { data } = await axios.get(`/api/restaurants/reviews?restaurant=${restaurantId}&page=${page}`, {
+      headers: {'Content-Type' : 'application/json'},
+      signal
+    });
+
+    return { error: false, data }
+  }
+  catch (error) {
+    if (error.response && error.response.data.details)
+      return { error: true, message: error.response.data.details };
+    else
+      return { error: true, message: error.message };
+  }
+}

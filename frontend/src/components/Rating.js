@@ -1,10 +1,10 @@
 import React from 'react'
 
-function Rating({ value, text, color }) {
+function Rating({ value, text, color, fontSize='18px', showTotal=true }) {
     return (
         <div className="rating">
             <span>
-                <i style={{ color }} className={
+                <i style={{ color, fontSize }} className={
                     value >= 1
                         ? 'fas fa-star'
                         : value >= 0.5
@@ -16,7 +16,7 @@ function Rating({ value, text, color }) {
             </span>
 
             <span>
-                <i style={{ color }} className={
+                <i style={{ color, fontSize }} className={
                     value >= 2
                         ? 'fas fa-star'
                         : value >= 1.5
@@ -28,7 +28,7 @@ function Rating({ value, text, color }) {
             </span>
 
             <span>
-                <i style={{ color }} className={
+                <i style={{ color, fontSize }} className={
                     value >= 3
                         ? 'fas fa-star'
                         : value >= 2.5
@@ -40,7 +40,7 @@ function Rating({ value, text, color }) {
             </span>
 
             <span>
-                <i style={{ color }} className={
+                <i style={{ color, fontSize }} className={
                     value >= 4
                         ? 'fas fa-star'
                         : value >= 3.5
@@ -52,7 +52,7 @@ function Rating({ value, text, color }) {
             </span>
 
             <span>
-                <i style={{ color }} className={
+                <i style={{ color, fontSize }} className={
                     value >= 5
                         ? 'fas fa-star'
                         : value >= 4.5

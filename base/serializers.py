@@ -13,6 +13,7 @@ from .models import (
     DriverOrderStatus,
     Reservation,
     Restaurant,
+    RestaurantReview,
     Location,
     FeatureProduct
 )
@@ -62,10 +63,11 @@ class ReviewSerializer (serializers.ModelSerializer):
 class ProductSerializer (serializers.ModelSerializer):
     reviews = serializers.SerializerMethodField(read_only=True)
     restaurant = serializers.SerializerMethodField(read_only=True)
+    feature = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = Product
-        fields = '__all__'
+        fields = ['name', 'description', 'restaurant', 'reviews', 'image', 'price', 'createdAt', '_id', 'feature']
 
     def get_reviews(self, obj):
         reviews = obj.review_set.all()
@@ -76,6 +78,12 @@ class ProductSerializer (serializers.ModelSerializer):
         restaurant = obj.restaurant
         serializer = RestaurantSerializer(restaurant)
         return serializer.data
+
+    def get_feature (self, obj):
+        feature = obj.featureproduct_set.all()
+        if len(feature) > 0:
+            return True
+        return False
 
 
 
@@ -177,10 +185,11 @@ class LocationSerializer (serializers.ModelSerializer):
 class RestaurantSerializer (serializers.ModelSerializer):
     locations = serializers.SerializerMethodField(read_only=True)
     owner_name = serializers.SerializerMethodField(read_only=True)
+    reviews = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = Restaurant
-        fields = ['_id', 'owner', 'name', 'owner_name', 'description', 'locations', 'logo', 'created_at']
+        fields = ['_id', 'owner', 'name', 'owner_name', 'reviews', 'description', 'locations', 'logo', 'created_at']
 
     def get_locations (self, obj):
         locations = obj.location_set.all()
@@ -192,6 +201,11 @@ class RestaurantSerializer (serializers.ModelSerializer):
         if owner is None:
             return ""
         return owner.profile.name
+
+    def get_reviews (self, obj):
+        reviews = obj.restaurantreview_set.all()
+        serializer = RestaurantReviewSerializer(reviews, many=True)
+        return serializer.data
 
 
 class FeatureProductSerializer (serializers.ModelSerializer):
@@ -225,3 +239,17 @@ class PromosSerializer (serializers.ModelSerializer):
     def get_status (self, obj):
         expiry_dt = obj.expiry_date
         return 'active' if expiry_dt > pytz.utc.localize(datetime.now()) else 'expired'
+
+
+class RestaurantReviewSerializer (serializers.ModelSerializer):
+    user = serializers.SerializerMethodField(read_only=True)
+
+    class Meta:
+        model = RestaurantReview
+        fields = '__all__'
+
+    def get_user (self, obj):
+        user = obj.user
+        if user is None:
+            return None
+        return user.profile.name
