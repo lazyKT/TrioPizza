@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
-import { Card, Row, Col, ListGroup, Image } from 'react-bootstrap';
+import Paper from '@mui/material/Paper';
+import { Card, Row, Col, ListGroup, Image, Button, Stack } from 'react-bootstrap';
 
 import Message from '../components/Message';
 import Loader from '../components/Loader';
 import RestaurantProducts from '../components/RestaurantProducts';
 import Rating from '../components/Rating';
+import ReviewForm from '../components/ReviewForm';
 import { getRestaurantById } from '../networking/restaurantRequests';
 
 
@@ -15,6 +17,8 @@ export default function RestaurantScreen ({match, location, history}) {
   const [ restaurant, setRestaurant ] = useState(null);
   const [ loading, setLoading ] = useState(true);
   const [ error, setError ] = useState(null);
+  const [ rating, setRating ] = useState(0);
+  const [ showRatingForm, setShowRatingForm ] = useState(false);
 
   const { userInfo } = useSelector(state => state.userCookie );
 
@@ -32,6 +36,11 @@ export default function RestaurantScreen ({match, location, history}) {
       else {
         setError (null);
         setRestaurant(data);
+        // console.log(data.reviews.map(r => Number(r.rating)).reduce((old, current) => old+current));
+        let totalRating = data.reviews.map(r => Number(r.rating))
+                              .reduce((old, current) => old+current);
+
+        setRating(totalRating/data.reviews.length);
       }
     }
     catch (error) {
@@ -89,7 +98,9 @@ export default function RestaurantScreen ({match, location, history}) {
                       </ListGroup.Item>
 
                       <ListGroup.Item>
-                        <Rating value={0} text={`0 reviews`} color={'#f8e825'} />
+                        <Link to={`/restaurant-review?id=${restaurant._id}`}>
+                          <Rating value={rating} text={`${restaurant.reviews.length} reviews`} color={'#f8e825'} />
+                        </Link>
                       </ListGroup.Item>
                   </ListGroup>
                 </Col>
@@ -108,8 +119,21 @@ export default function RestaurantScreen ({match, location, history}) {
                   </ListGroup>
                 </Col>
               </Row>
+
+              <Stack className="col-md-5 mx-auto" gap={3}>
+                <Button variant='success' className="mr-1 mt-2">
+                  Make Reservation
+                </Button>
+
+                <Button variant='primary' className="mt-2 mx-1" onClick={() => setShowRatingForm(true)}>
+                  Leave Rating
+                </Button>
+              </Stack>
             </Card.Body>
           </Card>
+
+          {showRatingForm && <ReviewForm hideForm={() => setShowRatingForm(false)} restaurantId={restaurant._id}/>}
+
           <RestaurantProducts restaurantId={restaurant._id} location={location}/>
         </>
       }

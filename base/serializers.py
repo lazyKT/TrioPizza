@@ -178,10 +178,11 @@ class LocationSerializer (serializers.ModelSerializer):
 class RestaurantSerializer (serializers.ModelSerializer):
     locations = serializers.SerializerMethodField(read_only=True)
     owner_name = serializers.SerializerMethodField(read_only=True)
+    reviews = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = Restaurant
-        fields = ['_id', 'owner', 'name', 'owner_name', 'description', 'locations', 'logo', 'created_at']
+        fields = ['_id', 'owner', 'name', 'owner_name', 'reviews', 'description', 'locations', 'logo', 'created_at']
 
     def get_locations (self, obj):
         locations = obj.location_set.all()
@@ -193,6 +194,11 @@ class RestaurantSerializer (serializers.ModelSerializer):
         if owner is None:
             return ""
         return owner.profile.name
+
+    def get_reviews (self, obj):
+        reviews = obj.restaurantreview_set.all()
+        serializer = RestaurantReviewSerializer(reviews, many=True)
+        return serializer.data
 
 
 class FeatureProductSerializer (serializers.ModelSerializer):
@@ -238,5 +244,5 @@ class RestaurantReviewSerializer (serializers.ModelSerializer):
     def get_user (self, obj):
         user = obj.user
         if user is None:
-            return ""
+            return None
         return user.profile.name

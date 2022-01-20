@@ -437,10 +437,10 @@ class RestaurantReviewList (APIView):
             page = request.query_params.get('page')
             if page is None:
                 page = 1
-
+            print(page)
             page = int(page)
 
-            paginator = Paginator(reviews, 10);
+            paginator = Paginator(reviews, 5);
 
             try:
                 reviews = paginator.page(page)
@@ -452,9 +452,10 @@ class RestaurantReviewList (APIView):
             serializer = RestaurantReviewSerializer(reviews, many=True)
             return Response({
                 'reviews' : serializer.data,
-                'page' : 'page',
+                'page' : page,
                 'pages' : paginator.num_pages,
-                'count' : num_reviews
+                'count' : num_reviews,
+                'restaurant' : restaurant.name if restaurant is not None else None
             })
 
         except Restaurant.DoesNotExist:
