@@ -90,23 +90,27 @@ export default function RestaurantReview ({ history, location }) {
       <h4>{restaurant && restaurant}</h4>
       <br/>
       <h5>Restaurant Review</h5>
+      <br/>
       { loading && <Loader /> }
       { error && <Message variant='danger'>{error}</Message> }
-      { reviews && <h5>{`${count} review(s)`}</h5>}
+      { reviews?.length > 0 && <h5>{`${count} review(s)`}</h5>}
       { reviews?.map (review => (
         <Review key={review._id} review={review}/>
       ))}
-      <Pagination>
-        {[...Array(pages).keys()].map(r => (
-          <Pagination.Item
-            key={r}
-            active={r + 1 === page}
-            onClick={() => handlePagination(r + 1)}
-          >
-            { r + 1}
-          </Pagination.Item>
-        ))}
-      </Pagination>
+      { reviews?.length > 0 &&
+        <Pagination>
+          {[...Array(pages).keys()].map(r => (
+            <Pagination.Item
+              key={r}
+              active={r + 1 === page}
+              onClick={() => handlePagination(r + 1)}
+            >
+              { r + 1}
+            </Pagination.Item>
+          ))}
+        </Pagination>
+      }
+      { reviews?.length === 0 && <Message variant='info'>There is no review(s) yet.</Message>}
     </Container>
   );
 }

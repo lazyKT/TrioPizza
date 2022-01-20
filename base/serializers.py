@@ -63,10 +63,11 @@ class ReviewSerializer (serializers.ModelSerializer):
 class ProductSerializer (serializers.ModelSerializer):
     reviews = serializers.SerializerMethodField(read_only=True)
     restaurant = serializers.SerializerMethodField(read_only=True)
+    feature = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = Product
-        fields = '__all__'
+        fields = ['name', 'description', 'restaurant', 'reviews', 'image', 'price', 'createdAt', '_id', 'feature']
 
     def get_reviews(self, obj):
         reviews = obj.review_set.all()
@@ -77,6 +78,12 @@ class ProductSerializer (serializers.ModelSerializer):
         restaurant = obj.restaurant
         serializer = RestaurantSerializer(restaurant)
         return serializer.data
+
+    def get_feature (self, obj):
+        feature = obj.featureproduct_set.all()
+        if len(feature) > 0:
+            return True
+        return False
 
 
 

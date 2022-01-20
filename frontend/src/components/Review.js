@@ -6,9 +6,27 @@ import Rating from './Rating';
 
 export default function Review ({ review }) {
 
+  const toPeriodTime = (time) => {
+    let period = '';
+    let hr = parseInt(time.split(':')[0]);
+
+    if (hr === 12)
+      period = 'PM';
+    else if (hr < 12) {
+      period = 'AM';
+      hr = hr < 10 ? `0${hr}` : hr;
+    }
+    else {
+      period = 'PM';
+      hr = hr - 12;
+    }
+
+    return `${hr}:${time.split(':')[1]} ${period}`;
+  }
+
   const toDateTime = (datetime) => {
     const dt = new Date(datetime);
-    return `${dt.toDateString()} ${dt.toLocaleTimeString()}`;
+    return `${dt.toDateString()} ${toPeriodTime(dt.toLocaleTimeString())}`;
   }
 
   return (

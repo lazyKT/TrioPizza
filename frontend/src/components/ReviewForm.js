@@ -75,7 +75,7 @@ export default function ReviewForm ({restaurantId, hideForm}) {
 
   useEffect(() => {
     if (!userInfo)
-      history.push('/');
+      history.push('/login');
 
     if (message) {
       setComment('');

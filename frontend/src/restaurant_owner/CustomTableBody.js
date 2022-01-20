@@ -3,6 +3,7 @@ import TableCell from '@mui/material/TableCell';
 import TableBody from '@mui/material/TableBody';
 import TableRow from '@mui/material/TableRow';
 import Checkbox from '@mui/material/Checkbox';
+import StarIcon from '@mui/icons-material/Star';
 
 
 // This method is created for cross-browser compatibility, if you don't
@@ -41,7 +42,7 @@ function getComparator(order, orderBy) {
 function getCellData (type) {
     switch (type) {
       case 'products':
-        return ['_id', 'name', 'description', 'price', 'numReviews', 'rating'];
+        return ['_id', 'name', 'description', 'price'];
       case 'promos':
         return ['_id', 'description', 'status', 'type', 'amount', 'expiry_date'];
       default:
@@ -102,7 +103,13 @@ export default function CustomTableBody (props) {
 
               { cells.map( (cell, idx) =>
                   <TableCell key={idx}>
-                    {row[cell]}
+                    {
+                      dataType === 'products' && cell === 'name'
+                      ? <span>
+                          {row[cell]} {row['feature'] && <StarIcon fontSize="small" sx={{ color: 'gold' }}/>}
+                        </span>
+                      : row[cell]
+                    }
                   </TableCell>
               )}
             </TableRow>

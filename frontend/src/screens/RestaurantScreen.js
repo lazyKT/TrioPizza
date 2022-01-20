@@ -37,10 +37,12 @@ export default function RestaurantScreen ({match, location, history}) {
         setError (null);
         setRestaurant(data);
         // console.log(data.reviews.map(r => Number(r.rating)).reduce((old, current) => old+current));
-        let totalRating = data.reviews.map(r => Number(r.rating))
-                              .reduce((old, current) => old+current);
+        if (data.reviews.length > 0) {
+          let totalRating = data.reviews.map(r => Number(r.rating))
+                                .reduce((old, current) => old+current);
 
-        setRating(totalRating/data.reviews.length);
+          setRating(totalRating/data.reviews.length);
+        }
       }
     }
     catch (error) {
