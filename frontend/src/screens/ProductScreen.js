@@ -80,9 +80,14 @@ function ProductScreen({ match, history }) {
       history.goBack();
     };
 
-    const discountedPrice = (price) => {
-      let percentage = Number(promo.amount)/100;
-      return (price - (price * percentage)).toFixed(2);
+    const discountedPrice = (price, type) => {
+      if (type === 'percent-off') {
+        let percentage = Number(promo.amount)/100;
+        return (price - (price * percentage)).toFixed(2);
+      }
+      else {
+        return Number(price) - Number(promo.amount);
+      }
     }
 
     const getProductPromotionDetails = async (productId, signal) => {
@@ -95,6 +100,7 @@ function ProductScreen({ match, history }) {
         }
         else {
           setPromoError(null);
+          console.log(data);
           setPromo(data);
         }
       }
@@ -170,7 +176,7 @@ function ProductScreen({ match, history }) {
                                      ${product.price}
                                     </span>
                                     {promo?.status === 'active' &&
-                                    <span>&nbsp;${discountedPrice(product.price)}</span>
+                                    <span>&nbsp;${discountedPrice(product.price, promo.type)}</span>
                                     }
                                 </ListGroup.Item>
 
@@ -178,7 +184,7 @@ function ProductScreen({ match, history }) {
                                     Description: {product.description}
                                 </ListGroup.Item>
 
-                                {promo && (
+                                {promo?.status === 'active' && (
                                   <ListGroup.Item className='text-danger'>
                                       <h5>*{promo.description}</h5>
                                   </ListGroup.Item>
@@ -196,7 +202,7 @@ function ProductScreen({ match, history }) {
                                         <Col>
                                           {
                                             promo?.status === 'active'
-                                            ? <strong>${discountedPrice(product.price)}</strong>
+                                            ? <strong>${discountedPrice(product.price, promo.type)}</strong>
                                             : <strong>${product.price}</strong>
                                           }
                                         </Col>
