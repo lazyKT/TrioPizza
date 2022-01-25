@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
+import { Row, Col } from 'react-bootstrap';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
@@ -11,6 +12,18 @@ import Loader from '../../components/Loader';
 import Message from '../../components/Message';
 import { fetchReservationTimeSlots, fetchReservationByDates } from '../../networking/restaurantRequests';
 
+
+const styles = {
+  heading: {
+    fontSize: '18px',
+    fontWeight: 'bold'
+  },
+  legend: {
+    width: '18px',
+    height: '18px',
+    marginRight: '10px'
+  }
+}
 
 function createEvents (timeSlots) {
   if (timeSlots) {
@@ -31,6 +44,18 @@ function createEvents (timeSlots) {
   return [];
 }
 
+
+function formatAMPM (dateStr) {
+  const date = dateStr.split('T')[0];
+  const time = dateStr.split('T')[1];
+  let hrs = parseInt(time.split(':')[0]);
+  let minutes = parseInt(time.split(':')[1]);
+  const ampm = hrs >= 12 ? 'pm' : 'am';
+  hrs = hrs % 12;
+  hrs = hrs ? hrs : 12; // the hour '0' should be '12'
+  minutes = minutes < 10 ? '0'+minutes : minutes;
+  return `${date} ${hrs}:${minutes} ${ampm}`;
+}
 
 
 export default function ReservationDashboard () {
@@ -87,10 +112,11 @@ export default function ReservationDashboard () {
 
   const onClickEvent = (e) => {
     setViewType(e.view.type);
-    setEventDateTime(e.event.startStr);
+    if (e.view.type === 'timeGridWeek')
+      setEventDateTime(formatAMPM(e.event.startStr));
+    else
+      setEventDateTime(e.event.startStr);
     setShowReservationlist(true);
-    console.log(e.event.startStr);
-    console.log(e.view.type);
   }
 
 
@@ -120,24 +146,45 @@ export default function ReservationDashboard () {
             />
           )
         : (
-          <FullCalendar
-            plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
-            headerToolbar={{
-              left: 'prev,next today',
-              center: 'title',
-              right: 'dayGridMonth,timeGridWeek'
-            }}
-            datesSet={dateInfo => setDates(dateInfo)}
-            initialView="dayGridMonth"
-            slotMinTime={'11:00:00'}
-            slotMaxTime={'21:00:00'}
-            height='580px'
-            editable={true}
-            selectable={true}
-            select={() => alert('Coming Soon!')}
-            events={createEvents(timeSlots)}
-            eventClick={event => onClickEvent(event)}
-          />
+          <>
+            <h6>Legends</h6>
+            <Row className="mb-4 w-50">
+              <Col className="d-flex justify-content-start">
+                <div style={{ ...styles.legend, background: 'white', border: 'solid 0.5px black'}} />
+                <span>Available</span>
+              </Col>
+              <Col className="d-flex justify-content-start">
+                <div style={{ ...styles.legend, background: 'green' }}/>
+                <span>Available</span>
+              </Col>
+              <Col className="d-flex justify-content-start">
+                <div style={{ ...styles.legend, background: 'dodgerblue' }}/>
+                <span>Available</span>
+              </Col>
+              <Col className="d-flex justify-content-start">
+                <div style={{ ...styles.legend, background: 'red' }} />
+                <span>Full</span>
+              </Col>
+            </Row>
+            <FullCalendar
+              plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
+              headerToolbar={{
+                left: 'prev,next today',
+                center: 'title',
+                right: 'dayGridMonth,timeGridWeek'
+              }}
+              datesSet={dateInfo => setDates(dateInfo)}
+              initialView="dayGridMonth"
+              slotMinTime={'11:00:00'}
+              slotMaxTime={'21:00:00'}
+              height='580px'
+              editable={true}
+              selectable={true}
+              select={() => alert('Coming Soon!')}
+              events={createEvents(timeSlots)}
+              eventClick={event => onClickEvent(event)}
+            />
+          </>
         )
       }
     </>

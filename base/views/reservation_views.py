@@ -52,7 +52,7 @@ class ReservationList (APIView):
 
             serializer = ReservationSerializer(reservations, many=True)
             return Response({'reservations' : serializer.data, 'count': len(reservations)})
-            
+
         except Restaurant.DoesNotExist:
             return Response({'details' : 'Restaurant Not Found!'}, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
@@ -230,7 +230,9 @@ def get_reservations_by_timeslot (request, pk):
         date2 = datetime.strptime(_date2, '%Y-%m-%d')
         reservations = Reservation.objects.filter(
             reservedDateTime__gte=date1, reservedDateTime__lte=date2 # greater than date1 and less than and equal to date2
-        ).filter(restaurant=restaurant).values('reservedDateTime').annotate(count=Count('reservedDateTime'))
+        ).filter(
+            restaurant=restaurant
+        ).filter(status='active').values('reservedDateTime').annotate(count=Count('reservedDateTime'))
         return Response(reservations)
     except Restaurant.DoesNotExist:
         return Response({'details' : 'Restaurant Not Found!'}, status=status.HTTP_400_BAD_REQUEST)
@@ -246,22 +248,21 @@ def get_reservations_by_day (request, pk):
         _date2 = request.query_params.get('date2')
         restaurant = Restaurant.objects.get(_id=pk)
         reservations = Reservation.objects.filter(restaurant=restaurant)
+
         if _date1 is None:
             return Response({'details' : 'Start Date is required*'}, status=status.HTTP_400_BAD_REQUEST)
         if _date2 is None:
             return Response({'details' : 'Start Date is required*'}, status=status.HTTP_400_BAD_REQUEST)
+
         date1 = datetime.strptime(_date1, '%Y-%m-%d')
         date2 = datetime.strptime(_date2, '%Y-%m-%d')
-        # reservations = Reservation.objects.filter(
-        #     reservedDateTime__gte=date1, reservedDateTime__lte=date2 # greater than date1 and less than and equal to date2
-        # ).filter(restaurant=restaurant).annotate(
-        #     day=TruncDate('reservedDateTime', output_field=DateField())
-        # ).values('reservedDateTime').annotate(count=Count('reservedDateTime')).order_by('reservedDateTime')
+
         reservations_per_day = Reservation.objects.filter(
             reservedDateTime__gte=date1, reservedDateTime__lte=date2 # greater than date1 and less than and equal to date2
-        ).filter(restaurant=restaurant).annotate(
+        ).filter(restaurant=restaurant).filter(status='active').annotate(
             day=TruncDate('reservedDateTime', output_field=DateField()),
         ).values('day').annotate(count=Count('reservedDateTime'))
+
         return Response(reservations_per_day)
     except Restaurant.DoesNotExist:
         return Response({'details' : 'Restaurant Not Found!'}, status=status.HTTP_400_BAD_REQUEST)
