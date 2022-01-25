@@ -52,15 +52,20 @@ export default function RestaurantScreen ({match, location, history}) {
   }
 
   const makeReservation = (e) => {
-    e.preventDefault();
-    dispatch({
-      type: RESERVATION_RESTAURANT,
-      payload: {
-        id: restaurant._id,
-        name: restaurant.name
-      }
-    });
-    history?.push('/reserve-table');
+    if (userInfo) {
+      e.preventDefault();
+      dispatch({
+        type: RESERVATION_RESTAURANT,
+        payload: {
+          id: restaurant._id,
+          name: restaurant.name
+        }
+      });
+      history?.push('/reserve-table');
+    }
+    else {
+      history?.push('/login');
+    }
   }
 
 

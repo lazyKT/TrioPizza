@@ -62,10 +62,14 @@ export default function ProductList ({addNewProduct}) {
   const closeOpenEditProduct = () => setOpenEditProduct(false);
 
   useEffect(() => {
+    const abortController = new AbortController();
+
     if (!openEditProduct) {
       if (!empty && restaurantInfo)
-        dispatch( listRestaurantProducts(restaurantInfo._id) )
+        dispatch( listRestaurantProducts(restaurantInfo._id, abortController.signal) );
     }
+
+    return () => abortController.abort();
   }, [openEditProduct, empty, restaurantInfo]);
 
   return (
