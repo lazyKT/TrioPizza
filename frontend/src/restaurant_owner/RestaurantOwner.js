@@ -12,6 +12,7 @@ import ProductDashboard from './products/ProductDashboard';
 import MyRestaurant from './restaurant_setting/MyRestaurant';
 import FeatureProducts from './feature_products/FeatureProducts';
 import Promotions from './promotions/Promotions';
+import ReservationDashboard from './reservations/ReservationDashboard';
 import OrderDashboard from './orders/OrderDashboard';
 import { logout } from '../actions/userActions';
 
@@ -58,7 +59,7 @@ function switchContents (page) {
       case 'Orders':
         return <OrderDashboard />;
       case 'Reservations':
-        return <h5>Reservations</h5>;
+        return <ReservationDashboard />;
       case 'Feature Products':
         return <FeatureProducts />;
       case 'Promo':
