@@ -143,3 +143,24 @@ export async function fetchRestaurantReviews (restaurantId, signal, page=1) {
       return { error: true, message: error.message };
   }
 }
+
+
+export async function fetchReservationTimeSlots (restaurantId, startDate, endDate, token, signal) {
+  try {
+    const { data } = await axios.get(`/api/reservations/restaurant/${restaurantId}?date1=${startDate}&date2=${endDate}`, {
+      headers: {
+        'Content-Type' : 'application/json',
+        Authorization: `Bearer ${token}`
+      },
+      signal
+    });
+
+    return { error: false, data }
+  }
+  catch (error) {
+    if (error.response && error.response.data.details)
+      return { error: true, message: error.response.data.details };
+    else
+      return { error: true, message: error.message };
+  }
+}

@@ -8,6 +8,7 @@ import Loader from '../components/Loader';
 import FormContainer from '../components/FormContainer';
 import ReservationSteps from '../components/ReservationSteps';
 import { createNewReservationRequest } from '../networking/reservationRequests';
+import { getRestaurantById } from '../networking/restaurantRequests';
 import { RESERVATION_CLEAR_DATA } from '../constants/reservationConstants';
 
 
@@ -18,7 +19,7 @@ export default function ReserveConfirm () {
   const [ reservationCreated, setReservationCreated ] = useState(false);
 
   const { userInfo } = useSelector(state => state.userCookie);
-  const { info, preOrder } = useSelector(state => state.reservation);
+  const { info, preOrder, restaurantName, restaurantId } = useSelector(state => state.reservation);
 
   const history = useHistory();
   const dispatch = useDispatch();
@@ -29,6 +30,7 @@ export default function ReserveConfirm () {
       setLoading(true);
 
       const body = {
+        restaurant: restaurantId,
         user : userInfo.id,
         num_of_pax : parseInt(info.numOfPax),
         reservedDateTime : `${info.date} ${info.time}`
@@ -61,10 +63,10 @@ export default function ReserveConfirm () {
       history.push('/');
     }
 
-    if (info && !(info.date) && !reservationCreated) {
+    if (info && !(info?.date) && !reservationCreated && !restaurantId && !restaurantName) {
       history.push('/reserve-table')
     }
-  }, [info, userInfo]);
+  }, [info, userInfo, restaurantName, restaurantId]);
 
   useEffect(() => {
     setLoading(false);
@@ -84,7 +86,7 @@ export default function ReserveConfirm () {
             { loading && <Loader /> }
             <h4>It's almost done!</h4>
             <p>
-              Please check the below details and confirm your reservation!
+              Please check the below details and confirm your reservation at {restaurantName}.
               <br/>You can always change back the details by clicking on the navigation above.
             </p>
             <br/>

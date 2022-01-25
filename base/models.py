@@ -187,6 +187,7 @@ class DriverOrderStatus (models.Model):
 class Reservation (models.Model):
     _id = models.AutoField(primary_key=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
+    restaurant = models.ForeignKey(Restaurant, on_delete=models.CASCADE)
     num_of_pax = models.IntegerField()
     status = models.CharField(max_length=16, default='active')
     pre_order = models.BooleanField(default=False)

@@ -88,9 +88,11 @@ const initialState = {
     cart: {
       cartItems: cartItemsFromStorage,
       shippingAddress: shippingAddressFromStorage,
-      restaurant: null
+      restaurantId: null,
+      restaurantName: null
     },
     reservation: {
+      restaurant: null,
       preOrder: false,
       preOrderItems: [],
       info: {}

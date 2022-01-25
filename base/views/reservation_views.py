@@ -1,5 +1,6 @@
 import pytz
-from datetime import datetime
+from datetime import datetime, timedelta
+from django.db.models import Count
 from django.http import Http404
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from rest_framework import status
@@ -8,7 +9,7 @@ from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
-from base.models import User, Reservation, Product
+from base.models import User, Reservation, Product, Restaurant
 from base.serializers import ReservationSerializer
 
 
@@ -23,9 +24,19 @@ class ReservationList (APIView):
         """
         # Get Reservation Lists
         """
-        reservations = Reservation.objects.all().order_by('-_id')
-        serializer = ReservationSerializer(reservations, many=True)
-        return Response(serializer.data)
+        try:
+            restaurant_id = request.query_params.get('restaurant')
+            reservations = Reservation.objects.all().order_by('-reservedDateTime')
+            if restaurant_id is not None:
+                restaurant = Restaurant.objects.get(_id=restaurant_id)
+                reservations = Reservation.objects.filter(restaurant=restaurant).order_by('-reservedDateTime')
+            serializer = ReservationSerializer(reservations, many=True)
+            return Response({'reservations' : serializer.data, 'count': len(reservations)})
+        except Restaurant.DoesNotExist:
+            return Response({'details' : 'Restaurant Not Found!'}, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            error = 'Internal Server Error' if str(e) == '' else str(e)
+            return Response({'details' : error }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
     def get_user_by_id (self, user_id):
@@ -39,6 +50,8 @@ class ReservationList (APIView):
         error = True
         if 'user' not in data:
             return error, 'User Must Not Be Empty*'
+        elif 'restaurant' not in data:
+            return error, 'Restaurant Must Not Be Empty*'
         elif 'num_of_pax' not in data:
             return error, 'Number of Pax is Required*'
         elif type(data['num_of_pax']) != int:
@@ -66,16 +79,21 @@ class ReservationList (APIView):
             if user.profile.type != 'customer':
                 return Response({'details' : 'Invalid User Type'}, status=status.HTTP_400_BAD_REQUEST)
 
+            restaurant = Restaurant.objects.get(_id=data['restaurant'])
+
             reservedDateTime = datetime.strptime(data['reservedDateTime'], '%Y-%m-%d %I:%M %p')
             reservation = Reservation.objects.create(
                 user=user,
+                restaurant=restaurant,
                 num_of_pax=data['num_of_pax'],
-                reservedDateTime=pytz.utc.localize(reservedDateTime) # add timezone to create timezone aware datetime object
+                reservedDateTime=reservedDateTime # add timezone to create timezone aware datetime object
             )
             serializer = ReservationSerializer(reservation)
             return Response(serializer.data)
         except Http404:
             return Response({'details' : 'User Not Found!'}, status=status.HTTP_400_BAD_REQUEST)
+        except Restaurant.DoesNotExist:
+            return Response({'details' : 'Restaurant Not Found!'}, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             error = 'Internal Server Error' if str(e) == '' else str(e)
             return Response({'details' : error }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -144,6 +162,7 @@ class ReservationDetails (APIView):
             return Response({'details' : error }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
+
 @api_view(['GET'])
 def get_users_reservation (request, pk):
     try:
@@ -169,6 +188,31 @@ def get_users_reservation (request, pk):
         return Response({'reservations' : serializer.data, 'page' : page, 'pages' : paginator.num_pages })
     except User.DoesNotExist:
         return Response({'details' : 'User Not Found!'}, status=status.HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        error = 'Internal Server Error' if str(e) == '' else str(e)
+        return Response({'details' : error }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+
+@api_view(['GET'])
+def get_reservations_by_timeslot (request, pk):
+    try:
+        _date1 = request.query_params.get('date1')
+        _date2 = request.query_params.get('date2')
+        restaurant = Restaurant.objects.get(_id=pk)
+        reservations = Reservation.objects.filter(restaurant=restaurant)
+        if _date1 is None:
+            return Response({'details' : 'Start Date is required*'}, status=status.HTTP_400_BAD_REQUEST)
+        if _date2 is None:
+            return Response({'details' : 'Start Date is required*'}, status=status.HTTP_400_BAD_REQUEST)
+        date1 = datetime.strptime(_date1, '%Y-%m-%d')
+        date2 = datetime.strptime(_date2, '%Y-%m-%d')
+        reservations = Reservation.objects.filter(
+            reservedDateTime__gte=date1, reservedDateTime__lte=date2
+        ).filter(restaurant=restaurant).values('reservedDateTime').annotate(count=Count('reservedDateTime'))
+        return Response(reservations)
+    except Restaurant.DoesNotExist:
+        return Response({'details' : 'Restaurant Not Found!'}, status=status.HTTP_400_BAD_REQUEST)
     except Exception as e:
         error = 'Internal Server Error' if str(e) == '' else str(e)
         return Response({'details' : error }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

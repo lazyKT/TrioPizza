@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
-import Paper from '@mui/material/Paper';
 import { Card, Row, Col, ListGroup, Image, Button, Stack } from 'react-bootstrap';
 
 import Message from '../components/Message';
@@ -10,6 +9,7 @@ import RestaurantProducts from '../components/RestaurantProducts';
 import Rating from '../components/Rating';
 import ReviewForm from '../components/ReviewForm';
 import { getRestaurantById } from '../networking/restaurantRequests';
+import { RESERVATION_RESTAURANT } from '../constants/reservationConstants';
 
 
 export default function RestaurantScreen ({match, location, history}) {
@@ -21,6 +21,7 @@ export default function RestaurantScreen ({match, location, history}) {
   const [ showRatingForm, setShowRatingForm ] = useState(false);
 
   const { userInfo } = useSelector(state => state.userCookie );
+  const dispatch = useDispatch();
 
   const getFullAddress = () => {
     return `${restaurant.locations[0].address}, ${restaurant.locations[0].district}, S${restaurant.locations[0].postal_code}`;
@@ -48,6 +49,18 @@ export default function RestaurantScreen ({match, location, history}) {
     catch (error) {
       setError(error.message);
     }
+  }
+
+  const makeReservation = (e) => {
+    e.preventDefault();
+    dispatch({
+      type: RESERVATION_RESTAURANT,
+      payload: {
+        id: restaurant._id,
+        name: restaurant.name
+      }
+    });
+    history?.push('/reserve-table');
   }
 
 
@@ -123,7 +136,11 @@ export default function RestaurantScreen ({match, location, history}) {
               </Row>
 
               <Stack className="col-md-5 mx-auto" gap={3}>
-                <Button variant='success' className="mr-1 mt-2">
+                <Button
+                  variant='success'
+                  className="mr-1 mt-2"
+                  onClick={makeReservation}
+                >
                   Make Reservation
                 </Button>
 

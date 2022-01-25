@@ -12,7 +12,6 @@ import { getOrderDetails, cancelOrder, completeOrder } from '../networking/order
 
 function OrderScreen({ match, history }) {
 
-    const [sdkReady, setSdkReady] = useState(false);
     const [ order, setOrder ] = useState(null);
     const [ loading, setLoading ] = useState(true);
     const [ error, setError ] = useState(null);
