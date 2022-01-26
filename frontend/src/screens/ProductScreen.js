@@ -4,7 +4,6 @@ import { Link } from 'react-router-dom';
 import { Row, Col, Image, ListGroup, Button, Card, Form, Modal } from 'react-bootstrap';
 import StarIcon from '@mui/icons-material/Star';
 
-import Rating from '../components/Rating';
 import Loader from '../components/Loader';
 import Message from '../components/Message';
 import { listProductDetails, createProductReview } from '../actions/productActions';
@@ -15,8 +14,6 @@ import { RESTAURANT_CART, CART_CLEAR_ITEMS } from '../constants/cartConstants';
 
 function ProductScreen({ match, history }) {
     const [ qty, setQty ] = useState(1);
-    const [ rating, setRating ] = useState(0);
-    const [ comment, setComment ] = useState('');
     const [ showModal, setShowModal ] = useState(false);
     const [ promo, setPromo ] = useState(null);
     const [ promoError, setPromoError ] = useState(null);
@@ -65,16 +62,6 @@ function ProductScreen({ match, history }) {
       history.push(`/cart/${match.params.id}?qty=${qty}`);
     };
 
-    const submitHandler = (e) => {
-      e.preventDefault()
-      dispatch(createProductReview(
-          match.params.id,
-          {
-            rating,
-            comment
-          }
-      ));
-    };
 
     const backButtonClicked = (e) => {
       history.goBack();
@@ -111,12 +98,6 @@ function ProductScreen({ match, history }) {
 
 
     useEffect(() => {
-      if (successProductReview) {
-        setRating(0)
-        setComment('')
-        dispatch({ type: PRODUCT_CREATE_REVIEW_RESET });
-      }
-
       dispatch(listProductDetails(match.params.id));
 
     }, [dispatch, match, successProductReview, restaurant]);
