@@ -5,6 +5,7 @@ import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import AddBoxIcon from '@mui/icons-material/AddBox';
 import { Row, Col, Card, Image, Container, Button } from 'react-bootstrap';
 
+import AddFeatureProduct from './AddFeatureProduct';
 import Loader from '../../components/Loader';
 import Message from '../../components/Message';
 import Rating from '../../components/Rating';
@@ -38,11 +39,12 @@ function FeatureProductCard({ product, remove }) {
 }
 
 
-function EmptyCard () {
+function EmptyCard ({addFeatureProduct}) {
   return (
       <Card className="p-2 rounded">
           <AddBoxIcon
-            sx={{ fontSize: 50, color: 'gainsboro' }}
+            sx={{ fontSize: 50, color: 'gainsboro', cursor: 'pointer' }}
+            onClick={() => addFeatureProduct()}
           />
       </Card>
   )
@@ -54,6 +56,7 @@ export default function FeatureProducts () {
   const [ featureProducts, setFeatureProducts ] = useState(null);
   const [ loading, setLoading ] = useState(true);
   const [ error, setError ] = useState(null);
+  const [ showAddFeatureProducts, setShowAddFeatureProducts ] = useState(false);
 
   const { restaurantInfo } = useSelector(state => state.restaurant);
   const { userInfo } = useSelector(state => state.userCookie);
@@ -105,7 +108,7 @@ export default function FeatureProducts () {
     }
 
     return () => abortController.abort();
-  }, [userInfo, restaurantInfo]);
+  }, [userInfo, restaurantInfo, showAddFeatureProducts]);
 
   useEffect(() => {
     if (error) setLoading(false);
@@ -120,25 +123,30 @@ export default function FeatureProducts () {
       { featureProducts && featureProducts.length === 0
         && <Message variant="info">You Don't Have Any Feature Products!</Message>}
 
-      <Container>
-        <Row>
-          { [0, 1, 2, 3, 4].map(a => (
-            <Col key={a} xs={3} className='mb-3'>
-              {
-                (featureProducts && featureProducts[a])
-                ? (
-                  <FeatureProductCard
-                    product={featureProducts[a].product}
-                    remove={() => removeOnClick(featureProducts[a]._id)}
-                  />
-                ) : (
-                  <EmptyCard />
-                )
-              }
-            </Col>
-          ))}
-        </Row>
-      </Container>
+      { showAddFeatureProducts
+        ? <AddFeatureProduct backToFeatureProductList={() => setShowAddFeatureProducts(false)}/>
+        : (
+          <Container>
+            <Row>
+              { [0, 1, 2, 3, 4].map(a => (
+                <Col key={a} xs={3} className='mb-3'>
+                  {
+                    (featureProducts && featureProducts[a])
+                    ? (
+                      <FeatureProductCard
+                        product={featureProducts[a].product}
+                        remove={() => removeOnClick(featureProducts[a]._id)}
+                      />
+                    ) : (
+                      <EmptyCard addFeatureProduct={() => setShowAddFeatureProducts(true)}/>
+                    )
+                  }
+                </Col>
+              ))}
+            </Row>
+          </Container>
+        )
+      }
     </div>
   );
 }

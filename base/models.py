@@ -187,6 +187,7 @@ class DriverOrderStatus (models.Model):
 class Reservation (models.Model):
     _id = models.AutoField(primary_key=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
+    restaurant = models.ForeignKey(Restaurant, on_delete=models.CASCADE)
     num_of_pax = models.IntegerField()
     status = models.CharField(max_length=16, default='active')
     pre_order = models.BooleanField(default=False)
@@ -198,3 +199,5 @@ class PreOrder (models.Model):
     _id = models.AutoField(primary_key=True)
     product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True)
     reservation = models.ForeignKey(Reservation, on_delete=models.CASCADE)
+    qty = models.IntegerField(default=0)
+    price = models.DecimalField(max_digits=7, decimal_places=2, null=True, blank=True)

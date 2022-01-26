@@ -43,9 +43,11 @@ export default function CreatePromotion ({backToPromoList}) {
       setLoading(true);
       e.preventDefault();
 
-      if (!(new RegExp(/^\d+\.\d+$/)).test(promotion.amount)) {
+      if (!(new RegExp(/^\d+\.\d+$/)).test(promotion.amount))
         throw new Error('Amount must be a deimal number!');
-      }
+
+      if (promotion?.type === '')
+        throw new Error ('Invalid Promo Type!');
 
       const body = {
         ...promotion,
@@ -159,6 +161,7 @@ export default function CreatePromotion ({backToPromoList}) {
                 onChange={handleOnChange}
                 required
               >
+                <option value=''>Select Type</option>
                 <option value='cash-off'>Cash Off</option>
                 <option value='percent-off'>Percentage Off</option>
               </Form.Control>

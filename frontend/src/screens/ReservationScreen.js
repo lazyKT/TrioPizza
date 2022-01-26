@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { Card, Row, Col, Button, ListGroup, Alert } from 'react-bootstrap';
+import MaterialButton from '@mui/material/Button';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import { Card, Row, Col, Button, ListGroup, Alert, Image } from 'react-bootstrap';
 
 
 import Message from '../components/Message';
@@ -51,6 +53,7 @@ export default function ReservationScreen ({match, history}) {
       }
       else {
         setError(null);
+        console.log(data);
         setReservation(data);
       }
     }
@@ -107,63 +110,86 @@ export default function ReservationScreen ({match, history}) {
 
 
   return (
-    <Card className='m-2'>
-      <Card.Body>
-        { loading && <Loader /> }
-        { error && <Message variant='danger'>{error}</Message> }
-        {
-          reservation && (
-            <>
-              <h4>Reservation # {reservationId}</h4>
-              <Row>
-                <Col>
-                  Date:<h5>{reservation.reservedDateTime}</h5>
-                </Col>
-                <Col>
-                  <h6
-                    style={
-                      reservation.status === 'active' ? styles.active : (
-                        reservation.status === 'done' ? styles.done : styles.cancel
-                      )
-                    }
+    <>
+      <MaterialButton
+        startIcon={<ArrowBackIcon/>}
+        onClick={() => history.goBack()}
+      >
+        Back
+      </MaterialButton>
+      <Card className='m-2'>
+        <Card.Body>
+          { loading && <Loader /> }
+          { error && <Message variant='danger'>{error}</Message> }
+          {
+            reservation && (
+              <>
+                <h4>Reservation # {reservationId}</h4>
+                <Row>
+                  <Col>
+                    Date:<h5>{reservation.reservedDateTime}</h5>
+                  </Col>
+                  <Col>
+                    <h6
+                      style={
+                        reservation.status === 'active' ? styles.active : (
+                          reservation.status === 'done' ? styles.done : styles.cancel
+                        )
+                      }
+                    >
+                      <strong>{reservation.status}</strong>
+                    </h6>
+                    <h6>
+                      <i className="fas fa-user"></i>&nbsp;
+                      <strong>{reservation.num_of_pax} people</strong>
+                    </h6>
+                  </Col>
+                </Row>
+
+                <h6>Pre-Order:</h6>
+                <ListGroup variant='flush' className='my-2'>
+                  { reservation?.preOrderItems?.length > 0 ? (
+                    <>
+                      {reservation.preOrderItems.map( item => (
+                        <ListGroup.Item key={item._id}>
+                          <Row>
+                            <Col md={2}>
+                                <Image style={{width: '50px', height: '50px'}}
+                                  src={item.product.image} alt={item.product.name} fluid rounded />
+                            </Col>
+
+                            <Col>
+                                {item.product.name}
+                            </Col>
+
+                            <Col md={4}>
+                                {item.qty} X ${item.price} = ${(item.qty * item.price).toFixed(2)}
+                            </Col>
+                          </Row>
+                        </ListGroup.Item>
+                      ))}
+                    </>
+                  ) : (
+                    <Alert variant='info'>
+                      You have nothing in Pre-Order List.
+                    </Alert>
+                  )}
+                </ListGroup>
+
+                { reservation.status === 'active' && (
+                  <Button
+                    variant='danger'
+                    className='mx-1'
+                    onClick={cancelOnClick}
                   >
-                    <strong>{reservation.status}</strong>
-                  </h6>
-                  <h6>
-                    <i className="fas fa-user"></i>&nbsp;
-                    <strong>{reservation.num_of_pax} people</strong>
-                  </h6>
-                </Col>
-              </Row>
-
-              <h6>Pre-Order:</h6>
-              <ListGroup variant='flush'>
-                { reservation.preOrder ? (
-                  <>
-                    {reservation.preOrder.items.map( item => (
-                      <h6>{item.name}</h6>
-                    ))}
-                  </>
-                ) : (
-                  <Alert variant='info'>
-                    You have nothing in Pre-Order List.
-                  </Alert>
+                    Cancel Reservation
+                  </Button>
                 )}
-              </ListGroup>
-
-              { reservation.status === 'active' && (
-                <Button
-                  variant='danger'
-                  className='mx-1'
-                  onClick={cancelOnClick}
-                >
-                  Cancel Reservation
-                </Button>
-              )}
-            </>
-          )
-        }
-      </Card.Body>
-    </Card>
+              </>
+            )
+          }
+        </Card.Body>
+      </Card>
+    </>
   );
 }
