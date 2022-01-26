@@ -26,7 +26,7 @@ const styles = {
 }
 
 
-function OrderListScreen({ history }) {
+export default function OrderListScreen({ history }) {
 
     const dispatch = useDispatch()
 
@@ -77,11 +77,10 @@ function OrderListScreen({ history }) {
               ? (<Message variant='danger'>{error}</Message>)
               : (
                 <>
-                  {orders?.orders && orders.orders.map(order => (
+                  {orders?.orders && orders.orders.map((order, idx) => (
                     <>
                       <Paper
-                        elevation={2}
-                        key={order._id}
+                        key={idx}
                         sx={styles.container}
                         onClick={() => orderOnClick(order._id)}
                       >
@@ -119,5 +118,3 @@ function OrderListScreen({ history }) {
         </div>
     )
 }
-
-export default OrderListScreen

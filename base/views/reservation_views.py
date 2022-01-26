@@ -10,7 +10,7 @@ from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
-from base.models import User, Reservation, Product, Restaurant
+from base.models import User, Reservation, Product, Restaurant, PreOrder
 from base.serializers import ReservationSerializer
 
 
@@ -86,6 +86,23 @@ class ReservationList (APIView):
             return error, ''
 
 
+    def create_preorder_items (self, items, reservation):
+        """
+        # Create Pre-Order Items for Reservation
+        """
+        try:
+            for item in items:
+                product = Product.objects.get(_id=item['_id'])
+                orderItem = PreOrder.objects.create(
+                    product=product,
+                    qty=item['qty'],
+                    reservation=reservation,
+                    price=item['price']
+                )
+        except Product.DoesNotExist:
+            raise Exception('Product Not Found!')
+
+
     def post (self, request, format=None):
         """
         # Create New Reservations
@@ -109,6 +126,9 @@ class ReservationList (APIView):
                 num_of_pax=data['num_of_pax'],
                 reservedDateTime=reservedDateTime # add timezone to create timezone aware datetime object
             )
+            if 'preOrderItems' in data:
+                self.create_preorder_items (data['preOrderItems'], reservation)
+
             serializer = ReservationSerializer(reservation)
             return Response(serializer.data)
         except Http404:

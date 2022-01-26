@@ -12,6 +12,7 @@ from .models import (
     Promos,
     DriverOrderStatus,
     Reservation,
+    PreOrder,
     Restaurant,
     RestaurantReview,
     Location,
@@ -160,10 +161,11 @@ class DriverOrderStatusSerializer (serializers.ModelSerializer):
 class ReservationSerializer (serializers.ModelSerializer):
     customer = serializers.SerializerMethodField(read_only=True)
     reservedDateTime = serializers.SerializerMethodField(read_only=True)
+    preOrderItems = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = Reservation
-        fields = ['_id', 'customer', 'num_of_pax', 'status', 'reservedDateTime', 'created_at']
+        fields = ['_id', 'customer', 'num_of_pax', 'status', 'reservedDateTime', 'created_at', 'preOrderItems']
 
     def get_customer (self, obj):
         customer = obj.user
@@ -173,6 +175,24 @@ class ReservationSerializer (serializers.ModelSerializer):
     def get_reservedDateTime (self, obj):
         reservedDateTime = obj.reservedDateTime
         return datetime.strftime(reservedDateTime, '%Y-%m-%d %I:%M %p')
+
+    def get_preOrderItems (self, obj):
+        items = obj.preorder_set.all()
+        serializer = PreOrderSerializer(items, many=True)
+        return serializer.data
+
+
+class PreOrderSerializer (serializers.ModelSerializer):
+    product = serializers.SerializerMethodField(read_only=True)
+
+    class Meta:
+        model = PreOrder
+        fields = '__all__'
+
+    def get_product (self, obj):
+        product = obj.product
+        serializer = ProductSerializer(product)
+        return serializer.data
 
 
 class LocationSerializer (serializers.ModelSerializer):

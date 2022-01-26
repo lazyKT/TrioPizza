@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { Card, Row, Col, Button, ListGroup, Alert } from 'react-bootstrap';
+import { Card, Row, Col, Button, ListGroup, Alert, Image } from 'react-bootstrap';
 import MaterialButton from '@mui/material/Button';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
@@ -66,30 +66,9 @@ export default function ReservationScreen ({reservation, backToList}) {
     }
   }
 
-
-  // useEffect(() => {
-  //
-  //   const abortController = new AbortController();
-  //
-  //   if (userInfo && reservationId) {
-  //     (async () =>
-  //       await fetchReservationById(reservationId, userInfo.token, abortController.signal)
-  //     )()
-  //   }
-  //   else {
-  //     history.push('/');
-  //   }
-  //
-  //
-  //   return (() => {
-  //     abortController.abort();
-  //   });
-  //
-  // }, [userInfo, reservationId, history]);
-
-
   useEffect(() => {
     setLoading(false);
+    console.log(reservation);
   }, [reservation, error]);
 
 
@@ -145,15 +124,30 @@ export default function ReservationScreen ({reservation, backToList}) {
 
                 <p style={styles.subTitle}>Pre-Order:</p>
                 <ListGroup variant='flush'>
-                  { reservation.preOrder ? (
+                  { reservation?.preOrderItems?.length > 0 ? (
                     <>
-                      {reservation.preOrder.items.map( item => (
-                        <h6>{item.name}</h6>
+                      {reservation.preOrderItems.map( item => (
+                        <ListGroup.Item key={item._id}>
+                          <Row>
+                            <Col md={2}>
+                                <Image style={{width: '50px', height: '50px'}}
+                                  src={item.product.image} alt={item.product.name} fluid rounded />
+                            </Col>
+
+                            <Col>
+                                {item.product.name}
+                            </Col>
+
+                            <Col md={4}>
+                                {item.qty} X ${item.price} = ${(item.qty * item.price).toFixed(2)}
+                            </Col>
+                          </Row>
+                        </ListGroup.Item>
                       ))}
                     </>
                   ) : (
                     <Alert variant='info'>
-                      N/A
+                      You have nothing in Pre-Order List.
                     </Alert>
                   )}
                 </ListGroup>

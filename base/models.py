@@ -199,3 +199,5 @@ class PreOrder (models.Model):
     _id = models.AutoField(primary_key=True)
     product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True)
     reservation = models.ForeignKey(Reservation, on_delete=models.CASCADE)
+    qty = models.IntegerField(default=0)
+    price = models.DecimalField(max_digits=7, decimal_places=2, null=True, blank=True)
