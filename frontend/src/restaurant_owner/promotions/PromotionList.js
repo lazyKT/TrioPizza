@@ -89,6 +89,7 @@ export default function PromotionList ({openCreatePromotion}) {
         }
         else {
           setError(null);
+          console.log(data);
           setPromos(data);
         }
     }

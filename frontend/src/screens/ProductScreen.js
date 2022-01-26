@@ -4,7 +4,6 @@ import { Link } from 'react-router-dom';
 import { Row, Col, Image, ListGroup, Button, Card, Form, Modal } from 'react-bootstrap';
 import StarIcon from '@mui/icons-material/Star';
 
-import Rating from '../components/Rating';
 import Loader from '../components/Loader';
 import Message from '../components/Message';
 import { listProductDetails, createProductReview } from '../actions/productActions';
@@ -15,8 +14,6 @@ import { RESTAURANT_CART, CART_CLEAR_ITEMS } from '../constants/cartConstants';
 
 function ProductScreen({ match, history }) {
     const [ qty, setQty ] = useState(1);
-    const [ rating, setRating ] = useState(0);
-    const [ comment, setComment ] = useState('');
     const [ showModal, setShowModal ] = useState(false);
     const [ promo, setPromo ] = useState(null);
     const [ promoError, setPromoError ] = useState(null);
@@ -65,24 +62,19 @@ function ProductScreen({ match, history }) {
       history.push(`/cart/${match.params.id}?qty=${qty}`);
     };
 
-    const submitHandler = (e) => {
-      e.preventDefault()
-      dispatch(createProductReview(
-          match.params.id,
-          {
-            rating,
-            comment
-          }
-      ));
-    };
 
     const backButtonClicked = (e) => {
       history.goBack();
     };
 
-    const discountedPrice = (price) => {
-      let percentage = Number(promo.amount)/100;
-      return (price - (price * percentage)).toFixed(2);
+    const discountedPrice = (price, type) => {
+      if (type === 'percent-off') {
+        let percentage = Number(promo.amount)/100;
+        return (price - (price * percentage)).toFixed(2);
+      }
+      else {
+        return Number(price) - Number(promo.amount);
+      }
     }
 
     const getProductPromotionDetails = async (productId, signal) => {
@@ -95,6 +87,7 @@ function ProductScreen({ match, history }) {
         }
         else {
           setPromoError(null);
+          console.log(data);
           setPromo(data);
         }
       }
@@ -105,12 +98,6 @@ function ProductScreen({ match, history }) {
 
 
     useEffect(() => {
-      if (successProductReview) {
-        setRating(0)
-        setComment('')
-        dispatch({ type: PRODUCT_CREATE_REVIEW_RESET });
-      }
-
       dispatch(listProductDetails(match.params.id));
 
     }, [dispatch, match, successProductReview, restaurant]);
@@ -170,7 +157,7 @@ function ProductScreen({ match, history }) {
                                      ${product.price}
                                     </span>
                                     {promo?.status === 'active' &&
-                                    <span>&nbsp;${discountedPrice(product.price)}</span>
+                                    <span>&nbsp;${discountedPrice(product.price, promo.type)}</span>
                                     }
                                 </ListGroup.Item>
 
@@ -178,7 +165,7 @@ function ProductScreen({ match, history }) {
                                     Description: {product.description}
                                 </ListGroup.Item>
 
-                                {promo && (
+                                {promo?.status === 'active' && (
                                   <ListGroup.Item className='text-danger'>
                                       <h5>*{promo.description}</h5>
                                   </ListGroup.Item>
@@ -196,7 +183,7 @@ function ProductScreen({ match, history }) {
                                         <Col>
                                           {
                                             promo?.status === 'active'
-                                            ? <strong>${discountedPrice(product.price)}</strong>
+                                            ? <strong>${discountedPrice(product.price, promo.type)}</strong>
                                             : <strong>${product.price}</strong>
                                           }
                                         </Col>

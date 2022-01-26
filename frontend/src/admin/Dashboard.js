@@ -1,11 +1,11 @@
 import React from 'react';
 
+import CustomDoughnut from './charts/CustomDoughnut';
+
 
 export default function Dashboard () {
 
   return (
-    <>
-      <h5>Dashboard</h5>
-    </>
+    <CustomDoughnut data={[12, 19, 3, 5, 2, 0]} />
   )
 }

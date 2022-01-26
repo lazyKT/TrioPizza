@@ -54,14 +54,15 @@ export const listProducts = (keyword = '') => async (dispatch) => {
 }
 
 
-export const listRestaurantProducts = (restaurantId) => async (dispatch) => {
+export const listRestaurantProducts = (restaurantId, signal, limit='all') => async (dispatch) => {
   try {
       dispatch({ type: PRODUCT_LIST_REQUEST });
 
-      const { data } = await axios.get(`/api/products/restaurants/${restaurantId}?limit=all`, {
+      const { data } = await axios.get(`/api/products/restaurants/${restaurantId}?limit=${limit}`, {
         headers: {
           'Content-Type' : 'application/json'
-        }
+        },
+        signal
       });
 
       dispatch({
@@ -107,7 +108,7 @@ export const listProductDetails = (id) => async (dispatch) => {
         dispatch({ type: PRODUCT_DETAILS_REQUEST })
 
         const { data } = await axios.get(`/api/products/${id}`)
-        
+
         dispatch({
             type: PRODUCT_DETAILS_SUCCESS,
             payload: data

@@ -42,6 +42,7 @@ import {
 
 import { ORDER_LIST_MY_RESET } from '../constants/orderConstants';
 import { RESTAURANT_RESET } from '../constants/restaurantConstants';
+import { RESERVATION_CLEAR_DATA } from '../constants/reservationConstants';
 
 import Cookie from 'js-cookie';
 
@@ -114,6 +115,7 @@ export const logout = () => (dispatch) => {
     dispatch({ type: ORDER_LIST_MY_RESET });
     dispatch({ type: USER_LIST_RESET });
     dispatch({ type: RESTAURANT_RESET });
+    dispatch({ type: RESERVATION_CLEAR_DATA });
     dispatch({ type: 'remove_user_cookie' });
     removeUserCookie();
 }

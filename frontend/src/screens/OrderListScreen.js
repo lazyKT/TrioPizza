@@ -26,7 +26,7 @@ const styles = {
 }
 
 
-function OrderListScreen({ history }) {
+export default function OrderListScreen({ history }) {
 
     const dispatch = useDispatch()
 
@@ -77,44 +77,44 @@ function OrderListScreen({ history }) {
               ? (<Message variant='danger'>{error}</Message>)
               : (
                 <>
-                  {orders?.orders && orders.orders.map(order => (
-                    <Paper
-                      elevation={2}
-                      key={order._id}
-                      sx={styles.container}
-                      onClick={() => orderOnClick(order._id)}
-                    >
-                      <Box sx={styles.row}>
-                        <div>
-                          <h5>{displayOrderItem(order.orderItems)}</h5>
-                          <h6>{toDate(order.createdAt)}</h6>
-                          <h6 style={{
-                            padding: '10px',
-                            width: 'fit-content',
-                            background: order.status === 'progress' ? 'dodgerblue' : 'gainsboro',
-                          }}>
-                            {order.status}
-                          </h6>
-                        </div>
-                        <h5>{order.totalPrice}&nbsp;$</h5>
-                      </Box>
-                    </Paper>
-                  ))}
-                  <Pagination>
-                    {[...Array(orders.pages).keys()].map((p, idx) => (
-                      <Pagination.Item
+                  {orders?.orders && orders.orders.map((order, idx) => (
+                    <>
+                      <Paper
                         key={idx}
-                        active={p + 1 === orders.page}
-                        onClick={() => handlePagination(p + 1)}
+                        sx={styles.container}
+                        onClick={() => orderOnClick(order._id)}
                       >
-                      { p + 1 }
-                      </Pagination.Item>
-                    ))}
-                  </Pagination>
+                        <Box sx={styles.row}>
+                          <div>
+                            <h5>{displayOrderItem(order.orderItems)}</h5>
+                            <h6>{toDate(order.createdAt)}</h6>
+                            <h6 style={{
+                              padding: '10px',
+                              width: 'fit-content',
+                              background: order.status === 'progress' ? 'dodgerblue' : 'gainsboro',
+                            }}>
+                              {order.status}
+                            </h6>
+                          </div>
+                          <h5>{order.totalPrice}&nbsp;$</h5>
+                        </Box>
+                      </Paper>
+                      <Pagination>
+                        {[...Array(orders.pages).keys()].map((p, idx) => (
+                          <Pagination.Item
+                            key={idx}
+                            active={p + 1 === orders.page}
+                            onClick={() => handlePagination(p + 1)}
+                          >
+                          { p + 1 }
+                          </Pagination.Item>
+                        ))}
+                      </Pagination>
+                    </>
+                  ))}
+                  {orders?.orders?.length === 0 && <Message variant='info'>You have not made any orders yet!</Message>}
                 </>
               )}
         </div>
     )
 }
-
-export default OrderListScreen
