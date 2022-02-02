@@ -179,6 +179,7 @@ class DriverOrderStatus (models.Model):
     last_assigned = models.BooleanField(default=False)
     total_order = models.IntegerField(default=0)
     active_orders = models.IntegerField(default=0)
+    total_delivery = models.IntegerField(default=0)
 
     def __str__(self):
         return 'driver name: %s, status: %s' % (self.driver.profile.name, self.status)

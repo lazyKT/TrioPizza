@@ -12,7 +12,14 @@ from django.contrib.auth.hashers import make_password
 from rest_framework import status
 
 from base.models import Profile, ShippingAddress, DriverOrderStatus, Order
-from base.serializers import ProductSerializer, UserSerializer, UserSerializerWithToken, ShippingAddressSerializer, DriverOrderStatusSerializer
+from base.serializers import (
+    ProductSerializer,
+    UserSerializer,
+    UserSerializerWithToken,
+    ProfileSerializer,
+    ShippingAddressSerializer,
+    DriverOrderStatusSerializer
+)
 
 
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
@@ -67,16 +74,24 @@ class UserList (APIView):
         """
         # Get All Users
         """
-        users = User.objects.all()
-        serializer = UserSerializer(users, many=True)
-        return Response(serializer.data)
+        try:
+            user_type = request.query_params.get('type')
+            if user_type is not None:
+                users = Profile.objects.filter(type=user_type)
+                serializer = ProfileSerializer(users, many=True)
+                return Response(serializer.data)
+            users = User.objects.all()
+            serializer = UserSerializer(users, many=True)
+            return Response(serializer.data)
+        except Exception as e:
+            error = 'Internal Server Error!' if str(e) == '' else str(e)
+            return Response({'details' : error}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
     def create_new_driver_record (self, driver):
         try:
             record = DriverOrderStatus.objects.create(
                 driver=driver,
-                current_order=None,
                 total_order=0
             )
         except Exception as e:
@@ -149,7 +164,7 @@ class UserDetails (APIView):
             error = True
             message = 'User Type is required!'
             return error, message
-        if body['type'] != 'customer' and body['type'] != 'driver' and body['type'] != 'admin':
+        if body['type'] != 'customer' and body['type'] != 'driver' and body['type'] != 'admin' and body['type'] != 'restaurant owner':
             error = True
             message = 'Invalid User Type!'
             return error, message

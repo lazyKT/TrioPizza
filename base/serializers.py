@@ -4,6 +4,7 @@ from rest_framework import serializers
 from django.contrib.auth.models import User
 from rest_framework_simplejwt.tokens import RefreshToken
 from .models import (
+    Profile,
     Product,
     Order,
     OrderItem,
@@ -55,6 +56,24 @@ class UserSerializerWithToken (UserSerializer):
         return str(token.access_token)
 
 
+class ProfileSerializer (serializers.ModelSerializer):
+    username = serializers.SerializerMethodField(read_only=True)
+    id = serializers.SerializerMethodField(read_only=True)
+
+    class Meta:
+        model = Profile
+        fields = ['id', 'username', 'mobile', 'name', 'type']
+
+    def get_username (self, obj):
+        user = obj.user
+        return user.username
+
+    def get_id (self, obj):
+        user = obj.user
+        return user.id
+
+
+
 class ReviewSerializer (serializers.ModelSerializer):
     class Meta:
         model = Review
@@ -63,7 +82,6 @@ class ReviewSerializer (serializers.ModelSerializer):
 
 class ProductSerializer (serializers.ModelSerializer):
     reviews = serializers.SerializerMethodField(read_only=True)
-    restaurant = serializers.SerializerMethodField(read_only=True)
     feature = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
@@ -73,11 +91,6 @@ class ProductSerializer (serializers.ModelSerializer):
     def get_reviews(self, obj):
         reviews = obj.review_set.all()
         serializer = ReviewSerializer(reviews, many=True)
-        return serializer.data
-
-    def get_restaurant(self, obj):
-        restaurant = obj.restaurant
-        serializer = RestaurantSerializer(restaurant)
         return serializer.data
 
     def get_feature (self, obj):
