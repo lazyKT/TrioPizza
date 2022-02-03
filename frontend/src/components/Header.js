@@ -111,6 +111,10 @@ function Header() {
                 { userInfo?.type !== 'driver' && <SearchBox />}
                 <Nav className="ml-auto">
 
+                  <LinkContainer to='/support'>
+                    <Nav.Link><i className="fas fa-info-circle"></i>Support</Nav.Link>
+                  </LinkContainer>
+
                   { userInfo && userInfo.type === 'customer' &&
                     <LinkContainer to='/cart'>
                       <Nav.Link ><i className="fas fa-shopping-cart"></i>Cart</Nav.Link>

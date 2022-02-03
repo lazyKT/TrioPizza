@@ -91,8 +91,8 @@ export default function RestaurantProductsStats () {
                       Total Earnings
                     </Col>
                   </Row>
-                  { data?.sales.slice(0, 3).map(sale => (
-                     <ListGroup.Item>
+                  { data?.sales.slice(0, 3).map((sale, idx) => (
+                     <ListGroup.Item key={idx}>
                        <Row>
                         <Col>
                           <h6>{sale.product}</h6>

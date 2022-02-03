@@ -4,6 +4,7 @@ import { HashRouter as Router, Route } from 'react-router-dom';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import HomeScreen from './screens/HomeScreen';
+import SupportScreen from './screens/SupportScreen';
 import ProductScreen from './screens/ProductScreen';
 import CartScreen from './screens/CartScreen';
 import LoginScreen from './screens/LoginScreen';
@@ -54,6 +55,7 @@ function App() {
           />
           <Route path='/login' component={LoginScreen} />
           <Route path='/register' component={RegisterScreen} />
+          <Route path='/support' component={SupportScreen} />
           <Route path='/profile' component={ProfileScreen} />
           <Route path='/shipping' component={ShippingScreen} />
           <Route path='/placeorder' component={PlaceOrderScreen} />

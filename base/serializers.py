@@ -17,7 +17,8 @@ from .models import (
     Restaurant,
     RestaurantReview,
     Location,
-    FeatureProduct
+    FeatureProduct,
+    Support
 )
 
 
@@ -286,3 +287,10 @@ class RestaurantReviewSerializer (serializers.ModelSerializer):
         if user is None:
             return None
         return user.profile.name
+
+
+class SupportSerializer (serializers.ModelSerializer):
+
+    class Meta:
+        model = Support
+        fields = '__all__'

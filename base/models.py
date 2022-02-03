@@ -202,3 +202,12 @@ class PreOrder (models.Model):
     reservation = models.ForeignKey(Reservation, on_delete=models.CASCADE)
     qty = models.IntegerField(default=0)
     price = models.DecimalField(max_digits=7, decimal_places=2, null=True, blank=True)
+
+
+class Support (models.Model):
+    _id = models.AutoField(primary_key=True)
+    email = models.CharField(max_length=24)
+    type = models.CharField(max_length=16)
+    headline = models.TextField()
+    content = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)

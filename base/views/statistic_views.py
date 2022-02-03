@@ -11,12 +11,15 @@ from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
+from django.core.mail import send_mail
 from django.contrib.auth.models import User
 from django.db.models import Count, DateField, Sum
 from django.db.models.functions import TruncYear, TruncMonth, TruncWeek, TruncDate
+from sendgrid import SendGridAPIClient
+from sendgrid.helpers.mail import *
 
 from base.models import Restaurant, Product, Order, OrderItem, Reservation, Location, DriverOrderStatus
-
+from base.utils import send_email
 
 
 class RestaurantStatisticView (APIView):
@@ -37,6 +40,35 @@ class RestaurantStatisticView (APIView):
                     restaurant_orders[restaurant.name] = len(Order.objects.filter(restaurant=restaurant))
 
             return Response(restaurant_orders)
+        except Exception as e:
+            error = 'Internal Server Error!' if repr(e) == '' else repr(e)
+            return Response({'details' : error}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+
+class RestaurantOrdersStatusView (APIView):
+    """
+    # Get Order Status from Restaurants
+    """
+
+    def get_restaurant (self, pk):
+        try:
+            return Restaurant.objects.get(_id=pk)
+        except Restaurant.DoesNotExist:
+            raise Http404
+
+
+    def get (self, request, pk, format=None):
+        try:
+            restaurant = self.get_restaurant(pk)
+            orders = Order.objects.filter(restaurant=restaurant).values('status').annotate(count=Count('status'))
+            total_orders = Order.objects.filter(restaurant=restaurant).count();
+            return Response({
+            'order_stats' : orders,
+            'total_orders' : total_orders
+            })
+        except Http404:
+            return Response({'details' : 'Restaurant Not Found!'}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
             error = 'Internal Server Error!' if repr(e) == '' else repr(e)
             return Response({'details' : error}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -253,3 +285,16 @@ def get_driver_order_deliveries (request):
         status='delivered'
     ).values('deliveredBy').annotate(count=Count('deliveredBy'))
     return Response(orders)
+
+
+@api_view(['POST'])
+def test_email (request):
+    try:
+        subject = '[TrioPizza] Testing Email'
+        body = '<h4>Dear Customer</h4><br/><p>This is test email</p>'
+        recipients = ['kyaw.thitlwin.me@gmail.com']
+        send_email(recipients, subject, body)
+        return Response('Test Email Sent. Check your email inbox')
+    except Exception as e:
+        print('error', str(e))
+        return Response(str(e))
