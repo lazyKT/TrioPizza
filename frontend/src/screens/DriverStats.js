@@ -32,10 +32,10 @@ export default function DriverStats () {
         setError (message);
       }
       else {
-        setTotal(data.total);
-        setCancelledCount(data.cancelled);
-        setActiveCount(data.active);
-        setDeliveredCount(data.delivered);
+        setTotal(data.total_orders);
+        setCancelledCount(data?.orders_stats?.cancelled);
+        setActiveCount(data?.orders_stats?.progress);
+        setDeliveredCount(data?.orders_stats?.delivered);
         setError(null);
       }
     }

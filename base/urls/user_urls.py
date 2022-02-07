@@ -4,6 +4,8 @@ from base.views import user_views as views
 
 urlpatterns = [
     path('', views.UserList.as_view()),
+    path('gen-password-reset-link/', views.gen_password_reset_link, name='pwd-reset-link'),
+    path('reset-password/', views.reset_password, name='reset-password'),
     path('login/', views.MyTokenObtainPairView.as_view(),
          name='token_obtain_pair'),
     path('addresses/', views.ShippingAddressList.as_view(), name="user-saved-addresses"),

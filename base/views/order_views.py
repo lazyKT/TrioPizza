@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from django.http import Http404
+from django.db.models import Count
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
@@ -353,16 +354,23 @@ def get_driver_order_stats (request, pk):
         driver = User.objects.get(id=pk)
         if driver.profile.type != 'driver':
             return Response({'details' : 'Invalid Driver!'}, status=status.HTTP_400_BAD_REQUEST)
-        orders = Order.objects.filter(deliveredBy=driver)
-        active_orders = len([order for order in orders if order.status == 'progress'])
-        delivered_orders = len([order for order in orders if order.status == 'delivered'])
-        cancelled_orders = len(orders) - (active_orders + delivered_orders)
+        orders_stats = { 'cancelled' : 0, 'delivered' : 0, 'progress' : 0}
+        orders = Order.objects.filter(deliveredBy=driver).values('status').annotate(
+            count=Count('status')
+        )
+        for order in orders:
+            if order['status'] == 'cancelled':
+                orders_stats['cancelled'] += order['count']
+            elif order['status'] == 'delivered':
+                orders_stats['delivered'] += order['count']
+            elif order['status'] == 'progress':
+                orders_stats['progress'] += order['count']
+
+        total_orders = Order.objects.filter(deliveredBy=driver).count()
 
         return Response({
-            'total' : len(orders),
-            'active' : active_orders,
-            'delivered' : delivered_orders,
-            'cancelled' : cancelled_orders
+            'orders_stats': orders_stats,
+            'total_orders' : total_orders
         })
 
     except User.DoesNotExist:

@@ -11,7 +11,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 
 from base.models import User, Reservation, Product, Restaurant, PreOrder
-from base.serializers import ReservationSerializer
+from base.serializers import ReservationSerializer, RestaurantSerializer
 
 
 
@@ -289,3 +289,23 @@ def get_reservations_by_day (request, pk):
     except Exception as e:
         error = 'Internal Server Error' if str(e) == '' else str(e)
         return Response({'details' : error }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['GET'])
+def get_users_featured_restaurants (request, pk):
+    try:
+        user = User.objects.get(id=pk)
+        reservations = Reservation.objects.filter(user=user).values('restaurant').annotate(
+            count=Count('restaurant')
+        )
+        sorted_list = sorted(
+            reservations, key=lambda r: r['count'], reverse=True
+        )[:3]
+        restaurants = [ Restaurant.objects.get(_id=sl['restaurant']) for sl in sorted_list ]
+        serializer = RestaurantSerializer(restaurants, many=True)
+        return Response(serializer.data)
+    except User.DoesNotExist:
+        return Response({'details' : 'User Not Found!'}, status=status.HTTP_404_NOT_FOUND)
+    except Exception as e:
+        error = 'Internal Server Error' if str(e) == '' else str(e)
+        return Response({'details' : error}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

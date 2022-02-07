@@ -28,6 +28,11 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'proshop-demo.herokuapp.com']
 
+EMAIL_BACKEND = "sendgrid_backend.SendgridBackend"
+SENDGRID_API_KEY = os.environ['TP_SENDGRID_API_KEY']
+SENDGRID_SANDBOX_MODE_IN_DEBUG=False
+# SENDGRID_ECHO_TO_STDOUT=True
+
 
 # Application definition
 
