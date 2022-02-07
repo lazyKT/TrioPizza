@@ -51,17 +51,12 @@ export default function OrderList () {
           <>
             { loading && <Loader/>}
             { error && <Message variant="danger">{error}</Message>}
-            { orders?.orders && (
-              <>
-                <h5>All Orders ({orders.count})</h5>
-                {orders.orders.map(order => (
-                  <OrderCard
-                    key={order._id}
-                    order={order}
-                    goToOrderDetails={goToOrderDetails}
-                  />
-                ))}
-              </>
+            { orders?.orders?.map(order => (
+              <OrderCard
+                key={order._id}
+                order={order}
+                goToOrderDetails={goToOrderDetails}
+              />
             )}
             <Pagination>
               {[...Array(orders?.pages).keys()].map(p => (

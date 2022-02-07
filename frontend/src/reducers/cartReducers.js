@@ -10,6 +10,7 @@ import {
 
 
 export const cartReducer = (state = { cartItems: [], shippingAddress: {}, restaurant: null }, action) => {
+
     switch (action.type) {
       case RESTAURANT_CART:
         return {
@@ -19,13 +20,23 @@ export const cartReducer = (state = { cartItems: [], shippingAddress: {}, restau
 
       case CART_ADD_ITEM:
         const item = action.payload
-        const existItem = state.cartItems.find(x => x.product === item.product)
+
+        const existItem = state.cartItems.find(x => x.product === item.product);
 
         if (existItem) {
           return {
             ...state,
-            cartItems: state.cartItems.map(x =>
-                x.product === existItem.product ? item : x)
+            cartItems: state.cartItems.map(x => {
+              if (x.product === item.product) {
+                return {
+                  ...x,
+                  qty: parseInt(x.qty) + 1,
+                  totalPrice: Number(x.totalPrice) + item.totalPrice
+                };
+              }
+              else
+                return x;
+            })
           };
 
         }

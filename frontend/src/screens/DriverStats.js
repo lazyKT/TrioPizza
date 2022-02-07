@@ -76,15 +76,17 @@ export default function DriverStats () {
       <Row className='my-2'>
         <Col className="p-2 mr-2">
           <Paper
-            sx={{ padding: '20px' }}
+            sx={{ padding: '20px', background: 'dodgerblue' }}
           >
             <Typography
               variant="subtitle2"
+              sx={{color: 'white'}}
             >
               Total Orders:
             </Typography>
             <Typography
               variant="h5"
+              sx={{color: 'white'}}
             >
               { total }
             </Typography>
@@ -93,15 +95,17 @@ export default function DriverStats () {
 
         <Col className="p-2 ml-2">
           <Paper
-            sx={{ padding: '20px' }}
+            sx={{ padding: '20px', background: 'coral'}}
           >
             <Typography
+              sx={{color: 'white'}}
               variant="subtitle2"
             >
               Total Active Orders:
             </Typography>
             <Typography
               variant="h5"
+              sx={{color: 'white'}}
             >
               { activeCount }
             </Typography>
@@ -111,15 +115,17 @@ export default function DriverStats () {
       <Row>
         <Col className="p-2 mr-2">
           <Paper
-            sx={{ padding: '20px' }}
+            sx={{ padding: '20px', background: 'limegreen' }}
           >
             <Typography
               variant="subtitle2"
+              sx={{color: 'white'}}
             >
               Total Orders Delivered:
             </Typography>
             <Typography
               variant="h5"
+              sx={{color: 'white'}}
             >
               { deliveredCount }
             </Typography>

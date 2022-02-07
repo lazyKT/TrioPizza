@@ -147,7 +147,7 @@ export default function CustomerDetails () {
               </Form.Control>
           </Form.Group>
 
-          <Form.Group controlId='email'>
+          <Form.Group controlId='email' className="mb-3">
               <Form.Label>Mobile Number</Form.Label>
               <Form.Control
                   required

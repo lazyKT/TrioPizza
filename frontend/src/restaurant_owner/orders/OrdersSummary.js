@@ -74,13 +74,13 @@ export default function OrdersSummary () {
           : (
             <div style={styles.container}>
                 <Paper
-                  sx={styles.box}
+                  sx={{...styles.box, background: 'dodgerblue', color: 'white'}}
                 >
                   Total Orders this month : {data?.total_orders}
                 </Paper>
 
                 <Paper
-                  sx={styles.box}
+                  sx={{...styles.box, background: 'limegreen', color: 'white'}}
                 >
                   Delivered Orders : {
                     data?.order_stats[1]?.count || 0
@@ -88,7 +88,7 @@ export default function OrdersSummary () {
                 </Paper>
 
                 <Paper
-                  sx={styles.box}
+                  sx={{...styles.box, background: 'coral', color: 'white'}}
                 >
                   Active Orders : {data?.order_stats[2]?.count || 0}
                 </Paper>

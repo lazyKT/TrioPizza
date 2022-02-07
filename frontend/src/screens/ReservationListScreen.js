@@ -47,6 +47,20 @@ const styles = {
 }
 
 
+function makeStyle (status) {
+  switch (status) {
+    case 'active':
+      return styles.active;
+    case 'complete':
+      return styles.done;
+    case 'cancel':
+      return styles.cancel;
+    default:
+      throw new Error('Unknown Status');
+  }
+}
+
+
 function getDay (date) {
   let day = '';
   switch (date.getDay()) {
@@ -118,7 +132,6 @@ export default function ReservationListScreen ({history}) {
       }
       else {
         setError(null);
-        console.log(data);
         setReservations(data);
       }
     }
@@ -181,11 +194,7 @@ export default function ReservationListScreen ({history}) {
             </h6>
           </div>
           <h6
-            style={
-              r.status === 'active' ? styles.active : (
-                r.status === 'done' ? styles.done : styles.cancel
-              )
-            }
+            style={makeStyle(r.status)}
           >
             <strong>{r.status}</strong>
           </h6>
