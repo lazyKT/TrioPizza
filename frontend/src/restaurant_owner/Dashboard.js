@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import Paper from '@mui/material/Paper';
 import { Row, Col } from 'react-bootstrap';
 import { Chart as CharJS, ArcElement, Tooltip, Legend } from 'chart.js';
 import { Doughnut, Pie } from 'react-chartjs-2';
 
+import RestaurantOrderReservation from './statistic/RestaurantOrderReservation';
+import RestaurantProductsStats from './statistic/RestaurantProductsStats';
 import Loader from '../components/Loader';
 import Message from '../components/Message';
 import { getRestaurantInfo } from '../actions/restaurantActions';
@@ -75,14 +78,13 @@ export default function Dashboard () {
       { restaurantInfo && (
         <div>
           <h5>{restaurantInfo.name}</h5>
+          <div>
+            <h6>Product Statistics</h6>
+            <RestaurantProductsStats />
+          </div>
           <Row>
             <Col>
-              <h6>Doughnut Chart</h6>
-              <Doughnut data={data} />
-            </Col>
-            <Col>
-              <h6>Pie Chart</h6>
-              <Pie data={data} />
+              <RestaurantOrderReservation />
             </Col>
           </Row>
         </div>

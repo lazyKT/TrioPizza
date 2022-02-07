@@ -7,5 +7,6 @@ urlpatterns = [
     path('users/<int:pk>/', views.get_users_reservation, name='users-reservations'),
     path('restaurant/day/<int:pk>', views.get_reservations_by_day, name='reservations-by-day'),
     path('restaurant/<int:pk>', views.get_reservations_by_timeslot, name='reservations-timeslots'),
+    path('<int:pk>/featured-restaurants/', views.get_users_featured_restaurants, name='featured-restaurants'),
     path('<int:pk>/', views.ReservationDetails.as_view()),
 ]

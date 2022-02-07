@@ -66,6 +66,25 @@ export default function ReservationScreen ({reservation, backToList}) {
     }
   }
 
+  const completeReservation = async (e) => {
+    try {
+      e.preventDefault();
+      setLoading(true);
+      const body = { status : 'complete'};
+      const { error, message } = await editReservationById (reservation._id, body, userInfo.token);
+
+      if (error) {
+        setError(message);
+      }
+      else {
+        backToList();
+      }
+    }
+    catch (error) {
+      setError(error.message);
+    }
+  }
+
   useEffect(() => {
     setLoading(false);
     console.log(reservation);
@@ -153,13 +172,22 @@ export default function ReservationScreen ({reservation, backToList}) {
                 </ListGroup>
 
                 { reservation.status === 'active' && (
-                  <Button
-                    variant='danger'
-                    className='mt-1'
-                    onClick={cancelOnClick}
-                  >
-                    Cancel Reservation
-                  </Button>
+                  <>
+                    <Button
+                      variant='danger'
+                      className='mt-1'
+                      onClick={cancelOnClick}
+                    >
+                      Cancel Reservation
+                    </Button>
+                    <Button
+                      variant='success'
+                      className='mt-1 mx-2'
+                      onClick={completeReservation}
+                    >
+                      Complete Reservation
+                    </Button>
+                  </>
                 )}
               </>
             )

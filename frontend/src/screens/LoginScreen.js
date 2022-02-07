@@ -83,12 +83,21 @@ function LoginScreen({ location, history }) {
                     </Form.Control>
                 </Form.Group>
 
+                <Row className='my-3'>
+                  <Col>
+                    <Link style={{ color: 'dodgerblue', fontStyle: 'italic'}}
+                      to='/forgot-password'>
+                        Forgot Password?
+                    </Link>
+                  </Col>
+                </Row>
+
                 <Button type='submit' variant='primary'>
                     Sign In
                 </Button>
             </Form>
 
-            <Row className='py-3'>
+            <Row className='my-3'>
                 <Col>
                     New Customer? <Link
                         to={redirect ? `/register?redirect=${redirect}` : '/register'}>

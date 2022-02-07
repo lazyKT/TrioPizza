@@ -112,7 +112,7 @@ export async function getOrdersByDriver (driverId, token, signal, page=1) {
 
 export async function getDriverOrderStats (driverId, token, signal) {
   try {
-    const { data } = await axios.get(`/api/orders/driver-stats/${driverId}`, {
+    const { data } = await axios.get(`/api/orders/driver-stats/${driverId}/`, {
       headers: {
         'Content-Type' : 'application/json',
         Authorization: `Bearer ${token}`

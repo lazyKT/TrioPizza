@@ -179,6 +179,7 @@ class DriverOrderStatus (models.Model):
     last_assigned = models.BooleanField(default=False)
     total_order = models.IntegerField(default=0)
     active_orders = models.IntegerField(default=0)
+    total_delivery = models.IntegerField(default=0)
 
     def __str__(self):
         return 'driver name: %s, status: %s' % (self.driver.profile.name, self.status)
@@ -201,3 +202,26 @@ class PreOrder (models.Model):
     reservation = models.ForeignKey(Reservation, on_delete=models.CASCADE)
     qty = models.IntegerField(default=0)
     price = models.DecimalField(max_digits=7, decimal_places=2, null=True, blank=True)
+
+
+class Support (models.Model):
+    _id = models.AutoField(primary_key=True)
+    email = models.CharField(max_length=64)
+    type = models.CharField(max_length=16)
+    headline = models.TextField()
+    content = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+
+class TempURL (models.Model):
+    _id = models.AutoField(primary_key=True)
+    email = models.CharField(max_length=24)
+    token = models.CharField(max_length=512)
+    expire_time = models.DateTimeField()
+    status = models.CharField(max_length=16, default='new')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+
+    def get_reset_link (self):
+        expiry = self.expire_time.strftime('%Y-%m-%dT%H:%M:%S')
+        return f"http://localhost:3000/#/reset-password?token={self.token}&expiry={expiry}"

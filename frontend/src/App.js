@@ -4,9 +4,12 @@ import { HashRouter as Router, Route } from 'react-router-dom';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import HomeScreen from './screens/HomeScreen';
+import SupportScreen from './screens/SupportScreen';
 import ProductScreen from './screens/ProductScreen';
 import CartScreen from './screens/CartScreen';
 import LoginScreen from './screens/LoginScreen';
+import ForgotPassword from './screens/ForgotPassword';
+import ResetPassword from './screens/ResetPassword';
 import RegisterScreen from './screens/RegisterScreen';
 import ProfileScreen from './screens/ProfileScreen';
 import ShippingScreen from './screens/ShippingScreen';
@@ -53,7 +56,10 @@ function App() {
             }
           />
           <Route path='/login' component={LoginScreen} />
+          <Route path='/forgot-password' component={ForgotPassword} />
+          <Route path='/reset-password' component={ResetPassword} />
           <Route path='/register' component={RegisterScreen} />
+          <Route path='/support' component={SupportScreen} />
           <Route path='/profile' component={ProfileScreen} />
           <Route path='/shipping' component={ShippingScreen} />
           <Route path='/placeorder' component={PlaceOrderScreen} />
