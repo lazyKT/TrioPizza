@@ -44,7 +44,7 @@ function getCellData (type) {
       case 'products':
         return ['_id', 'name', 'description', 'price'];
       case 'promos':
-        return ['_id', 'description', 'status', 'type', 'amount', 'expiry_date'];
+        return ['_id', 'description', 'product_name', 'status', 'type', 'amount', 'expiry_date'];
       default:
         throw new Error ("Invalid Data Type")
     }

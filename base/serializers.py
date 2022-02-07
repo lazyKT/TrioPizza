@@ -262,13 +262,18 @@ class FeatureProductSerializer (serializers.ModelSerializer):
 
 
 class PromosSerializer (serializers.ModelSerializer):
-    # product = serializers.SerializerMethodField(read_only=True)
+    product_name = serializers.SerializerMethodField(read_only=True)
     # restaurant = serializers.SerializerMethodField(read_only=True)
     status = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = Promos
         fields = '__all__'
+
+    def get_product_name (self, obj):
+        product = obj.product
+        print(product.name)
+        return product.name
 
     def get_status (self, obj):
         expiry_dt = obj.expiry_date

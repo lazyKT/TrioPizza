@@ -47,6 +47,19 @@ const styles = {
 }
 
 
+function makeStyle (status) {
+  switch (status) {
+    case 'active':
+      return styles.active;
+    case 'complete':
+      return styles.done;
+    case 'cancel':
+      return styles.cancel;
+    default:
+      throw new Error('Unknown Status');
+  }
+}
+
 export default function ReservationList ({viewType, dateTime, backToDashboard}) {
 
   const [ reservations, setReservations ] = useState(null);
@@ -134,11 +147,7 @@ export default function ReservationList ({viewType, dateTime, backToDashboard}) 
                   </h6>
                 </div>
                 <h6
-                  style={
-                    r.status === 'active' ? styles.active : (
-                      r.status === 'done' ? styles.done : styles.cancel
-                    )
-                  }
+                  style={makeStyle(r.status)}
                 >
                   <strong>{r.status}</strong>
                 </h6>

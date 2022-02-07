@@ -37,6 +37,7 @@ const styles = {
 const columns = [
   { id: '_id', label: 'ID', maxWidth: 70 },
   { id: 'description', label: 'Description', minWidth: 170 },
+  { id: 'product_name', label: 'Product', minWidth: 120},
   { id: 'status', label: 'Status', maxWidth: 80 },
   {
     id: 'type',
