@@ -130,7 +130,10 @@ class UserList (APIView):
             if data['type'] == 'driver':
                 self.create_new_driver_record (user)
             serializer = UserSerializer (user)
-
+            # send welcome email
+            subject = '[Triopizza] Welcome to TrioPizza'
+            body = 'Dear %s,\n\n\tWelcome to the TrioPizza.\n\tThis email is to confirm you that you have successfully registered.' % (data['name'])
+            send_email ([user.username], subject, body)
             return Response(serializer.data)
         except Exception as e:
             error = 'Internal Server Error!' if repr(e) == '' else repr(e)

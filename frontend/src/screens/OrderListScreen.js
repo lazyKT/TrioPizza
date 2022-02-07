@@ -16,12 +16,25 @@ const styles = {
   container: {
     padding: '20px',
     marginTop: '15px',
-    marginBottom: '20px'
+    marginBottom: '20px',
+    '&:hover': {
+      backgroundColor: 'gainsboro',
+      color: 'darkblue',
+      cursor: 'pointer'
+    },
   },
   row: {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center'
+  },
+  subHeader: {
+    fontSize: '16px',
+    fontWeight: '600',
+    marginTop: '10px',
+    marginBottom: '20px',
+    textDecoration: 'underline',
+    textDecorationColor: 'dodgerblue'
   }
 }
 
@@ -58,6 +71,13 @@ export default function OrderListScreen({ history }) {
       dispatch(listMyOrders(page))
     }
 
+    const getActiveOrdersCount = (orders) => {
+      if (!orders) return 0;
+
+      const activeOrders = orders.filter(o => o.status === 'active');
+      return activeOrders.length;
+    }
+
     useEffect(() => {
         if (userInfo) {
             dispatch(listMyOrders())
@@ -77,6 +97,7 @@ export default function OrderListScreen({ history }) {
               ? (<Message variant='danger'>{error}</Message>)
               : (
                 <>
+                  <p style={styles.subHeader}>Active Order(s) : {getActiveOrdersCount(orders?.orders)}</p>
                   {orders?.orders && orders.orders.map((order, idx) => (
                     <>
                       <Paper
@@ -99,19 +120,19 @@ export default function OrderListScreen({ history }) {
                           <h5>{order.totalPrice}&nbsp;$</h5>
                         </Box>
                       </Paper>
-                      <Pagination>
-                        {[...Array(orders.pages).keys()].map((p, idx) => (
-                          <Pagination.Item
-                            key={idx}
-                            active={p + 1 === orders.page}
-                            onClick={() => handlePagination(p + 1)}
-                          >
-                          { p + 1 }
-                          </Pagination.Item>
-                        ))}
-                      </Pagination>
                     </>
                   ))}
+                  <Pagination>
+                    {[...Array(orders.pages).keys()].map((p, idx) => (
+                      <Pagination.Item
+                        key={idx}
+                        active={p + 1 === orders.page}
+                        onClick={() => handlePagination(p + 1)}
+                      >
+                      { p + 1 }
+                      </Pagination.Item>
+                    ))}
+                  </Pagination>
                   {orders?.orders?.length === 0 && <Message variant='info'>You have not made any orders yet!</Message>}
                 </>
               )}

@@ -35,6 +35,14 @@ const styles = {
     padding: '5px',
     background: 'lightgray',
     color: 'black'
+  },
+  subHeader: {
+    fontSize: '16px',
+    fontWeight: '600',
+    marginTop: '10px',
+    marginBottom: '20px',
+    textDecoration: 'underline',
+    textDecorationColor: 'dodgerblue'
   }
 }
 
@@ -123,6 +131,11 @@ export default function ReservationListScreen ({history}) {
     history.push(`/reservations/${id}`);
   }
 
+  const getActiveReservationsCount = (reservations) => {
+    if (!reservations) return 0;
+    const active_rs = reservations.filter(r => r.status === 'active')
+    return active_rs.length;
+  }
 
   useEffect(() => {
 
@@ -153,6 +166,7 @@ export default function ReservationListScreen ({history}) {
       <h4>My Reservations</h4>
       { error && <Message variant='danger'>{error}</Message> }
       { loading && <Loader />}
+      <p style={styles.subHeader}>Active Reservation(s) : {getActiveReservationsCount(reservations?.reservations)}</p>
       { reservations?.reservations?.map ( (r) => (
         <Paper
           sx={styles.paper}
