@@ -206,8 +206,22 @@ class PreOrder (models.Model):
 
 class Support (models.Model):
     _id = models.AutoField(primary_key=True)
-    email = models.CharField(max_length=24)
+    email = models.CharField(max_length=64)
     type = models.CharField(max_length=16)
     headline = models.TextField()
     content = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
+
+
+class TempURL (models.Model):
+    _id = models.AutoField(primary_key=True)
+    email = models.CharField(max_length=24)
+    token = models.CharField(max_length=512)
+    expire_time = models.DateTimeField()
+    status = models.CharField(max_length=16, default='new')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+
+    def get_reset_link (self):
+        expiry = self.expire_time.strftime('%Y-%m-%dT%H:%M:%S')
+        return f"http://localhost:3000/#/reset-password?token={self.token}&expiry={expiry}"

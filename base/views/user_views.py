@@ -1,3 +1,6 @@
+import pytz
+from hashlib import sha256
+from datetime import datetime, timedelta
 from django.shortcuts import render, get_object_or_404
 from django.db.models import Q
 from django.http import Http404
@@ -11,7 +14,8 @@ from django.contrib.auth.models import User
 from django.contrib.auth.hashers import make_password
 from rest_framework import status
 
-from base.models import Profile, ShippingAddress, DriverOrderStatus, Order
+from base.utils import send_email
+from base.models import Profile, ShippingAddress, DriverOrderStatus, Order, TempURL
 from base.serializers import (
     ProductSerializer,
     UserSerializer,
@@ -511,6 +515,68 @@ def update_driver_status (request):
     except DriverOrderStatus.DoesNotExist:
         return Response({'details' : 'Driver Status Not Found!'}, status=status.HTTP_400_BAD_REQUEST)
 
+    except Exception as e:
+        error = 'Internal Server Error!' if str(e) == '' else str(e)
+        return Response({'details' : error}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+
+@api_view(['POST'])
+def gen_password_reset_link (request):
+    try:
+        data = request.data
+        if 'email' not in data:
+            return Response({'details' : 'Email is required*'})
+        user = User.objects.get(username=data['email'])
+        sg_tz = pytz.timezone('Asia/Singapore')
+        tempURL = TempURL.objects.create(
+            email = user.username,
+            token = sha256(f"{user.username}{str(datetime.utcnow().timestamp())}".encode('utf-8')).hexdigest(),
+            expire_time = datetime.now(tz=sg_tz) + timedelta(minutes=10)
+        )
+        subject = '[Triopizza] Password Reset Request'
+        body = 'You have requested the password reset\n%s' % (tempURL.get_reset_link())
+        send_email ([user.username], subject, body)
+        return Response({'details' : 'Password Reset Link has been sent. Please Check your email!'})
+    except User.DoesNotExist:
+        return Response({'details' : 'User not found with given email!'}, status=status.HTTP_404_NOT_FOUND)
+    except Exception as e:
+        error = 'Internal Server Error!' if str(e) == '' else str(e)
+        return Response({'details' : error}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['POST'])
+def reset_password (request):
+    try:
+        data = request.data
+        if 'email' not in data or 'password' not in data:
+            return Response({'details' : 'Email and Password is required*'}, status=status.HTTP_400_BAD_REQUEST)
+        if 'token' not in data:
+            return Response({'details' : 'Invalid Token*'}, status=status.HTTP_400_BAD_REQUEST)
+        if 'expiry' not in data:
+            return Response({'details' : 'Invalid or Empty Time Stamp'}, status=status.HTTP_400_BAD_REQUEST)
+        tmp_link = TempURL.objects.get(token=data['token'])
+        sg_tz = pytz.timezone('Asia/Singapore')
+        expiry = pytz.utc.localize(datetime.strptime(data['expiry'], '%Y-%m-%dT%H:%M:%S'))
+        token_expire_time = tmp_link.expire_time.astimezone(sg_tz)
+
+        # check requested email
+        if data['email'] != tmp_link.email:
+            return Response({'details' : 'Wrong Email'}, status=status.HTTP_401_UNAUTHORIZED)
+        # compare link expire times
+        if expiry.date() != token_expire_time.date() or expiry.hour != token_expire_time.hour or expiry.minute != token_expire_time.minute:
+            return Response({'details' : 'Invalid Token and TimeStamp!'}, status=status.HTTP_403_FORBIDDEN)
+
+        if token_expire_time < datetime.now(tz=sg_tz):
+            return Response({'details' : 'Token Expired!'}, status=status.HTTP_403_FORBIDDEN)
+        user = User.objects.get(username=data['email'])
+        user.password = make_password(data['password'])
+        user.save()
+        return Response(f"Password change for {user.username}")
+    except User.DoesNotExist:
+        return Response({'details' : 'User Not Found with give email!'}, status=status.HTTP_404_NOT_FOUND)
+    except TempURL.DoesNotExist:
+        return Response({'details' : 'Invalid Request!'}, status=status.HTTP_400_BAD_REQUEST)
     except Exception as e:
         error = 'Internal Server Error!' if str(e) == '' else str(e)
         return Response({'details' : error}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
