@@ -101,7 +101,7 @@ export default function OrderListScreen({ history }) {
                   {orders?.orders && orders.orders.map((order, idx) => (
                     <>
                       <Paper
-                        key={idx}
+                        key={order._id}
                         sx={styles.container}
                         onClick={() => orderOnClick(order._id)}
                       >
@@ -112,7 +112,9 @@ export default function OrderListScreen({ history }) {
                             <h6 style={{
                               padding: '10px',
                               width: 'fit-content',
-                              background: order.status === 'progress' ? 'dodgerblue' : 'gainsboro',
+                              background: order.status === 'progress' ? 'coral' : (
+                                order.status === 'delivered' ? 'lightgreen' : 'gainsboro'
+                              ),
                             }}>
                               {order.status}
                             </h6>

@@ -29,7 +29,6 @@ function Product({ product }) {
       }
       else {
         setPromoError(null);
-        console.log(data);
         setPromo(data);
       }
     }

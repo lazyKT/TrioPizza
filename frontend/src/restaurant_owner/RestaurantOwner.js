@@ -14,6 +14,7 @@ import FeatureProducts from './feature_products/FeatureProducts';
 import Promotions from './promotions/Promotions';
 import ReservationDashboard from './reservations/ReservationDashboard';
 import OrderDashboard from './orders/OrderDashboard';
+import Profile from './Profile';
 import { logout } from '../actions/userActions';
 
 
@@ -67,7 +68,7 @@ function switchContents (page) {
       case 'Restaurant Setting':
         return <MyRestaurant />;
       case 'Profile':
-        return <h5>Owner Profile</h5>;
+        return <Profile />;
 			default:
 				throw new Error ('Invalid Admin Page Content');
 		}

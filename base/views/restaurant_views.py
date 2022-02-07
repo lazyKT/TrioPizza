@@ -351,12 +351,14 @@ class PromoList (APIView):
                 return Response({'details' : message}, status=status.HTTP_400_BAD_REQUEST)
             restaurant = Restaurant.objects.get(_id=data['restaurant'])
             product = Product.objects.get(_id=data['product'])
+            if data['type'] == 'cash-off' and float(data['amount']) >= product.price:
+                return Response({'details' : 'Promotion price cannot be grater than product price'}, status=status.HTTP_400_BAD_REQUEST)
             if len(self.get_promos_by_product(product)) > 0:
                 return Response({'details' : 'Promotion existed with the same product!'}, status=status.HTTP_400_BAD_REQUEST)
             if restaurant._id != product.restaurant._id:
                 return Response({'details' : 'Invalid Product!'}, status=status.HTTP_400_BAD_REQUEST)
-            print(data['amount'], type(data['amount']))
-            print(float(data['amount']))
+            # print(data['amount'], type(data['amount']))
+            # print(float(data['amount']))
             promo = Promos.objects.create(
                 restaurant=restaurant,
                 product=product,

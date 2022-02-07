@@ -35,8 +35,8 @@ function createEvents (timeSlots) {
         id: idx,
         title: `${ts.count} reservations`,
         start: ts[time].split('Z')[0],
-        backgroundColor: ts.count > 1 ? 'red' : 'dodgerblue',
-        borderColor: ts.count > 1 ? 'red' : 'dodgerblue'
+        backgroundColor: ts.count > 5 ? 'red' : ( ts.count > 3 ? 'dodgerblue' : 'green'),
+        borderColor: ts.count > 5 ? 'red' : ( ts.count > 3 ? 'dodgerblue' : 'green'),
       };
     });
   }
@@ -148,18 +148,18 @@ export default function ReservationDashboard () {
         : (
           <>
             <h6>Legends</h6>
-            <Row className="mb-4 w-50">
+            <Row className="mb-4 w-75">
               <Col className="d-flex justify-content-start">
                 <div style={{ ...styles.legend, background: 'white', border: 'solid 0.5px black'}} />
                 <span>Available</span>
               </Col>
               <Col className="d-flex justify-content-start">
                 <div style={{ ...styles.legend, background: 'green' }}/>
-                <span>Available</span>
+                <span>75% Available</span>
               </Col>
               <Col className="d-flex justify-content-start">
                 <div style={{ ...styles.legend, background: 'dodgerblue' }}/>
-                <span>Available</span>
+                <span>50% Available</span>
               </Col>
               <Col className="d-flex justify-content-start">
                 <div style={{ ...styles.legend, background: 'red' }} />

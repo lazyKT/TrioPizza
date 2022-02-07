@@ -124,8 +124,8 @@ export default function RestaurantOrderReservation () {
           error ? <Message variant='danger'>{error}</Message>
           : (
             <LineChart
-              data1={dummyData2}
-              data2={dummyData}
+              data1={dummyData}
+              data2={dummyData2}
             />
           )
         )

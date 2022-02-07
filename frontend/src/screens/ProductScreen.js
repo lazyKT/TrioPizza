@@ -7,9 +7,10 @@ import StarIcon from '@mui/icons-material/Star';
 import Loader from '../components/Loader';
 import Message from '../components/Message';
 import { listProductDetails, createProductReview } from '../actions/productActions';
+import { addToCart } from '../actions/cartActions';
 import { getProductPromotion } from '../networking/productRequests';
 import { PRODUCT_CREATE_REVIEW_RESET } from '../constants/productConstants';
-import { RESTAURANT_CART, CART_CLEAR_ITEMS } from '../constants/cartConstants';
+import { RESTAURANT_CART, CART_CLEAR_ITEMS, CART_ADD_ITEM } from '../constants/cartConstants';
 
 
 function ProductScreen({ match, history }) {
@@ -33,32 +34,32 @@ function ProductScreen({ match, history }) {
     } = productReviewCreate;
 
     const addToCartHandler = () => {
-        if (userInfo) {
-          if (restaurant && product?.restaurant?._id !== restaurant) {
-            setShowModal(true);
-            console.log('product from different restaurants');
-          }
-          else {
-            dispatch({
-              type: RESTAURANT_CART,
-              payload: product?.restaurant?._id
-            });
-            history.push(`/cart/${match.params.id}?qty=${qty}`);
-          }
+      if (userInfo) {
+        if (restaurant && product?.restaurant !== restaurant) {
+          setShowModal(true);
         }
         else {
-          history.push('/login');
+          dispatch({
+            type: RESTAURANT_CART,
+            payload: product?.restaurant
+          });
+          dispatch(addToCart(product._id, qty));
+          history.push(`/cart/${match.params.id}?qty=${qty}`);
         }
+      }
+      else {
+        history.push('/login');
+      }
     };
 
     const createNewCart = (e) => {
       e.preventDefault();
-      console.log('createNewCart');
       dispatch({ type: CART_CLEAR_ITEMS });
       dispatch({
         type: RESTAURANT_CART,
-        payload: product?.restaurant?._id
+        payload: product?.restaurant
       });
+      dispatch(addToCart(product._id, qty));
       history.push(`/cart/${match.params.id}?qty=${qty}`);
     };
 
@@ -87,7 +88,6 @@ function ProductScreen({ match, history }) {
         }
         else {
           setPromoError(null);
-          console.log(data);
           setPromo(data);
         }
       }
@@ -99,7 +99,6 @@ function ProductScreen({ match, history }) {
 
     useEffect(() => {
       dispatch(listProductDetails(match.params.id));
-
     }, [dispatch, match, successProductReview, restaurant]);
 
     useEffect(() => {
