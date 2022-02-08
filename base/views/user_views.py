@@ -80,11 +80,16 @@ class UserList (APIView):
         """
         try:
             user_type = request.query_params.get('type')
+            users = None
             if user_type is not None:
                 users = Profile.objects.filter(type=user_type)
                 serializer = ProfileSerializer(users, many=True)
                 return Response(serializer.data)
-            users = User.objects.all()
+            search = request.query_params.get('search')
+            if search is not None and search != '':
+                users = User.objects.filter(username__contains=search)
+            else:
+                users = User.objects.all()
             serializer = UserSerializer(users, many=True)
             return Response(serializer.data)
         except Exception as e:

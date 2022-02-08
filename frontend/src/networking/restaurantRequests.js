@@ -22,6 +22,27 @@ export async function getAllRestaurants (signal, limit=8) {
 }
 
 
+export async function filterRestaurants (signal, filter, limit=8) {
+  try {
+    const { data } = await axios.get(`/api/restaurants?limit=${limit}&search=${filter}`, {
+      headers: {
+        'Content-Type' : 'application/json',
+        'Accept' : 'application/json'
+      },
+      signal: signal
+    });
+
+    return { error: false, data }
+  }
+  catch (error) {
+    if (error.response && error.response.data.details)
+      return { error: true, message: error.response.data.details };
+    else
+      return { error: true, message: error.message };
+  }
+}
+
+
 export async function getFeaturedRestaurants (userId, signal) {
   try {
     const { data } = await axios.get(`/api/reservations/${userId}/featured-restaurants/`, {

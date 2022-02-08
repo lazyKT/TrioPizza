@@ -14,6 +14,7 @@ import EditProduct from './EditProduct';
 import Message from '../../components/Message';
 import Loader from '../../components/Loader';
 import { listRestaurantProducts } from '../../actions/productActions';
+import { searchProductsRequest } from '../../networking/productRequests';
 
 
 const styles = {
@@ -48,10 +49,13 @@ export default function ProductList ({addNewProduct}) {
 
   const [ openEditProduct, setOpenEditProduct ] = useState(false);
   const [ editingID, setEditingID ] = useState(null);
+  const [ filter, setFilter ] = useState('');
+  const [ filteredProducts, setFilteredProducts ] = useState([]);
 
   const dispatch = useDispatch();
   const { empty, restaurantInfo } = useSelector(state => state.restaurant);
   const { loading, error, products } = useSelector(state => state.productList);
+  const { userInfo } = useSelector(state => state.userCookie);
 
 
   const editProduct = (val) => {
@@ -60,6 +64,21 @@ export default function ProductList ({addNewProduct}) {
   }
 
   const closeOpenEditProduct = () => setOpenEditProduct(false);
+
+  const searchProducts = async (e) => {
+    try {
+      setFilter(e.target.value);
+      const { data, error, message } = await searchProductsRequest(restaurantInfo._id, e.target.value, userInfo.token);
+
+      if (error)
+        throw new Error(message);
+      else
+        setFilteredProducts(data);
+    }
+    catch (error) {
+      console.error(error);
+    }
+  }
 
   useEffect(() => {
     const abortController = new AbortController();
@@ -70,7 +89,7 @@ export default function ProductList ({addNewProduct}) {
     }
 
     return () => abortController.abort();
-  }, [openEditProduct, empty, restaurantInfo]);
+  }, [openEditProduct, empty, restaurantInfo, userInfo]);
 
   return (
     <>
@@ -83,7 +102,15 @@ export default function ProductList ({addNewProduct}) {
           <>
             <Paper sx={styles.topContainer}>
               <Box sx={{width: '40%', maxWidth: '400px'}}>
-                <TextField fullWidth label="Search" variant="outlined" size="small"/>
+                <TextField
+                  fullWidth
+                  label="Search"
+                  variant="outlined"
+                  size="small"
+                  value={filter}
+                  name='filter'
+                  onChange={searchProducts}
+                />
               </Box>
 
               <Box>
@@ -106,7 +133,7 @@ export default function ProductList ({addNewProduct}) {
             </Paper>
             <CustomTable
               columns={columns}
-              rows={products}
+              rows={filter !== '' ? filteredProducts : products}
               type='products'
               edit={editProduct}
             />

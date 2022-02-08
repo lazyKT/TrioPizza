@@ -5,14 +5,13 @@ import Paper from '@mui/material/Paper';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton';
-
 import AddIcon from '@mui/icons-material/Add';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import RefreshIcon from '@mui/icons-material/Refresh';
 
 import CustomTable from '../CustomTable';
 import EditUser from './EditUser';
-
+import { searchUsersRequest } from '../../networking/userRequests';
 import { listUsers } from '../../actions/userActions';
 
 
@@ -60,6 +59,8 @@ export default function UserList({addNewUser}) {
 
   const [ openEditUser, setOpenEditUser ] = useState(false);
   const [ editingID, setEditingID ] = useState(null);
+  const [ filter, setFilter ] = useState('');
+  const [ filteredResults, setFilteredResults ] = useState([]);
 
   const dispatch = useDispatch();
 
@@ -75,10 +76,24 @@ export default function UserList({addNewUser}) {
 
   const handleAddButtonOnClick = (event) => {
     event.preventDefault();
-    console.log('handleAddButtonOnClick!')
     addNewUser();
   }
 
+  const handleSearchBoxOnChange = async (e) => {
+    try {
+      setFilter(e.target.value);
+      const { data, error, message } = await searchUsersRequest(e.target.value);
+      if (error) {
+        throw new Error(message);
+      }
+      else {
+        setFilteredResults(data);
+      }
+    }
+    catch (error) {
+      console.error(error);
+    }
+  }
 
   useEffect(() => {
     if (!openEditUser) {
@@ -109,7 +124,16 @@ export default function UserList({addNewUser}) {
                     sx={styles.topContainer}
                   >
                     <Box sx={{width: '40%', maxWidth: '400px'}}>
-                      <TextField fullWidth label="Search" variant="outlined" size="small"/>
+                      <TextField
+                        fullWidth
+                        label="Search"
+                        variant="outlined"
+                        size="small"
+                        placeholder='Search User(s) by Email'
+                        name='filter'
+                        value={filter}
+                        onChange={handleSearchBoxOnChange}
+                      />
                     </Box>
 
                     <Box>
@@ -133,7 +157,7 @@ export default function UserList({addNewUser}) {
 
                   <CustomTable
                     columns={columns}
-                    rows={users}
+                    rows={filter !== '' ? filteredResults : users}
                     type="user"
                     edit={editUser}
                   />
