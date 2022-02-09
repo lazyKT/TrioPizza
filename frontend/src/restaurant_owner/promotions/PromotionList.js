@@ -9,6 +9,8 @@ import Button from '@mui/material/Button';
 import AddIcon from '@mui/icons-material/Add';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import RefreshIcon from '@mui/icons-material/Refresh';
+import * as FileSaver from 'file-saver';
+import * as XLSX from 'xlsx';
 
 import CustomTable from '../CustomTable';
 import Loader from '../../components/Loader';
@@ -99,6 +101,20 @@ export default function PromotionList ({openCreatePromotion}) {
     }
   }
 
+  const exportData = (e) => {
+    e.preventDefault();
+
+    const fileType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8';
+    const fileExtension = '.xlsx';
+    const fileName = `promo_${(new Date()).toLocaleDateString()}${(new Date()).toLocaleTimeString()}`;
+
+    const ws = XLSX.utils.json_to_sheet(promos);
+    const wb = { Sheets: { 'data': ws }, SheetNames: ['data'] };
+    const excelBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+    const data = new Blob([excelBuffer], {type: fileType});
+    FileSaver.saveAs(data, fileName + fileExtension);
+  }
+
   useEffect(() => {
     const abortController = new AbortController();
 
@@ -134,7 +150,12 @@ export default function PromotionList ({openCreatePromotion}) {
           >
             Add
           </Button>
-          <Button sx={{margin: '10px'}} variant="contained" endIcon={<FileDownloadIcon />}>
+          <Button
+            sx={{margin: '10px'}}
+            variant="contained"
+            endIcon={<FileDownloadIcon />}
+            onClick={exportData}
+          >
             Export
           </Button>
           <IconButton>

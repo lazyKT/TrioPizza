@@ -8,6 +8,8 @@ import IconButton from '@mui/material/IconButton';
 import AddIcon from '@mui/icons-material/Add';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import RefreshIcon from '@mui/icons-material/Refresh';
+import * as FileSaver from 'file-saver';
+import * as XLSX from 'xlsx';
 
 import CustomTable from '../CustomTable';
 import EditUser from './EditUser';
@@ -55,6 +57,8 @@ const columns = [
 ];
 
 
+
+
 export default function UserList({addNewUser}) {
 
   const [ openEditUser, setOpenEditUser ] = useState(false);
@@ -93,6 +97,20 @@ export default function UserList({addNewUser}) {
     catch (error) {
       console.error(error);
     }
+  }
+
+  const exportData = (e) => {
+    e.preventDefault();
+
+    const fileType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8';
+    const fileExtension = '.xlsx';
+    const fileName = `users_${(new Date()).toLocaleDateString()}${(new Date()).toLocaleTimeString()}`;
+
+    const ws = XLSX.utils.json_to_sheet(users);
+    const wb = { Sheets: { 'data': ws }, SheetNames: ['data'] };
+    const excelBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+    const data = new Blob([excelBuffer], {type: fileType});
+    FileSaver.saveAs(data, fileName + fileExtension);
   }
 
   useEffect(() => {
@@ -146,7 +164,12 @@ export default function UserList({addNewUser}) {
                       >
                         Add
                       </Button>
-                      <Button sx={{margin: '10px'}} variant="contained" endIcon={<FileDownloadIcon />}>
+                      <Button
+                        sx={{margin: '10px'}}
+                        variant="contained"
+                        endIcon={<FileDownloadIcon />}
+                        onClick={exportData}
+                      >
                         Export
                       </Button>
                       <IconButton>

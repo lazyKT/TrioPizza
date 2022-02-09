@@ -8,6 +8,8 @@ import Button from '@mui/material/Button';
 import AddIcon from '@mui/icons-material/Add';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import RefreshIcon from '@mui/icons-material/Refresh';
+import * as FileSaver from 'file-saver';
+import * as XLSX from 'xlsx';
 
 import CustomTable from '../CustomTable';
 import EditProduct from './EditProduct';
@@ -80,6 +82,27 @@ export default function ProductList ({addNewProduct}) {
     }
   }
 
+  const exportData = (e) => {
+    e.preventDefault();
+
+    const fileType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8';
+    const fileExtension = '.xlsx';
+    const fileName = `products_${(new Date()).toLocaleDateString()}${(new Date()).toLocaleTimeString()}`;
+
+    const _products = products.map(product => {
+      return {
+        ...product,
+        createdAt: `${(new Date(product.createdAt)).toLocaleDateString()}, ${(new Date(product.createdAt)).toLocaleTimeString()}`
+      }
+    });
+
+    const ws = XLSX.utils.json_to_sheet(_products);
+    const wb = { Sheets: { 'data': ws }, SheetNames: ['data'] };
+    const excelBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+    const data = new Blob([excelBuffer], {type: fileType});
+    FileSaver.saveAs(data, fileName + fileExtension);
+  }
+
   useEffect(() => {
     const abortController = new AbortController();
 
@@ -123,7 +146,12 @@ export default function ProductList ({addNewProduct}) {
                 >
                   Add
                 </Button>
-                <Button sx={{margin: '10px'}} variant="contained" endIcon={<FileDownloadIcon />}>
+                <Button
+                  sx={{margin: '10px'}}
+                  variant="contained"
+                  endIcon={<FileDownloadIcon />}
+                  onClick={exportData}
+                >
                   Export
                 </Button>
                 <IconButton>
