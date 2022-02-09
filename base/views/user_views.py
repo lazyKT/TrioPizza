@@ -14,7 +14,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.hashers import make_password
 from rest_framework import status
 
-from base.utils import send_email
+from base.utils import send_email, get_email_template
 from base.models import Profile, ShippingAddress, DriverOrderStatus, Order, TempURL
 from base.serializers import (
     ProductSerializer,
@@ -80,11 +80,16 @@ class UserList (APIView):
         """
         try:
             user_type = request.query_params.get('type')
+            users = None
             if user_type is not None:
                 users = Profile.objects.filter(type=user_type)
                 serializer = ProfileSerializer(users, many=True)
                 return Response(serializer.data)
-            users = User.objects.all()
+            search = request.query_params.get('search')
+            if search is not None and search != '':
+                users = User.objects.filter(username__contains=search)
+            else:
+                users = User.objects.all()
             serializer = UserSerializer(users, many=True)
             return Response(serializer.data)
         except Exception as e:
@@ -100,6 +105,17 @@ class UserList (APIView):
             )
         except Exception as e:
             raise e
+
+
+    def send_welcome_email (self, user_type, name, email):
+        if user_type == 'customer':
+            email_template = get_email_template('wlc_customer')
+            data = { "name" : name }
+            send_email([email], email_template, data)
+        elif user_type == 'restaurant owner':
+            email_template = get_email_template('wlc_rest_owner')
+            data = { "name" : name }
+            send_email([email], email_template, data)
 
 
     def post (self, request, *args, **kwargs):
@@ -131,9 +147,7 @@ class UserList (APIView):
                 self.create_new_driver_record (user)
             serializer = UserSerializer (user)
             # send welcome email
-            subject = '[Triopizza] Welcome to TrioPizza'
-            body = 'Dear %s,\n\n\tWelcome to the TrioPizza.\n\tThis email is to confirm you that you have successfully registered.' % (data['name'])
-            send_email ([user.username], subject, body)
+            self.send_welcome_email(data['type'], data['name'], data['username'])
             return Response(serializer.data)
         except Exception as e:
             error = 'Internal Server Error!' if repr(e) == '' else repr(e)
@@ -537,9 +551,12 @@ def gen_password_reset_link (request):
             token = sha256(f"{user.username}{str(datetime.utcnow().timestamp())}".encode('utf-8')).hexdigest(),
             expire_time = datetime.now(tz=sg_tz) + timedelta(minutes=10)
         )
-        subject = '[Triopizza] Password Reset Request'
-        body = 'You have requested the password reset\n%s' % (tempURL.get_reset_link())
-        send_email ([user.username], subject, body)
+        email_template = get_email_template('forgot_password')
+        data = {
+            "name" : "Kyaw",
+            "link" : f"<a href=\"{tempURL.get_reset_link()}\">Go to Google</a>"
+        }
+        send_email ([user.username], email_template, data)
         return Response({'details' : 'Password Reset Link has been sent. Please Check your email!'})
     except User.DoesNotExist:
         return Response({'details' : 'User not found with given email!'}, status=status.HTTP_404_NOT_FOUND)

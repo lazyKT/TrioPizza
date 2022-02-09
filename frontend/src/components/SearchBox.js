@@ -18,14 +18,14 @@ function SearchBox() {
 
     return (
       <Form onSubmit={submitHandler}>
-            <Form.Control
-                type='text'
-                name='q'
-                onChange={(e) => setKeyword(e.target.value)}
-                className='mr-sm-2 ml-sm-5'
-                placeholder="Search Restaurants .."
-            ></Form.Control>
-        </Form>
+        <Form.Control
+            type='text'
+            name='q'
+            onChange={(e) => setKeyword(e.target.value)}
+            className='mr-sm-2 ml-sm-5'
+            placeholder="Search Restaurants .."
+        ></Form.Control>
+      </Form>
     )
 }
 

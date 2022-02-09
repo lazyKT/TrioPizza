@@ -2,6 +2,25 @@ import axios from 'axios';
 
 
 
+export async function searchUsersRequest (filter) {
+  try {
+    const { data } = await axios.get(`api/users/?search=${filter}`, {
+      headers: {
+        'Content-Type' : 'application/json'
+      }
+    });
+
+    return { error: false, data }
+  }
+  catch (error) {
+    if (error.response && error.response.data.details)
+      return { error : true, message : error.response.data.details };
+    else
+      return { error : true, message : error.message };
+  }
+}
+
+
 export async function getUserById (userId, token, signal) {
   try {
     const { data } = await axios.get(`api/users/${userId}`, {

@@ -3,7 +3,7 @@ import {
     CART_ADD_ITEM,
     CART_REMOVE_ITEM,
     CART_SAVE_SHIPPING_ADDRESS,
-
+    CART_CHANGE_QTY,
     CART_SAVE_PAYMENT_METHOD,
 } from '../constants/cartConstants'
 
@@ -38,6 +38,30 @@ export const addToCart = (id, qty) => async (dispatch, getState) => {
     // localStorage.setItem('cartItems', JSON.stringify(getState().cart.cartItems));
 }
 
+
+export const changeQty = (id, qty) => async (dispatch, getState) => {
+    const { data } = await axios.get(`/api/products/${id}`);
+    const { data: promoData } = await axios.get(`/api/restaurants/promos?product=${id}`);
+
+    const productPrice = promoData && promoData[0]?.status === 'active'
+                          ? discountedPrice(parseFloat(data.price), promoData[0]?.amount)
+                          : parseFloat(data.price);
+
+    dispatch({
+        type: CART_CHANGE_QTY,
+        payload: {
+            product: data._id,
+            name: data.name,
+            image: data.image,
+            price: parseFloat(productPrice),
+            countInStock: data.countInStock,
+            totalPrice: parseFloat(parseInt(qty) * productPrice),
+            promo: promoData && promoData[0]?.status === 'active',
+            qty
+        }
+    })
+    // localStorage.setItem('cartItems', JSON.stringify(getState().cart.cartItems));
+}
 
 
 export const removeFromCart = (id) => (dispatch, getState) => {

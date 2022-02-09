@@ -74,7 +74,7 @@ export default function OrderListScreen({ history }) {
     const getActiveOrdersCount = (orders) => {
       if (!orders) return 0;
 
-      const activeOrders = orders.filter(o => o.status === 'active');
+      const activeOrders = orders.filter(o => o.status === 'progress');
       return activeOrders.length;
     }
 
