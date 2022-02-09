@@ -23,6 +23,27 @@ export async function getRestaurantProducts (restaurantId, signal, page=1) {
 }
 
 
+// search products by product name
+export async function searchProductsRequest (restaurantId, filter, token) {
+  try {
+    const { data } = await axios.get(`api/products/restaurants/${restaurantId}?search=${filter}&limit=all`, {
+      headers: {
+        'Content-Type' : 'application/json',
+        Authorization : `Bearer ${token}`
+      }
+    });
+
+    return { error: false, data }
+  }
+  catch (error) {
+    if (error.response && error.response.data.details)
+      return {error: true, message: error.response.data.details};
+    else
+      return {error: true, message: error.message};
+  }
+}
+
+
 // get feature product list
 export async function getFeatureProducts (restaurantId, token, signal) {
   try {

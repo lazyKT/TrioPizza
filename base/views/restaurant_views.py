@@ -39,6 +39,11 @@ class RestaurantList (APIView):
                 owner = User.objects.get(id=keyword)
                 restaurants = Restaurant.objects.filter(owner=owner).order_by('name')
 
+            search = request.query_params.get('search')
+            if search is not None and search != '':
+                print(search)
+                restaurants = Restaurant.objects.filter(name__contains=search)
+
             num_restaurant = len(restaurants)
 
             limit = request.query_params.get('limit')

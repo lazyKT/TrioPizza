@@ -9,7 +9,7 @@ import Message from '../components/Message'
 import Paginate from '../components/Paginate'
 import RestaurantCarousel from '../components/RestaurantCarousel'
 import { listProducts } from '../actions/productActions'
-import { getAllRestaurants, getFeaturedRestaurants } from '../networking/restaurantRequests';
+import { getAllRestaurants, getFeaturedRestaurants, filterRestaurants } from '../networking/restaurantRequests';
 
 
 const styles = {
@@ -27,6 +27,7 @@ function HomeScreen () {
 
     const [ featuredRestaurants, setFeaturedRestaurants ] = useState(null);
     const [ restaurants, setRestaurants ] = useState([]);
+    const [ filter, setFilter ] = useState(null);
     const [ error, setError ] = useState(null);
     const [ loading, setLoading ] = useState(true);
     const [ page, setPage ] = useState(0);
@@ -41,6 +42,24 @@ function HomeScreen () {
     const fetchAllRestaurants = async (signal) => {
       try {
         const { error, data, message } = await getAllRestaurants(signal);
+
+        if (error) {
+          setError(message);
+        }
+        else {
+          setRestaurants(data.restaurants);
+          setPage(data.page);
+          setPages(data.pages);
+        }
+      }
+      catch (error) {
+        setError(error.message);
+      }
+    }
+
+    const getFilteredRestaurants = async (signal, filter) => {
+      try {
+        const { error, data, message } = await filterRestaurants(signal, filter);
 
         if (error) {
           setError(message);
@@ -76,7 +95,11 @@ function HomeScreen () {
 
       const abortController = new AbortController();
 
-      (async () => await fetchAllRestaurants(abortController.signal))();
+      if (keyword) {
+        setFilter((keyword.split('&')[0]).split('=')[1]);
+      }
+      else
+        (async () => await fetchAllRestaurants(abortController.signal))();
 
       if (userInfo) {
         if (userInfo.type === 'admin')
@@ -86,7 +109,8 @@ function HomeScreen () {
         else if (userInfo.type === 'driver')
           history.push('/driver');
 
-        (async () => await fetchFeaturedRestaurants(abortController.signal))();
+        if (!keyword)
+          (async () => await fetchFeaturedRestaurants(abortController.signal))();
       }
 
       return () => {
@@ -99,11 +123,24 @@ function HomeScreen () {
       setLoading(false);
     }, [error, restaurants])
 
+    useEffect(() => {
+      const abortController = new AbortController();
+
+      if (filter) {
+        console.log(filter);
+        (async () => await getFilteredRestaurants(abortController.signal, filter))();
+      }
+
+      return () => {
+        abortController.abort();
+      };
+    }, [filter]);
+
     return (
         <div>
             {!keyword && <RestaurantCarousel restaurants={restaurants}/>}
 
-            { userInfo && featuredRestaurants &&
+            { !keyword && userInfo && featuredRestaurants &&
               <>
                 <p style={styles.subHeader}>Your Featured Restaurants</p>
                 {loading ? <Loader />
@@ -136,6 +173,12 @@ function HomeScreen () {
                         </Row>
                         <Paginate page={page} pages={pages} keyword={keyword} />
                     </div>
+            }
+
+            { filter && restaurants.length === 0 &&
+              <Message variant='info'>
+                {`No restaurant(s) found with keyword ${filter}`}
+              </Message>
             }
         </div>
     );

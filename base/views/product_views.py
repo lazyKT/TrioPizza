@@ -88,7 +88,7 @@ class ProductList (APIView):
 
             restaurant = Restaurant.objects.get(_id=data['restaurant'])
             image = request.FILES.get('image')
-            print(image)
+            # print(image)
             if image is None:
                 product = Product.objects.create(
                     name=data['name'],
@@ -214,7 +214,10 @@ def get_products_by_restaurant (request, restaurant_id):
         num_products = len(products)
 
         limit = request.query_params.get('limit')
+        search = request.query_params.get('search')
         if limit == 'all':
+            if search is not None and search != '':
+                products = Product.objects.filter(restaurant=restaurant).filter(name__contains=search).order_by('name')
             serializer = ProductSerializer(products, many=True)
             return Response(serializer.data)
 
@@ -258,7 +261,7 @@ def uploadImage(request, pk):
     try:
         data = request.data
         product = Product.objects.get(_id=pk)
-        print(request.FILES.get('image'), pk)
+        # print(request.FILES.get('image'), pk)
         product.image = request.FILES.get('image')
         product.save()
 

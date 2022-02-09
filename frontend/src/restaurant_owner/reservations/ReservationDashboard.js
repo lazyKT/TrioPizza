@@ -178,9 +178,6 @@ export default function ReservationDashboard () {
               slotMinTime={'11:00:00'}
               slotMaxTime={'21:00:00'}
               height='580px'
-              editable={true}
-              selectable={true}
-              select={() => alert('Coming Soon!')}
               events={createEvents(timeSlots)}
               eventClick={event => onClickEvent(event)}
             />
