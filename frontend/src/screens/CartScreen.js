@@ -5,7 +5,7 @@ import MaterialButton from '@mui/material/Button';
 import { Row, Col, ListGroup, Image, Form, Button, Card } from 'react-bootstrap';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import Message from '../components/Message';
-import { addToCart, removeFromCart } from '../actions/cartActions';
+import { addToCart, removeFromCart, changeQty } from '../actions/cartActions';
 
 function CartScreen({ match, location, history }) {
     const productId = match.params.id
@@ -17,14 +17,13 @@ function CartScreen({ match, location, history }) {
     const { cartItems } = useSelector(state => state.cart);
 
     useEffect(() => {
-        // if (productId) {
-        //     dispatch(addToCart(productId, qty))
-        // }
-    }, [dispatch, productId, qty])
+      if (!userInfo) {
+        history.push('/');
+      }
+    }, [history, userInfo, cartItems]);
 
 
     const removeFromCartHandler = (id) => {
-      console.log(id);
       dispatch(removeFromCart(id))
     }
 
@@ -53,6 +52,7 @@ function CartScreen({ match, location, history }) {
                 ) :
                 (
                   <ListGroup variant='flush'>
+                      <Message variant='info'>Please do not refresh the browser.</Message>
                       {cartItems.map(item => (
                           <ListGroup.Item key={item.product}>
                               <Row>
@@ -64,7 +64,7 @@ function CartScreen({ match, location, history }) {
                                         fluid rounded
                                       />
                                   </Col>
-                                  <Col md={3}>
+                                  <Col md={3} className="d-flex align-items-center">
                                       <Link to={`/product/${item.product}`}>{item.name}</Link>
                                   </Col>
 
@@ -76,7 +76,7 @@ function CartScreen({ match, location, history }) {
                                     <Form.Control
                                         as="select"
                                         value={item.qty}
-                                        onChange={(e) => dispatch(addToCart(item.product, parseInt(e.target.value)))}
+                                        onChange={(e) => dispatch(changeQty(item.product, parseInt(e.target.value)))}
                                     >
                                       <option value={1}>1</option>
                                       <option value={2}>2</option>

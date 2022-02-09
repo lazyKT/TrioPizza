@@ -19,7 +19,7 @@ from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import *
 
 from base.models import Restaurant, Product, Order, OrderItem, Reservation, Location, DriverOrderStatus
-from base.utils import send_email
+from base.utils import send_email, get_email_template
 
 
 class RestaurantStatisticView (APIView):
@@ -293,7 +293,7 @@ def test_email (request):
         subject = '[TrioPizza] Testing Email'
         body = '<h4>Dear Customer</h4><br/><p>This is test email</p>'
         recipients = ['kyaw.thitlwin.me@gmail.com']
-        send_email(recipients, subject, body)
+        send_email(recipients, get_email_template('forgot_password'), {"name" : "Lwin"})
         return Response('Test Email Sent. Check your email inbox')
     except Exception as e:
         print('error', str(e))

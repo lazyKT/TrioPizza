@@ -5,12 +5,13 @@ import {
   CART_SAVE_SHIPPING_ADDRESS,
   CART_SAVE_PAYMENT_METHOD,
   CART_CLEAR_ITEMS,
+  CART_CHANGE_QTY
 } from '../constants/cartConstants'
 
 
 
 export const cartReducer = (state = { cartItems: [], shippingAddress: {}, restaurant: null }, action) => {
-
+  
     switch (action.type) {
       case RESTAURANT_CART:
         return {
@@ -20,7 +21,6 @@ export const cartReducer = (state = { cartItems: [], shippingAddress: {}, restau
 
       case CART_ADD_ITEM:
         const item = action.payload
-
         const existItem = state.cartItems.find(x => x.product === item.product);
 
         if (existItem) {
@@ -38,7 +38,6 @@ export const cartReducer = (state = { cartItems: [], shippingAddress: {}, restau
                 return x;
             })
           };
-
         }
         else {
           return {
@@ -46,6 +45,28 @@ export const cartReducer = (state = { cartItems: [], shippingAddress: {}, restau
             cartItems: [...state.cartItems, item]
           };
         }
+
+      case CART_CHANGE_QTY:
+        const _item = action.payload;
+        const _existItem = state.cartItems.find(x => x.product === _item.product);
+        if (_existItem) {
+          return {
+            ...state,
+            cartItems: state.cartItems.map(x => {
+              if (x.product === _item.product) {
+                return {
+                  ...x,
+                  qty: _item.qty,
+                  totalPrice: Number(x.totalPrice)
+                };
+              }
+              else
+                return x;
+            })
+          };
+        }
+        else
+          return state;
 
       case CART_REMOVE_ITEM:
         return {
