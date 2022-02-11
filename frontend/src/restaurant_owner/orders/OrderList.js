@@ -17,6 +17,7 @@ export default function OrderList () {
   const dispatch = useDispatch();
 
   const { userInfo } = useSelector(state => state.userCookie);
+  const { restaurantInfo } = useSelector(state => state.restaurant);
   const { error, loading, orders } = useSelector(state => state.orderList);
 
 
@@ -35,10 +36,10 @@ export default function OrderList () {
   };
 
   useEffect(() => {
-    if (userInfo && userInfo.isAdmin) {
-      dispatch(listOrders());
+    if (userInfo && restaurantInfo ) {
+      dispatch(listOrders(restaurantInfo._id));
     }
-  }, [userInfo, showOrderDetails]);
+  }, [userInfo, showOrderDetails, restaurantInfo]);
 
 
   useEffect(() => console.log(orders), [orders]);

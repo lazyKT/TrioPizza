@@ -12,10 +12,12 @@ from base.models import (
 )
 
 
+print('Been Here @ tests.py')
+
 """
 # User Test Cases
 """
-def UserTestCase (TestCase):
+class UserTestCase (TestCase):
 
     def create_user_object (self, username, name, mobile, type, password):
         """

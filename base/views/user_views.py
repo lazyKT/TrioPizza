@@ -476,6 +476,7 @@ def get_all_driver_status (request):
         return Response({'details' : error}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
+
 @api_view(['GET'])
 def get_all_avaialble_drivers (request):
     try:
@@ -485,6 +486,7 @@ def get_all_avaialble_drivers (request):
     except Exception as e:
         error = 'Internal Server Error!' if str(e) == '' else str(e)
         return Response({'details' : error}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 
 
 @api_view(['GET'])
@@ -501,6 +503,7 @@ def get_driver_status_by_id (request, pk):
     except Exception as e:
         error = 'Internal Server Error!' if str(e) == '' else str(e)
         return Response({'details' : error}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 
 
 @api_view(['PUT'])
@@ -563,6 +566,7 @@ def gen_password_reset_link (request):
     except Exception as e:
         error = 'Internal Server Error!' if str(e) == '' else str(e)
         return Response({'details' : error}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 
 
 @api_view(['POST'])
