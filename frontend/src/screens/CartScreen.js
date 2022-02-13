@@ -68,11 +68,11 @@ function CartScreen({ match, location, history }) {
                                       <Link to={`/product/${item.product}`}>{item.name}</Link>
                                   </Col>
 
-                                  <Col md={2}>
+                                  <Col md={2} className="d-flex align-items-center">
                                       ${item.price}
                                   </Col>
 
-                                  <Col md={3}>
+                                  <Col md={3} className="d-flex align-items-center">
                                     <Form.Control
                                         as="select"
                                         value={item.qty}
@@ -87,7 +87,7 @@ function CartScreen({ match, location, history }) {
                                     </Form.Control>
                                   </Col>
 
-                                  <Col md={1}>
+                                  <Col md={1} className="d-flex align-items-center">
                                     <Button
                                         type='button'
                                         variant='light'

@@ -159,7 +159,9 @@ function HomeScreen () {
               </>
             }
 
-            <p style={styles.subHeader}>All Restaurants</p>
+            <p style={styles.subHeader}>
+              Restaurants
+            </p>
             {loading ? <Loader />
                 : error ? <Message variant='danger'>{error}</Message>
                     :

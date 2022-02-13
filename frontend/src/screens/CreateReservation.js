@@ -56,9 +56,6 @@ export default function CreateReservation ({history}) {
       date: '',
       time: ''
     });
-    dispatch({
-      type: RESERVATION_CLEAR_DATA
-    });
   }
 
 

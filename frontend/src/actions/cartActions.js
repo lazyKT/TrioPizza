@@ -8,9 +8,15 @@ import {
 } from '../constants/cartConstants'
 
 
-function discountedPrice (price, amount) {
-  let percentage = Number(amount)/100;
-  return (price - (price * percentage)).toFixed(2);
+function discountedPrice (price, amount, type) {
+
+  if (type === 'cash-off') {
+    return price - Number(amount);
+  }
+  else if (type === 'percent-off') {
+    let percentage = Number(amount)/100;
+    return (price - (price * percentage)).toFixed(2);
+  }
 }
 
 
@@ -19,7 +25,7 @@ export const addToCart = (id, qty) => async (dispatch, getState) => {
     const { data: promoData } = await axios.get(`/api/restaurants/promos?product=${id}`);
 
     const productPrice = promoData && promoData[0]?.status === 'active'
-                          ? discountedPrice(parseFloat(data.price), promoData[0]?.amount)
+                          ? discountedPrice(parseFloat(data.price), promoData[0]?.amount, promoData[0]?.type)
                           : parseFloat(data.price);
 
     dispatch({

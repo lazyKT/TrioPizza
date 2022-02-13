@@ -2,6 +2,7 @@ from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
+from base.utils import get_email_template, send_email
 from base.models import Support
 from base.serializers import SupportSerializer
 
@@ -44,6 +45,8 @@ class SupportListView (APIView):
                 headline=data['headline'],
                 content=data['content']
             )
+            email_template = get_email_template('support_ack')
+            send_email([data['email']], email_template, dict())
             serializer = SupportSerializer(support)
             return Response(serializer.data)
         except Exception as e:

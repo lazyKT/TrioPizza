@@ -250,7 +250,7 @@ class UserDetails (APIView):
             # Delete Driver
             if user.profile.type == 'driver':
                 driver_status = DriverOrderStatus.objects.get(driver=user)
-                if driver_status.status == "offline":
+                if driver_status.active_orders < 1 and driver_status.status == "offline":
                     driver_status.delete()
                 else:
                     return Response({'details' : 'Error! Cannot Delete the Active Driver!'}, status=status.HTTP_400_BAD_REQUEST)
@@ -557,7 +557,7 @@ def gen_password_reset_link (request):
         email_template = get_email_template('forgot_password')
         data = {
             "name" : "Kyaw",
-            "link" : f"<a href=\"{tempURL.get_reset_link()}\">Go to Google</a>"
+            "link" : f"<a style=\"padding: 10px; background: coral; color: white;\" href=\"{tempURL.get_reset_link()}\">Reset Password</a>"
         }
         send_email ([user.username], email_template, data)
         return Response({'details' : 'Password Reset Link has been sent. Please Check your email!'})

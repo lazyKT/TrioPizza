@@ -38,7 +38,7 @@ const options = (title, data) => {
       y: {
         title: {
           display: true,
-          text: 'Total Orders Received'
+          text: 'Total Driver Orders/Deliveries Count'
         },
         min: 0,
         max: maxNumOrders > 5 ? maxNumOrders : 5,
