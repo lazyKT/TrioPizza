@@ -175,7 +175,7 @@ export default function CreateReservation ({history}) {
                     className='mr-1'
                     type='submit'
                   >
-                    Preceed
+                    Proceed
                   </Button>
                   <Button
                     variant='secondary'
