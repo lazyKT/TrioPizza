@@ -34,8 +34,8 @@ export default function ReserveConfirm () {
         num_of_pax : parseInt(info.numOfPax),
         reservedDateTime : `${info.date} ${info.time}`,
         preOrderItems: preOrderItems
-      }
-      console.log(body);
+      };
+      
       const { error, data, message } = await createNewReservationRequest (body, userInfo.token);
 
       if (error) {

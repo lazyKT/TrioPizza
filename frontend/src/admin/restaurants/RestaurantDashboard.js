@@ -25,7 +25,7 @@ const columns = [
   },
   {
     id: 'address',
-    lable: 'Address',
+    label: 'Address',
     minWidth: 120,
   },
   {

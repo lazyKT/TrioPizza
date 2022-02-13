@@ -26,7 +26,6 @@ export const addPreOrderItems = (id) => async (dispatch, getState) => {
 
 
 export const saveReservationInfo = (info) => (dispatch) => {
-  console.log('saveReservationInfo', info);
   dispatch({
     type: RESERVATION_INFO,
     payload: info

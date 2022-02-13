@@ -119,6 +119,7 @@ class OrderSerializer (serializers.ModelSerializer):
     orderItems = serializers.SerializerMethodField(read_only=True)
     user = serializers.SerializerMethodField(read_only=True)
     driver = serializers.SerializerMethodField(read_only=True)
+    restaurant_name = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = Order
@@ -142,6 +143,10 @@ class OrderSerializer (serializers.ModelSerializer):
             return None
         serializer = UserSerializer(driver, many=False)
         return serializer.data
+
+    def get_restaurant_name (self, obj):
+        restaurant = obj.restaurant
+        return restaurant.name
 
 
 class DriverOrderStatusSerializer (serializers.ModelSerializer):

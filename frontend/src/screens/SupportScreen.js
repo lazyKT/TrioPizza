@@ -129,7 +129,7 @@ export default function SupportScreen ({history}) {
           </Form.Group>
 
           <Form.Group controlId='subject' className="mt-2">
-            <Form.Label>Headline</Form.Label>
+            <Form.Label>Title</Form.Label>
             <Form.Control
               required
               type="text"
@@ -141,7 +141,7 @@ export default function SupportScreen ({history}) {
           </Form.Group>
 
           <Form.Group controlId='content' className="mt-2">
-            <Form.Label>Report Content</Form.Label>
+            <Form.Label>Content</Form.Label>
             <Form.Control
               as="textarea"
               required

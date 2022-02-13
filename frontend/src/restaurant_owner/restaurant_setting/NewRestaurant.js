@@ -142,7 +142,7 @@ export default function NewRestaurant () {
             </Form.Group>
 
             <Form.Group controlId="formFile" className="mb-3">
-              <Form.Label>Upload Product Image</Form.Label>
+              <Form.Label>Upload Restaurant Logo</Form.Label>
               <Form.Control type="file" />
             </Form.Group>
 

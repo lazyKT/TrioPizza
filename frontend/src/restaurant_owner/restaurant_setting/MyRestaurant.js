@@ -75,7 +75,7 @@ export default function MyRestaurant () {
               color: content === 'location' ? 'black' : 'gray'
             }}
           >
-            Loacation & Contact
+            Location & Contact
           </Typography>
           </Col>
           <Col sm="10">

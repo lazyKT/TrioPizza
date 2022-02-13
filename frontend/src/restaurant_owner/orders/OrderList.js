@@ -40,9 +40,7 @@ export default function OrderList () {
       dispatch(listOrders(restaurantInfo._id));
     }
   }, [userInfo, showOrderDetails, restaurantInfo]);
-
-
-  useEffect(() => console.log(orders), [orders]);
+  
 
   return (
     <>
