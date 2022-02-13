@@ -111,6 +111,7 @@ function OrderScreen({ match, history }) {
             Back
           </MaterialButton>
             <h1>Order: #{order._id}</h1>
+            <h2>{order?.restaurant_name}</h2>
             <Row>
                 <Col md={8}>
                     <ListGroup variant='flush'>

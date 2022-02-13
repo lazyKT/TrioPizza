@@ -9,7 +9,7 @@ from rest_framework.response import Response
 
 from base.models import Product, Order, OrderItem, ShippingAddress, User, DriverOrderStatus, Restaurant
 from base.serializers import ProductSerializer, OrderSerializer
-
+from base.utils import send_email, get_email_template
 from rest_framework import status
 from datetime import datetime
 
@@ -235,12 +235,32 @@ class OrderList (APIView):
                 # if there are no aviable drivers
                 return Response({'details' : 'Our Drivers Are Busy. Please Try Again Later'}, status=status.HTTP_503_SERVICE_UNAVAILABLE)
             restaurant = Restaurant.objects.get(_id=data['restaurant'])
+            # restaurant owner
+            restaurant_owner = User.objects.get(id=restaurant.owner.id)
             # Create Order
             order = self.create_order (data, user, driver, restaurant)
             # Update Driver Status
             OrderList.update_driver_order_status (driver, order)
             # Save Order Items Detail
             self.create_order_items(data['orderItems'], order)
+            # Email
+            driver_email_template = get_email_template('order_cfm_driver')
+            owner_email_template = get_email_template('order_cfm_restaurant')
+            cust_email_template = get_email_template('order_cfm_customer')
+            order_date_time = datetime.strftime(order.createdAt, '%Y-%m-%d %I:%M %p')
+            order_items = list()
+            for item in data['orderItems']:
+                order_items.append({ "name" : item['name'], "qty" : f"x{item['qty']}"})
+            data = {
+                "address" : data['shippingAddress'],
+                "orders" : {
+                    "date_time" : order_date_time,
+                    "items" : order_items
+                }
+            }
+            send_email([driver.username], driver_email_template, data) # send email to driver
+            send_email([restaurant_owner.username], owner_email_template, data) # send email to restaurant owner
+            send_email([user.username], cust_email_template, data) # send email to customer
 
             serializer = OrderSerializer(order)
             return Response(serializer.data)

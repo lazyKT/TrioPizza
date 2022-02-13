@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react'
 import { Button, Row, Col, ListGroup, Image, Card } from 'react-bootstrap'
 import { Link } from 'react-router-dom'
-import { useDispatch, useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux';
+
+import Loader from '../components/Loader';
 import Message from '../components/Message';
 import CheckoutSteps from '../components/CheckoutSteps';
 import { createOrder } from '../actions/orderActions';
@@ -13,6 +15,7 @@ import { CART_CLEAR_ITEMS } from '../constants/cartConstants';
 function PlaceOrderScreen({ history }) {
 
     const { order, error, success } = useSelector(state => state.orderCreate);
+    const [ loading, setLoading ] = useState(false);
 
     const dispatch = useDispatch()
 
@@ -25,21 +28,22 @@ function PlaceOrderScreen({ history }) {
     cart.totalPrice = (Number(cart.itemsPrice) + Number(cart.shippingPrice) + Number(cart.taxPrice)).toFixed(2)
 
     const placeOrder = (e) => {
-        e.preventDefault();
-        const { address, city, postalCode, country } = cart.shippingAddress;
-        const fullAddress = `${address}, ${city}, ${postalCode}, ${country}`;
-        console.log('cart', cart);
-        dispatch(createOrder({
-            orderItems: cart.cartItems,
-            shippingAddress: fullAddress,
-            paymentMethod: cart.paymentMethod,
-            itemsPrice: parseFloat(cart.itemsPrice),
-            shippingPrice: parseFloat(cart.shippingPrice),
-            taxPrice: parseFloat(cart.taxPrice),
-            totalPrice: parseFloat(cart.totalPrice),
-            isPaid: cart.paymentMethod === 'Cash' ? false : true,
-            restaurant: cart.restaurant
-        }));
+      setLoading(true);
+      e.preventDefault();
+      const { address, city, postalCode, country } = cart.shippingAddress;
+      const fullAddress = `${address}, ${city}, ${postalCode}, ${country}`;
+      
+      dispatch(createOrder({
+          orderItems: cart.cartItems,
+          shippingAddress: fullAddress,
+          paymentMethod: cart.paymentMethod,
+          itemsPrice: parseFloat(cart.itemsPrice),
+          shippingPrice: parseFloat(cart.shippingPrice),
+          taxPrice: parseFloat(cart.taxPrice),
+          totalPrice: parseFloat(cart.totalPrice),
+          isPaid: cart.paymentMethod === 'Cash' ? false : true,
+          restaurant: cart.restaurant
+      }));
     }
 
     const discardOrder = (e) => {
@@ -52,6 +56,7 @@ function PlaceOrderScreen({ history }) {
 
     useEffect(() => {
         if (success) {
+            setLoading(false);
             history.push(`/order/${order._id}`)
             dispatch({ type: ORDER_CREATE_RESET })
         }
@@ -62,7 +67,7 @@ function PlaceOrderScreen({ history }) {
       if (cart.cartItems.length === 0) {
         history.push('/');
       }
-      
+
       if (!cart.paymentMethod) {
           history.push('/payment')
       }
@@ -167,14 +172,19 @@ function PlaceOrderScreen({ history }) {
                             </ListGroup.Item>
 
                             <ListGroup.Item>
-                                <Button
-                                    type='button'
-                                    className='btn-block'
-                                    disabled={cart.cartItems === 0}
-                                    onClick={placeOrder}
-                                >
-                                    Place Order
-                                </Button>
+                                {
+                                  loading ? <Loader />
+                                  : (
+                                    <Button
+                                        type='button'
+                                        className='btn-block'
+                                        disabled={cart.cartItems === 0}
+                                        onClick={placeOrder}
+                                    >
+                                        Place Order
+                                    </Button>
+                                  )
+                                }
                             </ListGroup.Item>
 
                             <ListGroup.Item>

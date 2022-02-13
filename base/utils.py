@@ -37,6 +37,8 @@ def get_email_template (action):
         return 'd-ff57e205af0f47b88d0c277ca9d97b60'
     elif action == 'support_ack':
         return 'd-9f3eb8b0c30140ef8e9750dce9792d33'
+    elif action == 'order_cfm_driver':
+        return 'd-65516576de4849e48c63b77df89cc8b8'
     else:
         raise Exception('unknown email action')
 

@@ -96,10 +96,6 @@ function renderDrawerMenu (text, selected) {
       return (
         <AccountBoxIcon color={text === selected ? "primary" : "gray"} />
       );
-    case 'Setting':
-      return (
-        <SettingsIcon color={text === selected ? "primary" : "gray"} />
-      );
     case 'Sign Out':
       return (
         <LogoutIcon color={text === selected ? "primary" : "gray"} />
@@ -140,7 +136,7 @@ export default function AdminDrawerMenu (props) {
       </List>
       <Divider />
       <List>
-        {['Profile', 'Setting', 'Sign Out'].map((text, index) => (
+        {['Profile', 'Sign Out'].map((text, index) => (
           <ListItem button key={text} onClick={() => onChangePage(text)}>
             <ListItemIcon>
               { renderDrawerMenu(text) }

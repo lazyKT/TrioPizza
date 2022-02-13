@@ -61,8 +61,6 @@ function switchContents (page) {
 				return <RestaurantDashboard />;
       case 'Profile':
         return <Profile />
-      case 'Setting':
-        return <Setting />;
 			default:
 				throw new Error ('Invalid Admin Page Content');
 		}

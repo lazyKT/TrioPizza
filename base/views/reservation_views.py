@@ -10,6 +10,7 @@ from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
+from base.utils import send_email, get_email_template
 from base.models import User, Reservation, Product, Restaurant, PreOrder
 from base.serializers import ReservationSerializer, RestaurantSerializer
 
@@ -128,6 +129,21 @@ class ReservationList (APIView):
             )
             if 'preOrderItems' in data:
                 self.create_preorder_items (data['preOrderItems'], reservation)
+
+            cust_email_template = get_email_template('reservation_customer')
+            cust_email_addr = user.username
+            owner_email_template = get_email_template('reservation_restowner')
+            owner_email_addr = restaurant.owner.username
+
+            data = {
+                "date_time" : data['reservedDateTime'],
+                "num_pax" : data['num_of_pax'],
+                "pre_order" : 'Yes' if len(data['preOrderItems']) > 0 else 'No',
+                "restaurant_name" : restaurant.name
+            }
+
+            send_email([cust_email_addr], cust_email_template, data) # send reservation info email to customer
+            send_email([owner_email_addr], cust_email_template, data) # send reservation info email to restaurant owner
 
             serializer = ReservationSerializer(reservation)
             return Response(serializer.data)
