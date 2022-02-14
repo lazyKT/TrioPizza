@@ -251,8 +251,9 @@ class OrderList (APIView):
             order_items = list()
             for item in data['orderItems']:
                 order_items.append({ "name" : item['name'], "qty" : f"x{item['qty']}"})
-                
+
             email_data = {
+                "restaurant_name" : restaurant.name,
                 "address" : data['shippingAddress'],
                 "orders" : {
                     "date_time" : order_date_time,
