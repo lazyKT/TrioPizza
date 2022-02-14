@@ -148,3 +148,44 @@ export async function getProductPromotion (productId, signal) {
       return { error: true, message: error.message };
   }
 }
+
+
+// get promotion details by id
+export async function getPromoDetails (id, token, signal) {
+  try {
+    const { data } = await axios.get(`/api/restaurants/promos/${id}/`, {
+      headers: {
+        'Content-Type' : 'application/json',
+        Authentication : `Bearer ${token}`
+      }
+    });
+
+    return { error : false, data : data };
+  }
+  catch (error) {
+    if (error.response && error.response.data.details)
+      return { error: true, message: error.response.data.details };
+    else
+      return { error: true, message: error.message };
+  }
+}
+
+
+export async function deletePromoCode (id, token) {
+  try {
+    const { data } = await axios.delete(`/api/restaurants/promos/${id}/`, {
+      headers: {
+        'Content-Type' : 'application/json',
+        Authentication : `Bearer ${token}`
+      }
+    });
+
+    return { error: false, data }
+  }
+  catch (error) {
+    if (error.response && error.response.data.details)
+      return { error: true, message: error.response.data.details };
+    else
+      return { error: true, message: error.message };
+  }
+}

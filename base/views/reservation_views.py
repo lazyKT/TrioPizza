@@ -135,15 +135,15 @@ class ReservationList (APIView):
             owner_email_template = get_email_template('reservation_restowner')
             owner_email_addr = restaurant.owner.username
 
-            data = {
+            email_data = {
                 "date_time" : data['reservedDateTime'],
                 "num_pax" : data['num_of_pax'],
                 "pre_order" : 'Yes' if len(data['preOrderItems']) > 0 else 'No',
                 "restaurant_name" : restaurant.name
             }
 
-            send_email([cust_email_addr], cust_email_template, data) # send reservation info email to customer
-            send_email([owner_email_addr], cust_email_template, data) # send reservation info email to restaurant owner
+            send_email([cust_email_addr], cust_email_template, email_data) # send reservation info email to customer
+            send_email([owner_email_addr], cust_email_template, email_data) # send reservation info email to restaurant owner
 
             serializer = ReservationSerializer(reservation)
             return Response(serializer.data)

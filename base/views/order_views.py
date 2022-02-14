@@ -251,16 +251,18 @@ class OrderList (APIView):
             order_items = list()
             for item in data['orderItems']:
                 order_items.append({ "name" : item['name'], "qty" : f"x{item['qty']}"})
-            data = {
+
+            email_data = {
+                "restaurant_name" : restaurant.name,
                 "address" : data['shippingAddress'],
                 "orders" : {
                     "date_time" : order_date_time,
                     "items" : order_items
                 }
             }
-            send_email([driver.username], driver_email_template, data) # send email to driver
-            send_email([restaurant_owner.username], owner_email_template, data) # send email to restaurant owner
-            send_email([user.username], cust_email_template, data) # send email to customer
+            send_email([driver.username], driver_email_template, email_data) # send email to driver
+            send_email([restaurant_owner.username], owner_email_template, email_data) # send email to restaurant owner
+            send_email([user.username], cust_email_template, email_data) # send email to customer
 
             serializer = OrderSerializer(order)
             return Response(serializer.data)
