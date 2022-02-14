@@ -15,6 +15,7 @@ import * as XLSX from 'xlsx';
 import CustomTable from '../CustomTable';
 import Loader from '../../components/Loader';
 import Message from '../../components/Message';
+import EditPromotion from './EditPromotion';
 import { fetchPromotionsByRestaurant } from '../../networking/restaurantRequests';
 
 
@@ -76,6 +77,7 @@ function createData (promos) {
 export default function PromotionList ({openCreatePromotion}) {
 
   const [ promos, setPromos ] = useState(null);
+  const [ editing, setEditing ] = useState(null);
   const [ error, setError ] = useState(null);
   const [ loading, setLoading ] = useState(true);
 
@@ -114,6 +116,10 @@ export default function PromotionList ({openCreatePromotion}) {
     FileSaver.saveAs(data, fileName + fileExtension);
   }
 
+  const editPromoCode = (val) => {
+    setEditing(val);
+  }
+
   useEffect(() => {
     const abortController = new AbortController();
 
@@ -125,7 +131,7 @@ export default function PromotionList ({openCreatePromotion}) {
     }
 
     return () => abortController.abort();
-  }, [userInfo, restaurantInfo]);
+  }, [userInfo, restaurantInfo, editing]);
 
   useEffect(() => {
     if (promos || error)
@@ -134,52 +140,60 @@ export default function PromotionList ({openCreatePromotion}) {
 
   return (
     <div>
-      <Paper sx={styles.topContainer}>
-        <Box sx={styles.box}>
-          <TextField fullWidth label="Search" variant="outlined" size="small"/>
-        </Box>
-
-        <Box>
-          <Button
-            sx={{margin: '10px'}}
-            variant="contained"
-            color="success"
-            onClick={() => openCreatePromotion()}
-            endIcon={<AddIcon />}
-          >
-            Add
-          </Button>
-          <Button
-            sx={{margin: '10px'}}
-            variant="contained"
-            endIcon={<FileDownloadIcon />}
-            onClick={exportData}
-          >
-            Export
-          </Button>
-          <IconButton>
-            <RefreshIcon color="primary" />
-          </IconButton>
-        </Box>
-      </Paper>
-
-      { loading && <Loader/> }
-      { error && <Message variant="danger">{error}</Message>}
-
       {
-        promos?.length === 0
-        ? (
-          <Paper sx={styles.tableContainer}>
-            <h5 style={{ marginBottom: '20px'}}>Promotions</h5>
-            <Message variant="info">You Don't Have Any Promotion Data Yet!</Message>
+        editing ? <EditPromotion id={editing} backToPromoList={() => setEditing(null)} />
+        : (
+          <>
+          <Paper sx={styles.topContainer}>
+            <Box sx={styles.box}>
+              <TextField fullWidth label="Search" variant="outlined" size="small"/>
+            </Box>
+
+            <Box>
+              <Button
+                sx={{margin: '10px'}}
+                variant="contained"
+                color="success"
+                onClick={() => openCreatePromotion()}
+                endIcon={<AddIcon />}
+              >
+                Add
+              </Button>
+              <Button
+                sx={{margin: '10px'}}
+                variant="contained"
+                endIcon={<FileDownloadIcon />}
+                onClick={exportData}
+              >
+                Export
+              </Button>
+              <IconButton>
+                <RefreshIcon color="primary" />
+              </IconButton>
+            </Box>
           </Paper>
-        ) : (
-          <CustomTable
-          columns={columns}
-          rows={createData(promos)}
-          type='promos'
-          />
-        )
+
+          { loading && <Loader/> }
+          { error && <Message variant="danger">{error}</Message>}
+
+          {
+            promos?.length === 0
+            ? (
+              <Paper sx={styles.tableContainer}>
+                <h5 style={{ marginBottom: '20px'}}>Promotions</h5>
+                <Message variant="info">You Don't Have Any Promotion Data Yet!</Message>
+              </Paper>
+            ) : (
+              <CustomTable
+              columns={columns}
+              rows={createData(promos)}
+              type='promos'
+              edit={editPromoCode}
+              />
+            )
+          }
+        </>
+      )
       }
     </div>
   );

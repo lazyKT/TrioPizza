@@ -114,12 +114,11 @@ export default function CustomTable (props) {
           <>
             <Paper sx={{ width: '100%', mb: 2 }}>
 
-              {type !== 'promos' &&
-                <EnhancedTableToolbar
-                  selected={rows[selected]}
-                  openEditPannel={(id) => edit(id)}
-                />
-              }
+
+              <EnhancedTableToolbar
+                selected={rows[selected]}
+                openEditPannel={(id) => edit(id)}
+              />
 
               <TableContainer>
                 <Table

@@ -89,17 +89,16 @@ export default function CustomTableBody (props) {
               key={row[cells[0]]}
               selected={isItemSelected}
             >
-              {dataType !== 'promos' &&
-                <TableCell padding="checkbox">
-                  <Checkbox
-                    color="primary"
-                    checked={isItemSelected}
-                    inputProps={{
-                      'aria-labelledby': labelId,
-                    }}
-                  />
-                </TableCell>
-              }
+
+              <TableCell padding="checkbox">
+                <Checkbox
+                  color="primary"
+                  checked={isItemSelected}
+                  inputProps={{
+                    'aria-labelledby': labelId,
+                  }}
+                />
+              </TableCell>
 
               { cells.map( (cell, idx) =>
                   <TableCell key={idx}>

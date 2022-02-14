@@ -181,7 +181,7 @@ export default function CreatePromotion ({backToPromoList}) {
             </Form.Group>
 
             <Form.Group controlId='amount' className="mb-3">
-              <Form.Label>Promotion Amount</Form.Label>
+              <Form.Label>Promotion Expiry Date</Form.Label>
               <Form.Control
                 required
                 type="date"

@@ -41,7 +41,6 @@ export default function OrdersSummary () {
       }
       else {
         setError(null);
-        console.log(data);
         setData(data);
       }
     }
