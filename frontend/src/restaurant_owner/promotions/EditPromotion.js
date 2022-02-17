@@ -103,7 +103,7 @@ export default function EditPromotion ({id, backToPromoList}) {
 
           <Form onSubmit={handleOnSubmit}>
 
-            <Form.Group controlId='name'>
+            <Form.Group controlId='name' className='mb-2'>
               <Form.Label>Product Name</Form.Label>
               <Form.Control
                 required
@@ -116,7 +116,7 @@ export default function EditPromotion ({id, backToPromoList}) {
               />
             </Form.Group>
 
-            <Form.Group controlId='amount' className="mb-3">
+            <Form.Group controlId='amount' className="mb-2">
               <Form.Label>Promotion Expiry Date</Form.Label>
               <Form.Control
                 required
@@ -130,7 +130,7 @@ export default function EditPromotion ({id, backToPromoList}) {
               />
             </Form.Group>
 
-            <Form.Group controlId='description'>
+            <Form.Group controlId='description' className='mb-2'>
               <Form.Label>Promo Code Description</Form.Label>
               <Form.Control
                 as='textarea'

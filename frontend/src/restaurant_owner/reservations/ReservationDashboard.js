@@ -7,6 +7,7 @@ import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from "@fullcalendar/interaction"
 
+import ExportReservations from './ExportReservations';
 import ReservationList from './ReservationList';
 import Loader from '../../components/Loader';
 import Message from '../../components/Message';
@@ -147,6 +148,7 @@ export default function ReservationDashboard () {
           )
         : (
           <>
+            <ExportReservations />
             <h6>Legends</h6>
             <Row className="mb-4 w-75">
               <Col className="d-flex justify-content-start">

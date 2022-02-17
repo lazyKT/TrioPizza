@@ -10,6 +10,7 @@ urlpatterns = [
     path('myorders/<str:pk>', views.get_user_orders, name='myorders'), # get users orders by users id
     path('deliveries/<str:pk>', views.get_orders_by_driver, name='my-deliveries'),
     path('driver-stats/<str:pk>/', views.get_driver_order_stats, name='driver-order-stats'),
+    path('restaurants/<str:pk>/', views.get_orders_within_timeline),
     path('<str:pk>/', views.OrderDetails.as_view(), name='user-order'),
     path('<str:pk>/deliver/', views.updateOrderToDelivered, name='order-delivered'),
     path('<str:pk>/pay/', views.updateOrderToPaid, name='pay'),

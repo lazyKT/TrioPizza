@@ -37,6 +37,12 @@ function prepareData(data, label) {
 
 export default function CustomDoughnut ({data, label}) {
   return (
-    <Doughnut data={prepareData(data, label)} width={20} height={20} />
+    <Doughnut
+      data={prepareData(data, label)}
+      options={{
+          responsive: true,
+          maintainAspectRatio: true,
+        }}
+    />
   )
 }
