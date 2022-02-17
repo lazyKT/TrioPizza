@@ -12,7 +12,6 @@ const styles = {
     display: 'flex',
     justifyContent: 'flex-start',
     alignItems: 'center',
-    padding: '15px',
   },
   box: {
     padding: '15px',
@@ -71,7 +70,9 @@ export default function OrdersSummary () {
         : (
           error ? <Message variant='danger'>{error}</Message>
           : (
-            <div style={styles.container}>
+            <Paper sx={{padding: '10px', marginBottom: '15px'}}>
+              <p style={{fontSize: '18px', fontWeight: '600'}}>Order Summary</p>
+              <div style={styles.container}>
                 <Paper
                   sx={{...styles.box, background: 'dodgerblue', color: 'white'}}
                 >
@@ -97,7 +98,8 @@ export default function OrdersSummary () {
                 >
                   Cancelled Orders : {data?.order_stats[0]?.count || 0}
                 </Paper>
-            </div>
+              </div>
+            </Paper>
           )
         )
       }

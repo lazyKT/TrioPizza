@@ -280,6 +280,7 @@ def get_reservations_by_timeslot (request, pk):
 @api_view(['GET'])
 def get_reservations_by_day (request, pk):
     try:
+        sg_tz = pytz.timezone('Asia/Singapore')
         _date1 = request.query_params.get('date1')
         _date2 = request.query_params.get('date2')
         restaurant = Restaurant.objects.get(_id=pk)
@@ -290,8 +291,8 @@ def get_reservations_by_day (request, pk):
         if _date2 is None:
             return Response({'details' : 'Start Date is required*'}, status=status.HTTP_400_BAD_REQUEST)
 
-        date1 = datetime.strptime(_date1, '%Y-%m-%d')
-        date2 = datetime.strptime(_date2, '%Y-%m-%d')
+        date1 = datetime.strptime(_date1, '%Y-%m-%d').astimezone(sg_tz)
+        date2 = datetime.strptime(_date2, '%Y-%m-%d').astimezone(sg_tz)
 
         reservations_per_day = Reservation.objects.filter(
             reservedDateTime__gte=date1, reservedDateTime__lte=date2 # greater than date1 and less than and equal to date2
@@ -322,6 +323,29 @@ def get_users_featured_restaurants (request, pk):
         return Response(serializer.data)
     except User.DoesNotExist:
         return Response({'details' : 'User Not Found!'}, status=status.HTTP_404_NOT_FOUND)
+    except Exception as e:
+        error = 'Internal Server Error' if str(e) == '' else str(e)
+        return Response({'details' : error}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['GET'])
+def get_reservations_within_timeline (request, pk):
+    try:
+        restaurant = Restaurant.objects.get(_id=pk)
+        sg_tz = pytz.timezone('Asia/Singapore')
+        date1 = request.query_params.get('date1')
+        date2 = request.query_params.get('date2')
+        if date1 is None or date2 is None:
+            return Response({'details' : 'Invalid or Empty Dates'}, status=status.HTTP_400_BAD_REQUEST)
+        date1 = datetime.strptime(date1, '%Y-%m-%d').astimezone(sg_tz)
+        date2 = datetime.strptime(date2, '%Y-%m-%d').astimezone(sg_tz)
+        reservations = Reservation.objects.filter(
+            restaurant=restaurant, reservedDateTime__gte=date1, reservedDateTime__lte=date2
+        )
+        serializer = ReservationSerializer(reservations, many=True)
+        return Response(serializer.data)
+    except Restaurant.DoesNotExist:
+        return Response({'details' : 'Restaurant Not Found!'}, status=status.HTTP_404_NOT_FOUND)
     except Exception as e:
         error = 'Internal Server Error' if str(e) == '' else str(e)
         return Response({'details' : error}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

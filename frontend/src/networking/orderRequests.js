@@ -129,3 +129,23 @@ export async function getDriverOrderStats (driverId, token, signal) {
       return {error: true, message: error.message};
   }
 }
+
+
+export async function getOrdersWithinTimeFrames (restaurantId, date1, date2, token) {
+  try {
+    const { data } = await axios.get(`/api/orders/restaurants/${restaurantId}/?date1=${date1}&date2=${date2}`, {
+      headers: {
+        'Content-Type' : 'application/json',
+        Authorization : `Bearer ${token}`
+      }
+    });
+
+    return { error: false, data }
+  }
+  catch (error) {
+    if (error.response && error.response.data.details)
+      return {error: true, message: error.response.data.details};
+    else
+      return {error: true, message: error.message};
+  }
+}

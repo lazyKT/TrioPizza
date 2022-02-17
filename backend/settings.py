@@ -28,6 +28,12 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'proshop-demo.herokuapp.com']
 
+CORS_ORIGIN_ALLOW_ALL = False
+
+CORS_ORIGIN_WHITELIST = (
+       'http://127.0.0.1:3000',
+)
+
 EMAIL_BACKEND = "sendgrid_backend.SendgridBackend"
 SENDGRID_API_KEY = os.environ['TP_SENDGRID_API_KEY']
 SENDGRID_SANDBOX_MODE_IN_DEBUG=False
@@ -186,7 +192,6 @@ STATIC_URL = '/static/'
 MEDIA_URL = '/images/'
 
 STATICFILES_DIRS = [
-    BASE_DIR / 'static',
     BASE_DIR / 'frontend/build/static'
 ]
 

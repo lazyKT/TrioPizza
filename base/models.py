@@ -159,6 +159,9 @@ class OrderItem(models.Model):
         return str(self.name)
 
 
+"""
+# Saved Addresss
+"""
 class ShippingAddress(models.Model):
     name = models.CharField(max_length=64)
     address = models.CharField(max_length=200, null=True, blank=True)

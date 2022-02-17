@@ -1,3 +1,4 @@
+import pytz
 from django.shortcuts import render
 from django.http import Http404
 from django.db.models import Count
@@ -467,6 +468,29 @@ def cancel_order (request, pk):
         return Response(serializer.data)
     except Order.DoesNotExist:
         return Response({'details' : 'Order Not Found!'}, status=status.HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        error = 'Internal Server Error!' if str(e) == '' else str(e)
+        return Response({'details' : error}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['GET'])
+def get_orders_within_timeline (request, pk):
+    try:
+        restaurant = Restaurant.objects.get(_id=pk)
+        sg_tz = pytz.timezone('Asia/Singapore')
+        date1 = request.query_params.get('date1')
+        date2 = request.query_params.get('date2')
+        if date1 is None or date2 is None:
+            return Response({'details' : 'Invalid Dates Received!'}, status=status.HTTP_400_BAD_REQUEST)
+        date1 = datetime.strptime(date1, '%Y-%m-%d').astimezone(sg_tz)
+        date2 = datetime.strptime(date2, '%Y-%m-%d').astimezone(sg_tz)
+        orders = Order.objects.filter(
+            restaurant=restaurant, createdAt__gte=date1, createdAt__lte=date2
+        )
+        serializer = OrderSerializer(orders, many=True)
+        return Response(serializer.data)
+    except Restaurant.DoesNotExist:
+        return Response({'details' : 'Restaurant Not Found!'}, status=status.HTTP_404_NOT_FOUND)
     except Exception as e:
         error = 'Internal Server Error!' if str(e) == '' else str(e)
         return Response({'details' : error}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

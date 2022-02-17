@@ -1,27 +1,38 @@
 import React from 'react';
-import { Row, Col } from 'react-bootstrap';
-import Card from '@mui/material/Paper';
+import { Container, Card } from 'react-bootstrap';
 
 import RegisteredRestaurants from './statistic/RegisteredRestaurants';
 import DriverRanking from './statistic/DriverRanking';
 
 
+const styles = {
+  container: {
+
+  },
+  card: {
+    width: '100%',
+    minWidth: '200px',
+    maxWidth: '600px',
+    height: '780px'
+  }
+}
+
 export default function Dashboard () {
 
   return (
     <>
-      <Row>
-        <Col>
-          <Card sx={{padding: '10px'}}>
+      <Container className="d-flex justify-content-start" fluid>
+        <div>
+          <Card className='p-2 m-1' style={styles.card}>
             <RegisteredRestaurants />
           </Card>
-        </Col>
-        <Col>
-          <Card sx={{padding: '10px'}}>
+        </div>
+        <div>
+          <Card className='p-2 m-1' style={styles.card}>
             <DriverRanking />
           </Card>
-        </Col>
-      </Row>
+        </div>
+      </Container>
       <br/>
     </>
   )
