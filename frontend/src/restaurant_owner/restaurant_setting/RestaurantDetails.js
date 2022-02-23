@@ -137,7 +137,7 @@ export default function RestaurantDetails () {
       setRestaurant(restaurantInfo);
       setLogo(null);
       if (logoImg && logoImg.current)
-        logoImg.current.src = restaurantInfo.logo;
+        logoImg.current.src = `http://167.71.221.189${restaurantInfo.logo}`;
     }
   }, [editing]);
 
@@ -160,7 +160,7 @@ export default function RestaurantDetails () {
                   opacity: editing ? 0.7 : 1,
                   cursor: editing ? 'pointer' : 'default'
                 }}
-                src={restaurant.logo}
+                src={`http://167.71.221.189${restaurant.logo}`}
                 alt={restaurant.name}
                 ref={logoImg}
                 onClick={openFile}

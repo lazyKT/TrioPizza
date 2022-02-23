@@ -49,7 +49,7 @@ function ShippingScreen({ history }) {
     // fetch user's saved address
     const fetchSavedAddresses = async (userId, token, signal) => {
       try {
-        const { data } = await axios.get(`/api/users/${userId}/addresses`, {
+        const { data } = await axios.get(`http://167.71.221.189/api/users/${userId}/addresses`, {
           headers: {
             'Content-Type' : 'application/json',
             Authorization : `Bearer ${token}`

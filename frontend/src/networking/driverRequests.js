@@ -4,7 +4,7 @@ import axios from 'axios';
 
 export async function getAllDriverStatus (token, signal) {
   try {
-      const { data } = await axios.get('/api/users/drivers/status', {
+      const { data } = await axios.get('http://167.71.221.189/api/users/drivers/status', {
         headers: {
           'Content-Type' : 'application/json',
           Authorization : `Bearer ${token}`
@@ -26,7 +26,7 @@ export async function getAllDriverStatus (token, signal) {
 
 export async function getDriverWorkingStatus (driverId, token, signal) {
   try {
-    const { data } = await axios.get(`/api/users/drivers/status/${driverId}`, {
+    const { data } = await axios.get(`http://167.71.221.189/api/users/drivers/status/${driverId}`, {
       headers: {
         'Content-Type' : 'application/json',
         Authorization : `Bearer ${token}`
@@ -51,7 +51,7 @@ export async function updateWorkingStatus (driverId, status, token) {
       driver: parseInt(driverId),
       status
     }
-    const { data } = await axios.put('/api/users/drivers/status/update', body, {
+    const { data } = await axios.put('http://167.71.221.189/api/users/drivers/status/update', body, {
       headers: {
         'Content-Type' : 'application/json',
         Authorization : `Bearer ${token}`

@@ -3,7 +3,7 @@ import axios from 'axios';
 
 export async function createContactSupportRequest (body) {
   try {
-    const { data } = await axios.post('api/support/', body, {
+    const { data } = await axios.post('http://167.71.221.189/api/support/', body, {
       headers: {
         'Content-Type' : 'application/json'
       }

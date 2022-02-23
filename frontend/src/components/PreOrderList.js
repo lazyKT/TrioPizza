@@ -21,7 +21,7 @@ export default function PreOrderList () {
   // useEffect(() => {
   //   console.log('pre-order items', preOrderItems);
   // }, [preOrderItems]);
-  
+
   return (
     <>
       {
@@ -36,7 +36,7 @@ export default function PreOrderList () {
                     <Row>
                       <Col md={2}>
                           <Image style={{width: '50px', height: '50px'}}
-                            src={item.image} alt={item.name} fluid rounded />
+                            src={`http://167.71.221.189${item.image}`} alt={item.name} fluid rounded />
                       </Col>
 
                       <Col>

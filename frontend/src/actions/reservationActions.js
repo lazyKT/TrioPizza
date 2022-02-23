@@ -16,7 +16,7 @@ export const includePreOrder = () => (dispatch, getState) => {
 
 export const addPreOrderItems = (id) => async (dispatch, getState) => {
 
-  const { product } = await axios.get(`/api/products/${id}`);
+  const { product } = await axios.get(`http://167.71.221.189/api/products/${id}`);
 
   dispatch({
     type: RESERVATION_ADD_PREORDER_ITEM,

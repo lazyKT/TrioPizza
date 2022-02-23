@@ -217,31 +217,31 @@ class UserDetails (APIView):
 
 
     def put (self, request, pk, format=None):
-        try:
-            user = self.get_object (pk)
-            data = request.data
+        # try:
+        user = self.get_object (pk)
+        data = request.data
 
-            error, message = self.validate_request_body (data)
-            if error:
-                return Response ({'details': message}, status=status.HTTP_400_BAD_REQUEST)
+        error, message = self.validate_request_body (data)
+        if error:
+            return Response ({'details': message}, status=status.HTTP_400_BAD_REQUEST)
 
-            is_valid, message = self.validate_username(user.username, data['username'])
-            if is_valid is not True:
-                return Response ({'details' : message}, status=status.HTTP_400_BAD_REQUEST)
+        is_valid, message = self.validate_username(user.username, data['username'])
+        if is_valid is not True:
+            return Response ({'details' : message}, status=status.HTTP_400_BAD_REQUEST)
 
-            serializer = UserSerializer(user, data=data)
-            if serializer.is_valid():
-                serializer.save()
-                profile = user.profile
-                profile.name = data['name']
-                profile.type = data['type']
-                profile.mobile = data['mobile']
-                profile.save()
-                return Response (serializer.data)
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        except Exception as e:
-            error = repr(e)
-            return Response ({'details' : error}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        serializer = UserSerializer(user, data=data)
+        if serializer.is_valid():
+            serializer.save()
+            profile = user.profile
+            profile.name = data['name']
+            profile.type = data['type']
+            profile.mobile = data['mobile']
+            profile.save()
+            return Response (serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        # except Exception as e:
+        #     error = repr(e)
+        #     return Response ({'details' : error}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
     def delete (self, request, pk, format=None):

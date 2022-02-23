@@ -190,6 +190,7 @@ export default function EditProduct ({editingID, backToProductList}) {
       backToProductList();
 
     if (product) {
+      console.log(product);
       setEditingProduct({
         name: product.name ? product.name : 'Failed to fetch',
         description: product.description ? product.description : 'Failed to fetch',
@@ -260,7 +261,7 @@ export default function EditProduct ({editingID, backToProductList}) {
           <div style={styles.imgDiv}>
             <Image
               style={styles.img}
-              src={product.image}
+              src={`http://167.71.221.189${product.image}`}
               alt={product.name}
               ref={imgRef}
               onClick={openFile}

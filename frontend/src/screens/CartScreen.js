@@ -59,7 +59,7 @@ function CartScreen({ match, location, history }) {
                                   <Col md={2}>
                                       <Image
                                         style={{height: '75px', width: '80px'}}
-                                        src={item.image}
+                                        src={`http://167.71.221.189${item.image}`}
                                         alt={item.name}
                                         fluid rounded
                                       />

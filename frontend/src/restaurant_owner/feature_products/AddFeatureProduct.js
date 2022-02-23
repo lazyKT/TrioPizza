@@ -17,7 +17,8 @@ function ProductCard({ product, add }) {
         <Card className="p-2 rounded">
             <Image
               style={{ height: '230px'}}
-              src={product.image} alt={product.name}
+              src={`http://167.71.221.189${product.image}`}
+              alt={product.name}
             />
 
             <Card.Body>

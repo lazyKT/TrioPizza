@@ -36,9 +36,8 @@ export default function CustomTableHead (props) {
   return (
     <TableHead>
       <TableRow>
-        {type !== 'promos' &&
         <TableCell padding="checkbox">
-        </TableCell>}
+        </TableCell>
         {headCells.map((headCell) => (
           <TableCell
             key={headCell.id}

@@ -25,7 +25,7 @@ export const createRestaurant = (token, body) => async (dispatch) => {
       }
     };
 
-    const { data } = await axios.post('/api/restaurants/', body, config);
+    const { data } = await axios.post('http://167.71.221.189/api/restaurants/', body, config);
 
     dispatch({
       type: RESTAURANT_CREATE,
@@ -55,7 +55,7 @@ export const getRestaurantInfo = (ownerId, token, signal) => async (dispatch) =>
         signal
     };
 
-    const { data } = await axios.get(`/api/restaurants?owner=${ownerId}`, config);
+    const { data } = await axios.get(`http://167.71.221.189/api/restaurants?owner=${ownerId}`, config);
 
     const { restaurants, count } = data;
 
@@ -90,7 +90,7 @@ export const updateRestaurantInfo = (restaurantId, body, token) => async (dispat
         }
     };
 
-    const { data } = await axios.put(`/api/restaurants/${restaurantId}/`, body, config);
+    const { data } = await axios.put(`http://167.71.221.189/api/restaurants/${restaurantId}/`, body, config);
 
     dispatch({
       type: RESTAURANT_EDIT,
@@ -124,7 +124,7 @@ export const updateRestaurantLocation = (restaurantId, body, token) => async (di
         }
     };
 
-    const { data } = await axios.put(`/api/restaurants/location/${restaurantId}/`, body, config);
+    const { data } = await axios.put(`http://167.71.221.189/api/restaurants/location/${restaurantId}/`, body, config);
 
     dispatch({
       type: RESTAURANT_EDIT,

@@ -101,7 +101,7 @@ export default function RestaurantScreen ({match, location, history}) {
                 <Col md={3}>
                   <Image
                     style={{ height: '150px', width: '300px'}}
-                    src={restaurant.logo}
+                    src={`http://167.71.221.189${restaurant.logo}`}
                     alt={restaurant.name}
                     fluid
                   />

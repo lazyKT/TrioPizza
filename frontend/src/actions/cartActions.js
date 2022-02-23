@@ -21,8 +21,8 @@ function discountedPrice (price, amount, type) {
 
 
 export const addToCart = (id, qty) => async (dispatch, getState) => {
-    const { data } = await axios.get(`/api/products/${id}`);
-    const { data: promoData } = await axios.get(`/api/restaurants/promos?product=${id}`);
+    const { data } = await axios.get(`http://167.71.221.189/api/products/${id}`);
+    const { data: promoData } = await axios.get(`http://167.71.221.189/api/restaurants/promos?product=${id}`);
 
     const productPrice = promoData && promoData[0]?.status === 'active'
                           ? discountedPrice(parseFloat(data.price), promoData[0]?.amount, promoData[0]?.type)
@@ -46,8 +46,8 @@ export const addToCart = (id, qty) => async (dispatch, getState) => {
 
 
 export const changeQty = (id, qty) => async (dispatch, getState) => {
-    const { data } = await axios.get(`/api/products/${id}`);
-    const { data: promoData } = await axios.get(`/api/restaurants/promos?product=${id}`);
+    const { data } = await axios.get(`http://167.71.221.189/api/products/${id}`);
+    const { data: promoData } = await axios.get(`http://167.71.221.189/api/restaurants/promos?product=${id}`);
 
     const productPrice = promoData && promoData[0]?.status === 'active'
                           ? discountedPrice(parseFloat(data.price), promoData[0]?.amount)

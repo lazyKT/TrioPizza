@@ -4,7 +4,7 @@ import axios from 'axios';
 // restaurants registration stats
 export async function fetchRegisteredRestaurantsStats (token, signal) {
   try {
-    const { data } = await axios.get('/api/statistic/restaurant-register/', {
+    const { data } = await axios.get('http://167.71.221.189/api/statistic/restaurant-register/', {
       headers: {
         'Content-Type' : 'application/json',
         Authorization : `Bearer ${token}`
@@ -26,7 +26,7 @@ export async function fetchRegisteredRestaurantsStats (token, signal) {
 // driver number of total orders and deliveries
 export async function fetchDriversOrdersDeliveries (token, signal) {
   try {
-    const { data } = await axios.get('/api/statistic/driver-order-deliveries/', {
+    const { data } = await axios.get('http://167.71.221.189/api/statistic/driver-order-deliveries/', {
       headers: {
         'Content-Type' : 'application/json',
         Authorization : `Bearer ${token}`
@@ -48,7 +48,7 @@ export async function fetchDriversOrdersDeliveries (token, signal) {
 // monthly/weekly/daily stats of restaurants orders and reservations
 export async function fetchRestaurantsTimelineStats (restaurant_id, area, filter, token, signal) {
   try {
-    const url = `/api/statistic/restaurant-reserve-orders/${restaurant_id}/?data=${area}&filter=${filter}`;
+    const url = `http://167.71.221.189/api/statistic/restaurant-reserve-orders/${restaurant_id}/?data=${area}&filter=${filter}`;
 
     const { data } = await axios.get(url, {
       headers: {
@@ -72,7 +72,7 @@ export async function fetchRestaurantsTimelineStats (restaurant_id, area, filter
 // get sales data from products
 export async function fetchRestaurantProductsStats (restaurant_id, token, signal) {
   try {
-    const { data } = await axios.get(`/api/statistic/restaurant-products/${restaurant_id}/`, {
+    const { data } = await axios.get(`http://167.71.221.189/api/statistic/restaurant-products/${restaurant_id}/`, {
       headers: {
         'Content-Type' : 'application/json',
         Authorization : `Bearer ${token}`
@@ -93,7 +93,7 @@ export async function fetchRestaurantProductsStats (restaurant_id, token, signal
 
 export async function fetchRestaurantOrderStats (restaurant_id, token, signal) {
   try {
-    const { data } = await axios.get(`/api/statistic/restaurant-orders/${restaurant_id}/`, {
+    const { data } = await axios.get(`http://167.71.221.189/api/statistic/restaurant-orders/${restaurant_id}/`, {
       headers: {
         'Content-Type' : 'application/json',
         Authorization : `Bearer ${token}`

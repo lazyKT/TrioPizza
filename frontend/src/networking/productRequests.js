@@ -4,7 +4,7 @@ import axios from 'axios';
 // get products from restaurant
 export async function getRestaurantProducts (restaurantId, signal, page=1) {
   try {
-    const { data } = await axios.get(`/api/products/restaurants/${restaurantId}?page=${page}`, {
+    const { data } = await axios.get(`http://167.71.221.189/api/products/restaurants/${restaurantId}?page=${page}`, {
       headers: {
         'Content-Type' : 'application/json',
         'Accept' : 'application/json'
@@ -26,7 +26,7 @@ export async function getRestaurantProducts (restaurantId, signal, page=1) {
 // search products by product name
 export async function searchProductsRequest (restaurantId, filter, token) {
   try {
-    const { data } = await axios.get(`api/products/restaurants/${restaurantId}?search=${filter}&limit=all`, {
+    const { data } = await axios.get(`http://167.71.221.189/api/products/restaurants/${restaurantId}?search=${filter}&limit=all`, {
       headers: {
         'Content-Type' : 'application/json',
         Authorization : `Bearer ${token}`
@@ -47,7 +47,7 @@ export async function searchProductsRequest (restaurantId, filter, token) {
 // get feature product list
 export async function getFeatureProducts (restaurantId, token, signal) {
   try {
-    const { data } = await axios.get(`/api/products/featuring?restaurant=${restaurantId}`, {
+    const { data } = await axios.get(`http://167.71.221.189/api/products/featuring?restaurant=${restaurantId}`, {
       headers: {
         'Content-Type' : 'application/json',
         Authorization : `Bearer ${token}`
@@ -69,7 +69,7 @@ export async function getFeatureProducts (restaurantId, token, signal) {
 // add product to feature product list
 export async function addToFeatureProducts (body, token) {
   try {
-    const { data } = await axios.post(`/api/products/featuring/`, body, {
+    const { data } = await axios.post(`http://167.71.221.189/api/products/featuring/`, body, {
       headers: {
         'Content-Type' : 'application/json',
         Authorization : `Bearer ${token}`
@@ -90,7 +90,7 @@ export async function addToFeatureProducts (body, token) {
 // remove product from feature product list
 export async function removeFromFeatureProducts (id, token) {
   try {
-    const { data } = await axios.delete(`/api/products/featuring/${id}/`, {
+    const { data } = await axios.delete(`http://167.71.221.189/api/products/featuring/${id}/`, {
       headers: {
         'Content-Type' : 'application/json',
         Authorization : `Bearer ${token}`
@@ -111,7 +111,7 @@ export async function removeFromFeatureProducts (id, token) {
 // upload product new image
 export async function uploadNewProductImage (productId, body, token) {
   try {
-    const { data } = await axios.post(`/api/products/upload/${productId}/`, body, {
+    const { data } = await axios.post(`http://167.71.221.189/api/products/upload/${productId}/`, body, {
       headers: {
         'Content-Type' : 'multipart/form-data',
         Authorization: `Bearer ${token}`
@@ -132,7 +132,7 @@ export async function uploadNewProductImage (productId, body, token) {
 // get product promotion details
 export async function getProductPromotion (productId, signal) {
   try {
-    const { data } = await axios.get(`/api/restaurants/promos?product=${productId}`, {
+    const { data } = await axios.get(`http://167.71.221.189/api/restaurants/promos?product=${productId}`, {
       headers: {
         'Content-Type': 'application/json'
       },
@@ -153,7 +153,7 @@ export async function getProductPromotion (productId, signal) {
 // get promotion details by id
 export async function getPromoDetails (id, token, signal) {
   try {
-    const { data } = await axios.get(`/api/restaurants/promos/${id}/`, {
+    const { data } = await axios.get(`http://167.71.221.189/api/restaurants/promos/${id}/`, {
       headers: {
         'Content-Type' : 'application/json',
         Authentication : `Bearer ${token}`
@@ -173,7 +173,7 @@ export async function getPromoDetails (id, token, signal) {
 
 export async function deletePromoCode (id, token) {
   try {
-    const { data } = await axios.delete(`/api/restaurants/promos/${id}/`, {
+    const { data } = await axios.delete(`http://167.71.221.189/api/restaurants/promos/${id}/`, {
       headers: {
         'Content-Type' : 'application/json',
         Authentication : `Bearer ${token}`
