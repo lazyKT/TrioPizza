@@ -36,7 +36,7 @@ export const listProducts = (keyword = '') => async (dispatch) => {
     try {
         dispatch({ type: PRODUCT_LIST_REQUEST })
 
-        const { data } = await axios.get(`/api/products${keyword}`)
+        const { data } = await axios.get(`http://167.71.221.189/api/products${keyword}`)
 
         dispatch({
             type: PRODUCT_LIST_SUCCESS,
@@ -58,7 +58,7 @@ export const listRestaurantProducts = (restaurantId, signal, limit='all') => asy
   try {
       dispatch({ type: PRODUCT_LIST_REQUEST });
 
-      const { data } = await axios.get(`/api/products/restaurants/${restaurantId}?limit=${limit}`, {
+      const { data } = await axios.get(`http://167.71.221.189/api/products/restaurants/${restaurantId}?limit=${limit}`, {
         headers: {
           'Content-Type' : 'application/json'
         },
@@ -85,7 +85,7 @@ export const listTopProducts = () => async (dispatch) => {
     try {
         dispatch({ type: PRODUCT_TOP_REQUEST })
 
-        const { data } = await axios.get(`/api/products/top/`)
+        const { data } = await axios.get(`http://167.71.221.189/api/products/top/`)
 
         dispatch({
             type: PRODUCT_TOP_SUCCESS,
@@ -107,7 +107,7 @@ export const listProductDetails = (id) => async (dispatch) => {
     try {
         dispatch({ type: PRODUCT_DETAILS_REQUEST })
 
-        const { data } = await axios.get(`/api/products/${id}`)
+        const { data } = await axios.get(`http://167.71.221.189/api/products/${id}`)
 
         dispatch({
             type: PRODUCT_DETAILS_SUCCESS,
@@ -143,7 +143,7 @@ export const deleteProduct = (id) => async (dispatch, getState) => {
         }
 
         const { data } = await axios.delete(
-            `/api/products/${id}/`,
+            `http://167.71.221.189/api/products/${id}/`,
             config
         )
 
@@ -183,13 +183,13 @@ export const createProduct = (product, image) => async (dispatch, getState) => {
         }
 
         const { data } = await axios.post(
-            `/api/products/`,
+            `http://167.71.221.189/api/products/`,
             product,
             config
         );
 
         if (image) {
-          const response = await axios.post(`/api/products/upload/${data._id}/`, image, {
+          const response = await axios.post(`http://167.71.221.189/api/products/upload/${data._id}/`, image, {
             headers: {
               'Content-Type' : 'multipart/form-data',
               Authorization: `Bearer ${userInfo.token}`
@@ -233,7 +233,7 @@ export const updateProduct = (product, id) => async (dispatch, getState) => {
         }
 
         const { data } = await axios.put(
-            `/api/products/${id}/`,
+            `http://167.71.221.189/api/products/${id}/`,
             product,
             config
         )
@@ -277,7 +277,7 @@ export const createProductReview = (productId, review) => async (dispatch, getSt
         }
 
         const { data } = await axios.post(
-            `/api/products/${productId}/reviews/`,
+            `http://167.71.221.189/api/products/${productId}/reviews/`,
             review,
             config
         )

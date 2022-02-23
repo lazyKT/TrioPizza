@@ -3,7 +3,7 @@ import axios from 'axios';
 
 export async function createNewReservationRequest (reservation, token) {
   try {
-    const { data } = await axios.post(`api/reservations/`, reservation, {
+    const { data } = await axios.post(`http://167.71.221.189/api/reservations/`, reservation, {
       headers: {
         'Content-Type' : 'application/json',
         Authorization : `Bearer ${token}`
@@ -24,7 +24,7 @@ export async function createNewReservationRequest (reservation, token) {
 
 export async function getUsersReservations (userId, token, signal, page=1) {
   try {
-    const { data } = await axios.get(`api/reservations/users/${userId}?page=${page}`, {
+    const { data } = await axios.get(`http://167.71.221.189/api/reservations/users/${userId}?page=${page}`, {
       headers: {
         'Content-Type' : 'application/json',
         Authorization : `Bearer ${token}`
@@ -55,13 +55,13 @@ export async function getReservationListByDateTime ({ restaurantId, date, dateti
     };
 
     if (date) {
-      const { data } = await axios.get(`http://127.0.0.1:8000/api/reservations/?restaurant=${restaurantId}&date=${date}`, {
+      const { data } = await axios.get(`http://167.71.221.189/api/reservations/?restaurant=${restaurantId}&date=${date}`, {
         config
       });
       return { error : false, data };
     }
     if (datetime) {
-      const { data } = await axios.get(`http://127.0.0.1:8000/api/reservations/?restaurant=${restaurantId}&datetime=${datetime}`, {
+      const { data } = await axios.get(`http://167.71.221.189/api/reservations/?restaurant=${restaurantId}&datetime=${datetime}`, {
         config
       });
       return { error : false, data };
@@ -79,7 +79,7 @@ export async function getReservationListByDateTime ({ restaurantId, date, dateti
 // get reservation by reservation id
 export async function getReservationById (reservationId, token, signal) {
   try {
-    const { data } = await axios.get(`api/reservations/${reservationId}`, {
+    const { data } = await axios.get(`http://167.71.221.189/api/reservations/${reservationId}`, {
       headers: {
         'Content-Type' : 'application/json',
         Authorization : `Bearer ${token}`
@@ -100,7 +100,7 @@ export async function getReservationById (reservationId, token, signal) {
 
 export async function editReservationById (reservationId, body, token) {
   try {
-    const { data } = await axios.put(`api/reservations/${reservationId}/`, body, {
+    const { data } = await axios.put(`http://167.71.221.189/api/reservations/${reservationId}/`, body, {
       headers: {
         'Content-Type' : 'application/json',
         Authorization : `Bearer ${token}`
@@ -120,7 +120,7 @@ export async function editReservationById (reservationId, body, token) {
 
 export async function getReservationsWithinTimeFrames (restaurantId, date1, date2, token) {
   try {
-    const { data } = await axios.get(`api/reservations/restaurant/${restaurantId}/export/?date1=${date1}&date2=${date2}`, {
+    const { data } = await axios.get(`http://167.71.221.189/api/reservations/restaurant/${restaurantId}/export/?date1=${date1}&date2=${date2}`, {
       headers: {
         'Content-Type' : 'application/json',
         Authorization : `Bearer ${token}`

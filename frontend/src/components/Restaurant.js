@@ -9,7 +9,7 @@ export default function Restaurant ({restaurant}) {
         <Link to={`/restaurants/${restaurant._id}`}>
             <Card.Img
               style={{ height: '200px' }}
-              src={restaurant.logo}
+              src={`http://167.71.221.189${restaurant.logo}`}
             />
         </Link>
 

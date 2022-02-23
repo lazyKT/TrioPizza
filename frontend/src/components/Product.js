@@ -63,7 +63,7 @@ function Product({ product }) {
       <Link to={`/product/${product._id}`}>
           <Card.Img
             style={styles.img}
-            src={product.image}
+            src={`http://167.71.221.189${product.image}`}
           />
       </Link>
 

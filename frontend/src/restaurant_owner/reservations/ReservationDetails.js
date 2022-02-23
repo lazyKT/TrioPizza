@@ -150,7 +150,7 @@ export default function ReservationScreen ({reservation, backToList}) {
                           <Row>
                             <Col md={2}>
                                 <Image style={{width: '50px', height: '50px'}}
-                                  src={item.product.image} alt={item.product.name} fluid rounded />
+                                  src={`http://167.71.221.189${item.product.image}`} alt={item.product.name} fluid rounded />
                             </Col>
 
                             <Col>

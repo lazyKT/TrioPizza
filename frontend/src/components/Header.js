@@ -72,6 +72,7 @@ function Header() {
     const abortController = new AbortController();
 
     if (userInfo) {
+      console.log(userInfo);
       if (userInfo.type === 'admin' || userInfo.type === 'restaurant owner')
         setShowHeader(false);
       else {

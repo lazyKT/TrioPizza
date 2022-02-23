@@ -35,7 +35,7 @@ export default function ReserveConfirm () {
         reservedDateTime : `${info.date} ${info.time}`,
         preOrderItems: preOrderItems
       };
-      
+
       const { error, data, message } = await createNewReservationRequest (body, userInfo.token);
 
       if (error) {
@@ -114,7 +114,7 @@ export default function ReserveConfirm () {
                       <Row>
                         <Col md={2}>
                             <Image style={{width: '50px', height: '50px'}}
-                              src={item.image} alt={item.name} fluid rounded />
+                              src={`http://167.71.221.189${item.image}`} alt={item.name} fluid rounded />
                         </Col>
 
                         <Col>

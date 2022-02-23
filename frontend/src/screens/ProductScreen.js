@@ -128,7 +128,7 @@ function ProductScreen({ match, history }) {
                         <div>
                           <Row>
                             <Col md={6}>
-                              <Image src={product.image} alt={product.name} fluid />
+                              <Image src={`http://167.71.221.189${product.image}`} alt={product.name} fluid />
                             </Col>
 
 

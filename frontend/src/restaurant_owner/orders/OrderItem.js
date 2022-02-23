@@ -25,7 +25,8 @@ export default function OrderItem ({items}) {
                           <ListGroup.Item key={index}>
                               <Row>
                                   <Col md={1}>
-                                      <Image style={{width: '50px', height: '50px'}} src={item.product.image} fluid rounded />
+                                      <Image style={{width: '50px', height: '50px'}}
+                                        src={`http://167.71.221.189${item.product.image}`} fluid rounded />
                                   </Col>
 
                                   <Col>{item.name}</Col>

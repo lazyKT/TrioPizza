@@ -10,7 +10,7 @@ export default function RestaurantCarousel ({restaurants}) {
       {restaurants.map(restaurant => (
           <Carousel.Item key={restaurant._id}>
               <Link to={`/restaurants/${restaurant._id}`}>
-                  <Image src={restaurant.logo} alt={restaurant.name} fluid />
+                  <Image src={`http://167.71.221.189${restaurant.logo}`} alt={restaurant.name} fluid />
                   <Carousel.Caption className='carousel.caption'>
                       <h4>{restaurant.name}</h4>
                   </Carousel.Caption>

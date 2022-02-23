@@ -80,7 +80,7 @@ export const login = (email, password) => async (dispatch) => {
         };
 
         const { data } = await axios.post(
-            '/api/users/login/',
+            'http://167.71.221.189/api/users/login/',
             { 'username': email, 'password': password },
             config
         );
@@ -133,7 +133,7 @@ export const register = (user) => async (dispatch) => {
             }
         };
 
-        const { data } = await axios.post ( '/api/users/',
+        const { data } = await axios.post ( 'http://167.71.221.189/api/users/',
             user,
             config
         )
@@ -171,7 +171,7 @@ export const getUserDetails = (id) => async (dispatch, getState) => {
         }
 
         const { data } = await axios.get(
-            `/api/users/${id}/`,
+            `http://167.71.221.189/api/users/${id}/`,
             config
         );
 
@@ -211,7 +211,7 @@ export const updateUserProfile = (user) => async (dispatch, getState) => {
         }
 
         const { data } = await axios.put(
-            `/api/users/${userInfo.id}/`,
+            `http://167.71.221.189/api/users/${userInfo.id}/`,
             { ...user, type: userInfo.type },
             config
         )
@@ -260,7 +260,7 @@ export const listUsers = () => async (dispatch, getState) => {
         }
 
         const { data } = await axios.get(
-            `/api/users/`,
+            `http://167.71.221.189/api/users/`,
             config
         )
 
@@ -299,7 +299,7 @@ export const deleteUser = (id) => async (dispatch, getState) => {
         }
 
         const { data } = await axios.delete(
-            `/api/users/${id}/`,
+            `http://167.71.221.189/api/users/${id}/`,
             config
         );
 
@@ -340,7 +340,7 @@ export const updateUser = (id, user) => async (dispatch, getState) => {
         }
 
         const { data } = await axios.put(
-            `/api/users/${id}/`,
+            `http://167.71.221.189/api/users/${id}/`,
             user,
             config
         )

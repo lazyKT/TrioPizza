@@ -59,7 +59,7 @@ export const createOrder = (order) => async (dispatch, getState) => {
         };
 
         const { data } = await axios.post(
-            `/api/orders/`,
+            `http://167.71.221.189/api/orders/`,
             body,
             config
         )
@@ -103,7 +103,7 @@ export const getOrderDetails = (id) => async (dispatch, getState) => {
         }
 
         const { data } = await axios.get(
-            `/api/orders/${id}/`,
+            `http://167.71.221.189/api/orders/${id}/`,
             config
         )
 
@@ -143,7 +143,7 @@ export const payOrder = (id, paymentResult) => async (dispatch, getState) => {
         }
 
         const { data } = await axios.put(
-            `/api/orders/${id}/pay/`,
+            `http://167.71.221.189/api/orders/${id}/pay/`,
             paymentResult,
             config
         )
@@ -181,7 +181,7 @@ export const deliverOrder = orderId => async (dispatch, getState) => {
         };
 
         const { data } = await axios.put(
-            `/api/orders/${orderId}/deliver/`,
+            `http://167.71.221.189/api/orders/${orderId}/deliver/`,
             {},
             config
         )
@@ -220,7 +220,7 @@ export const listMyOrders = (page = 1) => async (dispatch, getState) => {
         }
 
         const { data } = await axios.get(
-            `/api/orders/myorders/${userInfo.id}?page=${page}`,
+            `http://167.71.221.189/api/orders/myorders/${userInfo.id}?page=${page}`,
             config
         );
 
@@ -257,7 +257,7 @@ export const listOrders = (restaurant, page=1) => async (dispatch, getState) => 
         }
 
         const { data } = await axios.get(
-            `/api/orders?page=${page}&restaurant=${restaurant}`,
+            `http://167.71.221.189/api/orders?page=${page}&restaurant=${restaurant}`,
             config
         );
 
@@ -287,7 +287,7 @@ export const cancelOrder = orderId => async (dispatch, getState) => {
 
       const { userCookie: { userInfo } } = getState();
 
-      const { data } = await axios.put(`/api/orders/${orderId}/cancel/`, {
+      const { data } = await axios.put(`http://167.71.221.189/api/orders/${orderId}/cancel/`, {
         headers: {
           'Content-Type' : 'Application/json',
           Authorization: `Bearer ${userInfo.token}`

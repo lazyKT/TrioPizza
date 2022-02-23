@@ -34,7 +34,7 @@ function Product({ product }) {
     <Card className="my-3 p-3 rounded" style={styles.container}>
       <Card.Img
         style={styles.img}
-        src={product.image}
+        src={`http://167.71.221.189${product.image}`}
       />
 
       <Card.Body>

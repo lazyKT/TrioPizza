@@ -32,7 +32,7 @@ function PlaceOrderScreen({ history }) {
       e.preventDefault();
       const { address, city, postalCode, country } = cart.shippingAddress;
       const fullAddress = `${address}, ${city}, ${postalCode}, ${country}`;
-      
+
       dispatch(createOrder({
           orderItems: cart.cartItems,
           shippingAddress: fullAddress,
@@ -110,7 +110,7 @@ function PlaceOrderScreen({ history }) {
                                             <ListGroup.Item key={index}>
                                                 <Row>
                                                     <Col md={1}>
-                                                        <Image src={item.image} alt={item.name} fluid rounded />
+                                                        <Image src={`http://167.71.221.189${item.image}`} alt={item.name} fluid rounded />
                                                     </Col>
 
                                                     <Col>

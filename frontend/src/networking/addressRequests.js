@@ -4,7 +4,7 @@ import axios from 'axios';
 
 export async function getUserSavedAddresses (id, token, signal) {
   try {
-    const { data } = await axios.get(`/api/users/${id}/addresses`, {
+    const { data } = await axios.get(`http://167.71.221.189/api/users/${id}/addresses`, {
       headers: {
         'Content-Type' : 'application/json',
         Authorization: `Bearer ${token}`
@@ -29,7 +29,7 @@ export async function saveNewAddress (address, id, token) {
       ...address,
       user: id
     }
-    const { data } = await axios.post(`api/users/addresses/`, body, {
+    const { data } = await axios.post(`http://167.71.221.189/api/users/addresses/`, body, {
       headers: {
         'Content-Type' : 'application/json',
         Authorization : `Bearer ${token}`
